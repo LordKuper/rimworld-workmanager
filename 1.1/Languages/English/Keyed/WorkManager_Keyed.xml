@@ -2,6 +2,8 @@
 
 <LanguageData>
   <WorkManager>Work Manager</WorkManager>
+  <WorkManager.UpdateInterval>Update frequency</WorkManager.UpdateInterval>
+  <WorkManager.UpdateIntervalTooltip>How many times to update work priorities per in-game hour</WorkManager.UpdateIntervalTooltip>
   <WorkManager.AssignMultipleDoctors>Assign multiple doctors</WorkManager.AssignMultipleDoctors>
   <WorkManager.AssignMultipleDoctorsTooltip>Assign multiple doctors when there are multiple downed pawns</WorkManager.AssignMultipleDoctorsTooltip>
   <WorkManager.AssignAllWorkTypes>Assign all work types</WorkManager.AssignAllWorkTypes>

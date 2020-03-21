@@ -23,7 +23,7 @@ namespace WorkManager
             DefDatabase<WorkTypeDef>.GetNamed("Hauling"), DefDatabase<WorkTypeDef>.GetNamed("Cleaning")
         };
 
-        private int _currentHour = -1;
+        private float _currentTime = -1;
 
         public WorkPriorityUpdater(Map map) : base(map) { }
 
@@ -282,14 +282,13 @@ namespace WorkManager
         public override void MapComponentTick()
         {
             base.MapComponentTick();
-            if ((Find.TickManager.TicksGame + GetHashCode()) % 60 != 0 || GenLocalDate.HourOfDay(map) == _currentHour)
-            {
-                return;
-            }
+            var hourFloat = GenLocalDate.HourFloat(map);
+            if ((Find.TickManager.TicksGame + GetHashCode()) % 60 != 0 ||
+                Math.Abs(hourFloat - _currentTime) < 1f / Settings.UpdateFrequency) { return; }
             #if DEBUG
-            Log.Message("----- Work Manager: Updating work priorities... -----", true);
+            Log.Message($"----- Work Manager: Updating work priorities... (hour = {hourFloat}) -----", true);
             #endif
-            _currentHour = GenLocalDate.HourOfDay(map);
+            _currentTime = hourFloat;
             AssignWorkPriorities();
             #if DEBUG
             Log.Message("----------------------------------------------------", true);
