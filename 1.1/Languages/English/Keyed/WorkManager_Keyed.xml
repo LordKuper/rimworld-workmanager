@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<LanguageData>
+  <WorkManager>Work Manager</WorkManager>
+  <WorkManager.AssignMultipleDoctors>Assign multiple doctors</WorkManager.AssignMultipleDoctors>
+  <WorkManager.AssignMultipleDoctorsTooltip>Assign multiple doctors when there are multiple downed pawns</WorkManager.AssignMultipleDoctorsTooltip>
+  <WorkManager.AssignAllWorkTypes>Assign all work types</WorkManager.AssignAllWorkTypes>
+  <WorkManager.AssignAllWorkTypesTooltip>Assign every pawn all leftover work types with minimum priority to prevent idling</WorkManager.AssignAllWorkTypesTooltip>
+</LanguageData>
