@@ -351,11 +351,13 @@ namespace WorkManager
                 foreach (var workType in _commonWorkTypes) { pawn.workSettings.SetPriority(workType, 1); }
                 if (Settings.AllHaulers)
                 {
-                    pawn.workSettings.SetPriority(DefDatabase<WorkTypeDef>.GetNamed("Hauling"), 4);
+                    pawn.workSettings.SetPriority(DefDatabase<WorkTypeDef>.GetNamed("Hauling"),
+                        Settings.AssignAllWorkTypes ? 3 : 4);
                 }
                 if (Settings.AllCleaners)
                 {
-                    pawn.workSettings.SetPriority(DefDatabase<WorkTypeDef>.GetNamed("Cleaning"), 4);
+                    pawn.workSettings.SetPriority(DefDatabase<WorkTypeDef>.GetNamed("Cleaning"),
+                        Settings.AssignAllWorkTypes ? 3 : 4);
                 }
             }
         }
