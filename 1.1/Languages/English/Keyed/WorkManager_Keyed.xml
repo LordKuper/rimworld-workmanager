@@ -8,4 +8,8 @@
   <WorkManager.AssignMultipleDoctorsTooltip>Assign multiple doctors when there are multiple downed pawns</WorkManager.AssignMultipleDoctorsTooltip>
   <WorkManager.AssignAllWorkTypes>Assign all work types</WorkManager.AssignAllWorkTypes>
   <WorkManager.AssignAllWorkTypesTooltip>Assign every pawn all leftover work types with minimum priority to prevent idling</WorkManager.AssignAllWorkTypesTooltip>
+  <WorkManager.AllHaulers>Everyone is a hauler</WorkManager.AllHaulers>
+  <WorkManager.AllHaulersTooltip>Assign hauling to every pawn</WorkManager.AllHaulersTooltip>
+  <WorkManager.AllCleaners>Everyone is a cleaner</WorkManager.AllCleaners>
+  <WorkManager.AllCleanersTooltip>Assign cleaning to every pawn</WorkManager.AllCleanersTooltip>
 </LanguageData>

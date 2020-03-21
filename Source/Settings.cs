@@ -7,10 +7,11 @@ namespace WorkManager
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public class Settings : ModSettings
     {
-        public static int UpdateFrequency = 1;
-        private static string _updateFrequencyBuffer = UpdateFrequency.ToString();
-        public static bool AssignAllWorkTypes = true;
+        public static bool AllCleaners = true;
+        public static bool AllHaulers = true;
+        public static bool AssignAllWorkTypes;
         public static bool AssignMultipleDoctors = true;
+        public static int UpdateFrequency = 1;
 
         public static void DoWindowContents(Rect rect)
         {
@@ -24,20 +25,28 @@ namespace WorkManager
             TooltipHandler.TipRegion(optionRect, (string) "WorkManager.UpdateIntervalTooltip".Translate());
             Widgets.DrawHighlightIfMouseover(optionRect);
             Widgets.Label(labelRect, (string) "WorkManager.UpdateInterval".Translate());
-            Widgets.TextFieldNumeric(fieldRect, ref UpdateFrequency, ref _updateFrequencyBuffer, 1, 10);
+            var updateFrequencyBuffer = UpdateFrequency.ToString();
+            Widgets.TextFieldNumeric(fieldRect, ref UpdateFrequency, ref updateFrequencyBuffer, 1, 10);
             options.Gap(options.verticalSpacing);
             options.CheckboxLabeled("WorkManager.AssignMultipleDoctors".Translate(), ref AssignMultipleDoctors,
                 "WorkManager.AssignMultipleDoctorsTooltip".Translate());
             options.CheckboxLabeled("WorkManager.AssignAllWorkTypes".Translate(), ref AssignAllWorkTypes,
                 "WorkManager.AssignAllWorkTypesTooltip".Translate());
+            options.CheckboxLabeled("WorkManager.AllHaulers".Translate(), ref AllHaulers,
+                "WorkManager.AllHaulersTooltip".Translate());
+            options.CheckboxLabeled("WorkManager.AllCleaners".Translate(), ref AllCleaners,
+                "WorkManager.AllCleanersTooltip".Translate());
             options.End();
         }
 
         public override void ExposeData()
         {
+            base.ExposeData();
             Scribe_Values.Look(ref UpdateFrequency, "UpdateFrequency", 1);
             Scribe_Values.Look(ref AssignMultipleDoctors, "AssignMultipleDoctors", true);
-            Scribe_Values.Look(ref AssignAllWorkTypes, "AssignAllWorkTypes", true);
+            Scribe_Values.Look(ref AssignAllWorkTypes, "AssignAllWorkTypes");
+            Scribe_Values.Look(ref AllHaulers, "AllHaulers", true);
+            Scribe_Values.Look(ref AllCleaners, "AllCleaners", true);
         }
     }
 }

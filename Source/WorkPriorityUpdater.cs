@@ -48,6 +48,24 @@ namespace WorkManager
                 pawn.workSettings.SetPriority(WorkTypeDefOf.Doctor, 1);
                 doctorCount++;
             }
+            if (doctorCount == 1)
+            {
+                var doctor = doctors.First(o => o.workSettings.GetPriority(WorkTypeDefOf.Doctor) > 0);
+                if (doctor.health.HasHediffsNeedingTend() || doctor.health.hediffSet.HasTendableInjury() ||
+                    doctor.health.hediffSet.HasTendableHediff())
+                {
+                    var pawn = doctors.OrderByDescending(p => p.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Doctor))
+                        .FirstOrDefault(p => p.workSettings.GetPriority(WorkTypeDefOf.Doctor) == 0);
+                    if (pawn != null)
+                    {
+                        #if DEBUG
+                        Log.Message($"Work Manager: Assigning '{doctor.LabelShort}' as a doctor", true);
+                        #endif
+                        pawn.workSettings.SetPriority(WorkTypeDefOf.Doctor, 1);
+                        doctorCount++;
+                    }
+                }
+            }
             if (Settings.AssignMultipleDoctors)
             {
                 {
@@ -89,13 +107,29 @@ namespace WorkManager
             #if DEBUG
             Log.Message($"Work Manager: Max hunting skill value = '{maxSkillValue}'", true);
             #endif
-            foreach (var pawn in hunters.Where(pawn =>
-                pawn.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Hunting) >= maxSkillValue))
+            foreach (var pawn in hunters)
             {
-                #if DEBUG
-                Log.Message($"Work Manager: Assigning '{pawn.LabelShort}' as a hunter", true);
-                #endif
-                pawn.workSettings.SetPriority(WorkTypeDefOf.Hunting, 1);
+                if (pawn.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Hunting) >= maxSkillValue)
+                {
+                    #if DEBUG
+                Log.Message($"Work Manager: Assigning '{pawn.LabelShort}' as a hunter with priority 1", true);
+                    #endif
+                    pawn.workSettings.SetPriority(WorkTypeDefOf.Hunting, 1);
+                }
+                else if (pawn.skills.MaxPassionOfRelevantSkillsFor(WorkTypeDefOf.Hunting) == Passion.Major)
+                {
+                    #if DEBUG
+                Log.Message($"Work Manager: Assigning '{pawn.LabelShort}' as a hunter with priority 2", true);
+                    #endif
+                    pawn.workSettings.SetPriority(WorkTypeDefOf.Hunting, 2);
+                }
+                else if (pawn.skills.MaxPassionOfRelevantSkillsFor(WorkTypeDefOf.Hunting) == Passion.Minor)
+                {
+                    #if DEBUG
+                Log.Message($"Work Manager: Assigning '{pawn.LabelShort}' as a hunter with priority 3", true);
+                    #endif
+                    pawn.workSettings.SetPriority(WorkTypeDefOf.Hunting, 3);
+                }
             }
         }
 
@@ -132,6 +166,16 @@ namespace WorkManager
                 foreach (var workType in leftoverWorkTypes)
                 {
                     var pawn = pawns.OrderBy(p => workTypes.Count(w => p.workSettings.GetPriority(w) > 0)).First();
+                    #if DEBUG
+                    Log.Message(
+                        $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {priority}",
+                        true);
+                    #endif
+                    pawn.workSettings.SetPriority(workType, priority);
+                }
+                foreach (var pawn in pawns.Where(p => workTypes.Count(w => p.workSettings.WorkIsActive(w)) == 0))
+                {
+                    var workType = workTypes.OrderBy(w => pawns.Count(p => p.workSettings.WorkIsActive(w))).First();
                     #if DEBUG
                     Log.Message(
                         $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {priority}",
@@ -256,7 +300,7 @@ namespace WorkManager
             foreach (var pawn in pawns)
             {
                 var workTypes = DefDatabase<WorkTypeDef>.AllDefsListForReading.Where(o =>
-                    !_commonWorkTypes.Contains(o) && o != WorkTypeDefOf.Doctor);
+                    !_commonWorkTypes.Contains(o) && o != WorkTypeDefOf.Doctor && o != WorkTypeDefOf.Hunting);
                 foreach (var workType in workTypes)
                 {
                     pawn.workSettings.SetPriority(workType, _mentalWorkTypes.Contains(workType) ? 2 : 3);
@@ -305,6 +349,14 @@ namespace WorkManager
                 pawn.workSettings.DisableAll();
                 if (pawn.Dead || pawn.Downed) { continue; }
                 foreach (var workType in _commonWorkTypes) { pawn.workSettings.SetPriority(workType, 1); }
+                if (Settings.AllHaulers)
+                {
+                    pawn.workSettings.SetPriority(DefDatabase<WorkTypeDef>.GetNamed("Hauling"), 4);
+                }
+                if (Settings.AllCleaners)
+                {
+                    pawn.workSettings.SetPriority(DefDatabase<WorkTypeDef>.GetNamed("Cleaning"), 4);
+                }
             }
         }
     }
