@@ -381,7 +381,10 @@ namespace WorkManager
                 #endif
                 pawn.workSettings.DisableAll();
                 if (pawn.Dead || pawn.Downed) { continue; }
-                foreach (var workType in _commonWorkTypes) { pawn.workSettings.SetPriority(workType, 1); }
+                foreach (var workType in _commonWorkTypes.Where(w => !pawn.WorkTypeIsDisabled(w)))
+                {
+                    pawn.workSettings.SetPriority(workType, 1);
+                }
             }
         }
     }
