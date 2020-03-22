@@ -23,6 +23,7 @@ namespace WorkManager
             DefDatabase<WorkTypeDef>.GetNamed("Hauling"), DefDatabase<WorkTypeDef>.GetNamed("Cleaning")
         };
 
+        private int _currentDay = -1;
         private float _currentTime = -1;
 
         public WorkPriorityUpdater(Map map) : base(map) { }
@@ -112,21 +113,21 @@ namespace WorkManager
                 if (pawn.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Hunting) >= maxSkillValue)
                 {
                     #if DEBUG
-                Log.Message($"Work Manager: Assigning '{pawn.LabelShort}' as a hunter with priority 1", true);
+                    Log.Message($"Work Manager: Assigning '{pawn.LabelShort}' as a hunter with priority 1", true);
                     #endif
                     pawn.workSettings.SetPriority(WorkTypeDefOf.Hunting, 1);
                 }
                 else if (pawn.skills.MaxPassionOfRelevantSkillsFor(WorkTypeDefOf.Hunting) == Passion.Major)
                 {
                     #if DEBUG
-                Log.Message($"Work Manager: Assigning '{pawn.LabelShort}' as a hunter with priority 2", true);
+                    Log.Message($"Work Manager: Assigning '{pawn.LabelShort}' as a hunter with priority 2", true);
                     #endif
                     pawn.workSettings.SetPriority(WorkTypeDefOf.Hunting, 2);
                 }
                 else if (pawn.skills.MaxPassionOfRelevantSkillsFor(WorkTypeDefOf.Hunting) == Passion.Minor)
                 {
                     #if DEBUG
-                Log.Message($"Work Manager: Assigning '{pawn.LabelShort}' as a hunter with priority 3", true);
+                    Log.Message($"Work Manager: Assigning '{pawn.LabelShort}' as a hunter with priority 3", true);
                     #endif
                     pawn.workSettings.SetPriority(WorkTypeDefOf.Hunting, 3);
                 }
@@ -143,7 +144,6 @@ namespace WorkManager
             if (!pawns.Any()) { return; }
             var workTypes = DefDatabase<WorkTypeDef>.AllDefsListForReading.Where(o =>
                 !_commonWorkTypes.Contains(o) && o != WorkTypeDefOf.Doctor && o != WorkTypeDefOf.Hunting).ToList();
-            const int priority = 4;
             if (Settings.AssignAllWorkTypes)
             {
                 foreach (var pawn in pawns)
@@ -153,10 +153,10 @@ namespace WorkManager
                     {
                         #if DEBUG
                         Log.Message(
-                            $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {priority}",
+                            $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {4}",
                             true);
                         #endif
-                        pawn.workSettings.SetPriority(workType, priority);
+                        pawn.workSettings.SetPriority(workType, 4);
                     }
                 }
             }
@@ -165,23 +165,50 @@ namespace WorkManager
                 var leftoverWorkTypes = workTypes.Where(w => !pawns.Any(p => p.workSettings.GetPriority(w) > 0));
                 foreach (var workType in leftoverWorkTypes)
                 {
-                    var pawn = pawns.OrderBy(p => workTypes.Count(w => p.workSettings.GetPriority(w) > 0)).First();
-                    #if DEBUG
-                    Log.Message(
-                        $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {priority}",
-                        true);
-                    #endif
-                    pawn.workSettings.SetPriority(workType, priority);
+                    var pawn = pawns.Where(p => !p.WorkTypeIsDisabled(workType))
+                        .OrderBy(p => workTypes.Count(w => p.workSettings.GetPriority(w) > 0)).FirstOrDefault();
+                    if (pawn != null)
+                    {
+                        #if DEBUG
+                        Log.Message(
+                            $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {1}",
+                            true);
+                        #endif
+                        pawn.workSettings.SetPriority(workType, 1);
+                    }
                 }
                 foreach (var pawn in pawns.Where(p => workTypes.Count(w => p.workSettings.WorkIsActive(w)) == 0))
                 {
-                    var workType = workTypes.OrderBy(w => pawns.Count(p => p.workSettings.WorkIsActive(w))).First();
-                    #if DEBUG
-                    Log.Message(
-                        $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {priority}",
-                        true);
-                    #endif
-                    pawn.workSettings.SetPriority(workType, priority);
+                    var workType = workTypes.Where(w => !pawn.WorkTypeIsDisabled(w))
+                        .OrderBy(w => pawns.Count(p => p.workSettings.WorkIsActive(w))).FirstOrDefault();
+                    if (workType != null)
+                    {
+                        #if DEBUG
+                        Log.Message(
+                            $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {1}",
+                            true);
+                        #endif
+                        pawn.workSettings.SetPriority(workType, 1);
+                    }
+                }
+            }
+            foreach (var pawn in pawns)
+            {
+                if (Settings.AllHaulers)
+                {
+                    var hauling = DefDatabase<WorkTypeDef>.GetNamed("Hauling");
+                    if (!pawn.WorkTypeIsDisabled(hauling) && !pawn.workSettings.WorkIsActive(hauling))
+                    {
+                        pawn.workSettings.SetPriority(hauling, Settings.AssignAllWorkTypes ? 3 : 4);
+                    }
+                }
+                if (Settings.AllCleaners)
+                {
+                    var cleaning = DefDatabase<WorkTypeDef>.GetNamed("Cleaning");
+                    if (!pawn.WorkTypeIsDisabled(cleaning) && !pawn.workSettings.WorkIsActive(cleaning))
+                    {
+                        pawn.workSettings.SetPriority(cleaning, Settings.AssignAllWorkTypes ? 3 : 4);
+                    }
                 }
             }
             #if DEBUG
@@ -247,9 +274,11 @@ namespace WorkManager
             const int priority = 1;
             foreach (var workType in workTypes)
             {
+                var relevantPawns = pawns.Where(p => !p.WorkTypeIsDisabled(workType)).ToList();
                 var maxSkillValue =
-                    (int) Math.Floor(pawns.Max(pawn => pawn.skills.AverageOfRelevantSkillsFor(workType)));
-                foreach (var pawn in pawns.Where(o => o.skills.AverageOfRelevantSkillsFor(workType) >= maxSkillValue))
+                    (int) Math.Floor(relevantPawns.Max(pawn => pawn.skills.AverageOfRelevantSkillsFor(workType)));
+                foreach (var pawn in relevantPawns.Where(o =>
+                    o.skills.AverageOfRelevantSkillsFor(workType) >= maxSkillValue))
                 {
                     #if DEBUG
                     Log.Message(
@@ -299,8 +328,9 @@ namespace WorkManager
                 pawn => !pawn.Dead && !pawn.Downed && pawn.InMentalState);
             foreach (var pawn in pawns)
             {
-                var workTypes = DefDatabase<WorkTypeDef>.AllDefsListForReading.Where(o =>
-                    !_commonWorkTypes.Contains(o) && o != WorkTypeDefOf.Doctor && o != WorkTypeDefOf.Hunting);
+                var workTypes = DefDatabase<WorkTypeDef>.AllDefsListForReading.Where(w =>
+                    !_commonWorkTypes.Contains(w) && w != WorkTypeDefOf.Doctor && w != WorkTypeDefOf.Hunting &&
+                    !pawn.WorkTypeIsDisabled(w));
                 foreach (var workType in workTypes)
                 {
                     pawn.workSettings.SetPriority(workType, _mentalWorkTypes.Contains(workType) ? 2 : 3);
@@ -326,12 +356,15 @@ namespace WorkManager
         public override void MapComponentTick()
         {
             base.MapComponentTick();
+            var day = GenLocalDate.DayOfYear(map);
             var hourFloat = GenLocalDate.HourFloat(map);
-            if ((Find.TickManager.TicksGame + GetHashCode()) % 60 != 0 ||
-                Math.Abs(hourFloat - _currentTime) < 1f / Settings.UpdateFrequency) { return; }
+            if ((Find.TickManager.TicksGame + GetHashCode()) % 60 != 0 || Math.Abs(day - _currentDay) * 24 +
+                Math.Abs(hourFloat - _currentTime) < 24f / Settings.UpdateFrequency) { return; }
             #if DEBUG
-            Log.Message($"----- Work Manager: Updating work priorities... (hour = {hourFloat}) -----", true);
+            Log.Message($"----- Work Manager: Updating work priorities... (day = {day}, hour = {hourFloat}) -----",
+                true);
             #endif
+            _currentDay = day;
             _currentTime = hourFloat;
             AssignWorkPriorities();
             #if DEBUG
@@ -349,16 +382,6 @@ namespace WorkManager
                 pawn.workSettings.DisableAll();
                 if (pawn.Dead || pawn.Downed) { continue; }
                 foreach (var workType in _commonWorkTypes) { pawn.workSettings.SetPriority(workType, 1); }
-                if (Settings.AllHaulers)
-                {
-                    pawn.workSettings.SetPriority(DefDatabase<WorkTypeDef>.GetNamed("Hauling"),
-                        Settings.AssignAllWorkTypes ? 3 : 4);
-                }
-                if (Settings.AllCleaners)
-                {
-                    pawn.workSettings.SetPriority(DefDatabase<WorkTypeDef>.GetNamed("Cleaning"),
-                        Settings.AssignAllWorkTypes ? 3 : 4);
-                }
             }
         }
     }

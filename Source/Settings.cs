@@ -11,7 +11,7 @@ namespace WorkManager
         public static bool AllHaulers = true;
         public static bool AssignAllWorkTypes;
         public static bool AssignMultipleDoctors = true;
-        public static int UpdateFrequency = 1;
+        public static int UpdateFrequency = 24;
 
         public static void DoWindowContents(Rect rect)
         {
@@ -26,7 +26,7 @@ namespace WorkManager
             Widgets.DrawHighlightIfMouseover(optionRect);
             Widgets.Label(labelRect, (string) "WorkManager.UpdateInterval".Translate());
             var updateFrequencyBuffer = UpdateFrequency.ToString();
-            Widgets.TextFieldNumeric(fieldRect, ref UpdateFrequency, ref updateFrequencyBuffer, 1, 10);
+            Widgets.TextFieldNumeric(fieldRect, ref UpdateFrequency, ref updateFrequencyBuffer, 1, 120);
             options.Gap(options.verticalSpacing);
             options.CheckboxLabeled("WorkManager.AssignMultipleDoctors".Translate(), ref AssignMultipleDoctors,
                 "WorkManager.AssignMultipleDoctorsTooltip".Translate());
@@ -42,7 +42,7 @@ namespace WorkManager
         public override void ExposeData()
         {
             base.ExposeData();
-            Scribe_Values.Look(ref UpdateFrequency, "UpdateFrequency", 1);
+            Scribe_Values.Look(ref UpdateFrequency, "UpdateFrequency", 24);
             Scribe_Values.Look(ref AssignMultipleDoctors, "AssignMultipleDoctors", true);
             Scribe_Values.Look(ref AssignAllWorkTypes, "AssignAllWorkTypes");
             Scribe_Values.Look(ref AllHaulers, "AllHaulers", true);
