@@ -22,20 +22,19 @@ namespace WorkManager
             var labelRect = optionRect;
             fieldRect.xMin = optionRect.xMax - optionRect.width * (1 / 8f);
             labelRect.xMax = fieldRect.xMin;
-            TooltipHandler.TipRegion(optionRect, (string) "WorkManager.UpdateIntervalTooltip".Translate());
+            TooltipHandler.TipRegion(optionRect, Resources.Strings.UpdateIntervalTooltip);
             Widgets.DrawHighlightIfMouseover(optionRect);
-            Widgets.Label(labelRect, (string) "WorkManager.UpdateInterval".Translate());
+            Widgets.Label(labelRect, Resources.Strings.UpdateInterval);
             var updateFrequencyBuffer = UpdateFrequency.ToString();
             Widgets.TextFieldNumeric(fieldRect, ref UpdateFrequency, ref updateFrequencyBuffer, 1, 120);
             options.Gap(options.verticalSpacing);
-            options.CheckboxLabeled("WorkManager.AssignMultipleDoctors".Translate(), ref AssignMultipleDoctors,
-                "WorkManager.AssignMultipleDoctorsTooltip".Translate());
-            options.CheckboxLabeled("WorkManager.AssignAllWorkTypes".Translate(), ref AssignAllWorkTypes,
-                "WorkManager.AssignAllWorkTypesTooltip".Translate());
-            options.CheckboxLabeled("WorkManager.AllHaulers".Translate(), ref AllHaulers,
-                "WorkManager.AllHaulersTooltip".Translate());
-            options.CheckboxLabeled("WorkManager.AllCleaners".Translate(), ref AllCleaners,
-                "WorkManager.AllCleanersTooltip".Translate());
+            options.CheckboxLabeled(Resources.Strings.AssignMultipleDoctors, ref AssignMultipleDoctors,
+                Resources.Strings.AssignMultipleDoctorsTooltip);
+            options.CheckboxLabeled(Resources.Strings.AssignAllWorkTypes, ref AssignAllWorkTypes,
+                Resources.Strings.AssignAllWorkTypesTooltip);
+            options.CheckboxLabeled(Resources.Strings.AllHaulers, ref AllHaulers, Resources.Strings.AllHaulersTooltip);
+            options.CheckboxLabeled(Resources.Strings.AllCleaners, ref AllCleaners,
+                Resources.Strings.AllCleanersTooltip);
             options.End();
         }
 

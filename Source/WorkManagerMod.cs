@@ -23,7 +23,7 @@ namespace WorkManager
 
         public override string SettingsCategory()
         {
-            return "WorkManager".Translate();
+            return Resources.Strings.WorkManager;
         }
     }
 }
