@@ -69,6 +69,7 @@
     <Compile Include="WorkManagerMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WorkManagerGameComponent.cs" />
+    <Compile Include="WorkPriority.cs" />
     <Compile Include="WorkPriorityUpdater.cs" />
   </ItemGroup>
   <ItemGroup>
