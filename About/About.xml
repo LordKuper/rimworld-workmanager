@@ -16,6 +16,8 @@
   </modDependencies>
   <loadAfter>
     <li>brrainz.harmony</li>
+    <li>fluffy.worktab</li>
+    <li>notfood.MoreThanCapable</li>
   </loadAfter>
   <description>Automatic work priority management mod</description>
 </ModMetaData>

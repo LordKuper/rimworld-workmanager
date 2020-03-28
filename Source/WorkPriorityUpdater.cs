@@ -172,6 +172,24 @@ namespace WorkManager
                     SetPawnWorkTypePriority(pawn, WorkTypeDefOf.Hunting, 3);
                 }
             }
+            if (hunters.Count(p => p.workSettings.WorkIsActive(WorkTypeDefOf.Hunting)) == 0)
+            {
+                var pawn = _capablePawns.Intersect(_managedPawns)
+                    .Where(p => !p.WorkTypeIsDisabled(WorkTypeDefOf.Hunting))
+                    .OrderBy(p => IsBadWork(p, WorkTypeDefOf.Hunting))
+                    .ThenByDescending(p => p.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Hunting)).FirstOrDefault();
+                {
+                    if (pawn != null)
+                    {
+                        #if DEBUG
+                        Log.Message(
+                            $"Work Manager: Setting {pawn.LabelShort}'s priority of '{WorkTypeDefOf.Hunting.labelShort}' to {1} (skill = {pawn.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Hunting)}, max = {maxSkillValue})",
+                            true);
+                        #endif
+                        SetPawnWorkTypePriority(pawn, WorkTypeDefOf.Hunting, 1);
+                    }
+                }
+            }
         }
 
         private void AssignLeftoverWorkTypes()
