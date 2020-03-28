@@ -7,15 +7,19 @@ using Verse;
 
 namespace WorkManager.Patches
 {
-    [HarmonyPatch(typeof(PawnColumnWorker_WorkPriority), nameof(PawnColumnWorker_WorkPriority.DoHeader))]
+    [HarmonyPatch(typeof(PawnColumnWorker_WorkPriority))]
     [UsedImplicitly]
-    public static class PawnColumnWorkerWorkPriorityHeaderContentPatch
+    public static class PawnColumnWorkerWorkPriorityPatch
     {
         [UsedImplicitly]
         [SuppressMessage("ReSharper", "InconsistentNaming")]
-        private static void Postfix(PawnColumnWorker_WorkPriority __instance, Rect rect)
+        [HarmonyPatch(nameof(PawnColumnWorker_WorkPriority.DoHeader))]
+        [HarmonyPostfix]
+        [SuppressMessage("ReSharper", "PossibleLossOfFraction")]
+        private static void DoHeaderPostfix(PawnColumnWorker_WorkPriority __instance, Rect rect)
         {
-            var buttonRect = new Rect(rect.center.x - 7, rect.y + 55, 16, 16);
+            const int iconSize = 16;
+            var buttonRect = new Rect(rect.center.x - iconSize / 2 + 1, rect.yMax - iconSize - 4, iconSize, iconSize);
             var component = Current.Game.GetComponent<WorkManagerGameComponent>();
             if (component.Enabled)
             {
@@ -29,6 +33,15 @@ namespace WorkManager.Patches
                 GUI.color = Color.white;
                 GUI.DrawTexture(buttonRect, Resources.Textures.WorkTypeToggleButtonInactive);
             }
+        }
+
+        [UsedImplicitly]
+        [SuppressMessage("ReSharper", "InconsistentNaming")]
+        [HarmonyPatch(nameof(PawnColumnWorker_WorkPriority.GetMinHeaderHeight))]
+        [HarmonyPostfix]
+        private static void GetMinHeaderHeightPostfix(ref int __result)
+        {
+            __result += 30;
         }
     }
 }

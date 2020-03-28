@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using JetBrains.Annotations;
 using RimWorld;
@@ -33,7 +34,7 @@ namespace WorkManager
 
         private static WorkManagerGameComponent WorkManager => Current.Game.GetComponent<WorkManagerGameComponent>();
 
-        private void ApplyPriorities()
+        private void ApplyWorkPriorities()
         {
             foreach (var pawnWorkPriority in _pawnWorkPriorities.Where(pawnWorkPriority =>
                 _managedPawns.Contains(pawnWorkPriority.Key)))
@@ -51,7 +52,10 @@ namespace WorkManager
             foreach (var pawn in _managedPawns.Intersect(_capablePawns))
             {
                 foreach (var workType in _managedWorkTypes.Intersect(_commonWorkTypes)
-                    .Where(w => !pawn.WorkTypeIsDisabled(w))) { SetPawnWorkTypePriority(pawn, workType, 1); }
+                    .Where(w => !pawn.WorkTypeIsDisabled(w) && !IsBadWork(pawn, w)))
+                {
+                    SetPawnWorkTypePriority(pawn, workType, 1);
+                }
             }
         }
 
@@ -67,13 +71,17 @@ namespace WorkManager
             Log.Message($"Work Manager: Max doctoring skill value = '{maxSkillValue}'", true);
             #endif
             foreach (var pawn in doctors.Intersect(_managedPawns).Where(p =>
-                !IsPawnWorkTypeActive(p, WorkTypeDefOf.Doctor) &&
-                p.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Doctor) >= maxSkillValue))
+                    !IsPawnWorkTypeActive(p, WorkTypeDefOf.Doctor) &&
+                    p.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Doctor) >= maxSkillValue)
+                .OrderBy(p => IsBadWork(p, WorkTypeDefOf.Doctor)))
             {
                 #if DEBUG
                 Log.Message($"Work Manager: Assigning '{pawn.LabelShort}' as a doctor", true);
                 #endif
-                SetPawnWorkTypePriority(pawn, WorkTypeDefOf.Doctor, 1);
+                if (doctorCount == 0 || !IsBadWork(pawn, WorkTypeDefOf.Doctor))
+                {
+                    SetPawnWorkTypePriority(pawn, WorkTypeDefOf.Doctor, 1);
+                }
                 doctorCount++;
             }
             if (doctorCount == 1)
@@ -138,8 +146,8 @@ namespace WorkManager
             #if DEBUG
             Log.Message($"Work Manager: Max hunting skill value = '{maxSkillValue}'", true);
             #endif
-            foreach (var pawn in hunters.Intersect(_managedPawns)
-                .OrderByDescending(p => p.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Hunting)))
+            foreach (var pawn in hunters.Intersect(_managedPawns).OrderBy(p => IsBadWork(p, WorkTypeDefOf.Hunting))
+                .ThenByDescending(p => p.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Hunting)))
             {
                 if (pawn.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Hunting) >= maxSkillValue ||
                     _capablePawns.Count(p => IsPawnWorkTypeActive(p, WorkTypeDefOf.Hunting)) == 0)
@@ -178,8 +186,9 @@ namespace WorkManager
             {
                 foreach (var pawn in _capablePawns.Intersect(_managedPawns))
                 {
-                    foreach (var workType in workTypes.Where(w =>
-                        !pawn.WorkTypeIsDisabled(w) && !IsPawnWorkTypeActive(pawn, w)))
+                    foreach (var workType in workTypes.Where(w => !IsBadWork(pawn, w) &&
+                                                                  !pawn.WorkTypeIsDisabled(w) &&
+                                                                  !IsPawnWorkTypeActive(pawn, w)))
                     {
                         #if DEBUG
                         Log.Message(
@@ -190,37 +199,33 @@ namespace WorkManager
                     }
                 }
             }
-            else
+            var leftoverWorkTypes = workTypes.Where(w => !_capablePawns.Any(p => IsPawnWorkTypeActive(p, w)));
+            foreach (var workType in leftoverWorkTypes)
             {
-                var leftoverWorkTypes = workTypes.Where(w => !_capablePawns.Any(p => IsPawnWorkTypeActive(p, w)));
-                foreach (var workType in leftoverWorkTypes)
+                var pawn = _capablePawns.Intersect(_managedPawns).Where(p => !p.WorkTypeIsDisabled(workType))
+                    .OrderBy(p => IsBadWork(p, workType)).ThenBy(p => workTypes.Count(w => IsPawnWorkTypeActive(p, w)))
+                    .FirstOrDefault();
+                if (pawn != null)
                 {
-                    var pawn = _capablePawns.Intersect(_managedPawns).Where(p => !p.WorkTypeIsDisabled(workType))
-                        .OrderBy(p => workTypes.Count(w => IsPawnWorkTypeActive(p, w))).FirstOrDefault();
-                    if (pawn != null)
-                    {
-                        #if DEBUG
-                        Log.Message(
-                            $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {1}",
-                            true);
-                        #endif
-                        SetPawnWorkTypePriority(pawn, workType, 1);
-                    }
+                    #if DEBUG
+                    Log.Message($"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {1}",
+                        true);
+                    #endif
+                    SetPawnWorkTypePriority(pawn, workType, 1);
                 }
-                foreach (var pawn in _capablePawns.Intersect(_managedPawns)
-                    .Where(p => workTypes.Count(w => IsPawnWorkTypeActive(p, w)) == 0))
+            }
+            foreach (var pawn in _capablePawns.Intersect(_managedPawns)
+                .Where(p => workTypes.Count(w => IsPawnWorkTypeActive(p, w)) == 0))
+            {
+                var workType = workTypes.Where(w => !pawn.WorkTypeIsDisabled(w)).OrderBy(w => IsBadWork(pawn, w))
+                    .ThenBy(w => _capablePawns.Count(p => IsPawnWorkTypeActive(p, w))).FirstOrDefault();
+                if (workType != null)
                 {
-                    var workType = workTypes.Where(w => !pawn.WorkTypeIsDisabled(w))
-                        .OrderBy(w => _capablePawns.Count(p => IsPawnWorkTypeActive(p, w))).FirstOrDefault();
-                    if (workType != null)
-                    {
-                        #if DEBUG
-                        Log.Message(
-                            $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {1}",
-                            true);
-                        #endif
-                        SetPawnWorkTypePriority(pawn, workType, 1);
-                    }
+                    #if DEBUG
+                    Log.Message($"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {1}",
+                        true);
+                    #endif
+                    SetPawnWorkTypePriority(pawn, workType, 1);
                 }
             }
             foreach (var pawn in _capablePawns.Intersect(_managedPawns))
@@ -229,7 +234,7 @@ namespace WorkManager
                 {
                     var hauling = DefDatabase<WorkTypeDef>.GetNamed("Hauling");
                     if (_managedWorkTypes.Contains(hauling) && !pawn.WorkTypeIsDisabled(hauling) &&
-                        !IsPawnWorkTypeActive(pawn, hauling))
+                        !IsBadWork(pawn, hauling) && !IsPawnWorkTypeActive(pawn, hauling))
                     {
                         SetPawnWorkTypePriority(pawn, hauling, Settings.AssignAllWorkTypes ? 3 : 4);
                     }
@@ -238,7 +243,7 @@ namespace WorkManager
                 {
                     var cleaning = DefDatabase<WorkTypeDef>.GetNamed("Cleaning");
                     if (_managedWorkTypes.Contains(cleaning) && !pawn.WorkTypeIsDisabled(cleaning) &&
-                        !IsPawnWorkTypeActive(pawn, cleaning))
+                        !IsBadWork(pawn, cleaning) && !IsPawnWorkTypeActive(pawn, cleaning))
                     {
                         SetPawnWorkTypePriority(pawn, cleaning, Settings.AssignAllWorkTypes ? 3 : 4);
                     }
@@ -305,10 +310,11 @@ namespace WorkManager
                 var relevantPawns = _capablePawns.Where(p => !p.WorkTypeIsDisabled(workType)).ToList();
                 var maxSkillValue =
                     (int) Math.Floor(relevantPawns.Max(p => p.skills.AverageOfRelevantSkillsFor(workType)));
-                foreach (var pawn in relevantPawns.Intersect(_managedPawns)
-                    .OrderByDescending(p => p.skills.AverageOfRelevantSkillsFor(workType)))
+                foreach (var pawn in relevantPawns.Intersect(_managedPawns).OrderBy(p => IsBadWork(p, workType))
+                    .ThenByDescending(p => p.skills.AverageOfRelevantSkillsFor(workType)))
                 {
-                    if (pawn.skills.AverageOfRelevantSkillsFor(workType) >= maxSkillValue ||
+                    if (!IsBadWork(pawn, workType) &&
+                        pawn.skills.AverageOfRelevantSkillsFor(workType) >= maxSkillValue ||
                         _capablePawns.Count(p => IsPawnWorkTypeActive(p, workType)) == 0)
                     {
                         #if DEBUG
@@ -338,8 +344,8 @@ namespace WorkManager
             const int priority = 4;
             foreach (var pawn in pawns)
             {
-                foreach (var workType in workTypes.Where(w =>
-                    !pawn.WorkTypeIsDisabled(w) && !IsPawnWorkTypeActive(pawn, w)))
+                foreach (var workType in workTypes.Where(w => !pawn.WorkTypeIsDisabled(w) &&
+                                                              !IsBadWork(pawn, w) && !IsPawnWorkTypeActive(pawn, w)))
                 {
                     #if DEBUG
                     Log.Message(
@@ -364,7 +370,14 @@ namespace WorkManager
             AssignWorkersByPassion();
             AssignLeftoverWorkTypes();
             AssignWorkForIdlePawns();
-            ApplyPriorities();
+            ApplyWorkPriorities();
+        }
+
+        [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]
+        private static bool IsBadWork(Pawn pawn, WorkTypeDef workType)
+        {
+            if (Settings.IsBadWorkMethod == null) { return false; }
+            return (bool) Settings.IsBadWorkMethod.Invoke(null, new object[] {pawn, workType});
         }
 
         private bool IsPawnWorkTypeActive(Pawn pawn, WorkTypeDef workType)

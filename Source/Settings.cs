@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using UnityEngine;
 using Verse;
 
@@ -11,6 +12,7 @@ namespace WorkManager
         public static bool AllHaulers = true;
         public static bool AssignAllWorkTypes;
         public static bool AssignMultipleDoctors = true;
+        internal static MethodInfo IsBadWorkMethod;
         public static int UpdateFrequency = 24;
 
         public static void DoWindowContents(Rect rect)

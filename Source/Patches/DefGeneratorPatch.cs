@@ -7,6 +7,7 @@ using WorkManager.DefOfs;
 namespace WorkManager.Patches
 {
     [HarmonyPatch(typeof(DefGenerator), nameof(DefGenerator.GenerateImpliedDefs_PreResolve))]
+    [HarmonyBefore("fluffy.worktab")]
     [UsedImplicitly]
     public static class DefGeneratorPatch
     {
