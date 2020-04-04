@@ -132,7 +132,7 @@ namespace WorkManager
         {
             if (WorkManager.DisabledWorkTypes.Contains(WorkTypeDefOf.Hunting)) { return; }
             var hunters = _capablePawns.Where(pawn =>
-                    !pawn.WorkTypeIsDisabled(WorkTypeDefOf.Hunting) &&
+                    !pawn.WorkTypeIsDisabled(WorkTypeDefOf.Hunting) && !IsBadWork(pawn, WorkTypeDefOf.Hunting) &&
                     !pawn.story.traits.HasTrait(TraitDefOf.Brawler) &&
                     (pawn.skills.GetSkill(SkillDefOf.Shooting).passion >
                      pawn.skills.GetSkill(SkillDefOf.Melee).passion ||
@@ -146,8 +146,8 @@ namespace WorkManager
             #if DEBUG
             Log.Message($"Work Manager: Max hunting skill value = '{maxSkillValue}'", true);
             #endif
-            foreach (var pawn in hunters.Intersect(_managedPawns).OrderBy(p => IsBadWork(p, WorkTypeDefOf.Hunting))
-                .ThenByDescending(p => p.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Hunting)))
+            foreach (var pawn in hunters.Intersect(_managedPawns)
+                .OrderByDescending(p => p.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Hunting)))
             {
                 if (pawn.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Hunting) >= maxSkillValue ||
                     _capablePawns.Count(p => IsPawnWorkTypeActive(p, WorkTypeDefOf.Hunting)) == 0)
@@ -282,7 +282,7 @@ namespace WorkManager
             {
                 foreach (var workType in _managedWorkTypes.Where(w =>
                     !_commonWorkTypes.Contains(w) && w != WorkTypeDefOf.Doctor && w != WorkTypeDefOf.Hunting &&
-                    !pawn.WorkTypeIsDisabled(w) && !IsPawnWorkTypeActive(pawn, w)))
+                    !pawn.WorkTypeIsDisabled(w) && !IsBadWork(pawn, w) && !IsPawnWorkTypeActive(pawn, w)))
                 {
                     int priority;
                     switch (pawn.skills.MaxPassionOfRelevantSkillsFor(workType))
@@ -291,7 +291,7 @@ namespace WorkManager
                             priority = 2;
                             #if DEBUG
                             Log.Message(
-                                $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {priority} (passion = {Passion.Major.ToString()})",
+                                $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {priority} (passion = {Passion.Major})",
                                 true);
                             #endif
                             SetPawnWorkTypePriority(pawn, workType, priority);
@@ -300,7 +300,7 @@ namespace WorkManager
                             priority = 3;
                             #if DEBUG
                             Log.Message(
-                                $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {priority} (passion = {Passion.Minor.ToString()})",
+                                $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {priority} (passion = {Passion.Minor})",
                                 true);
                             #endif
                             SetPawnWorkTypePriority(pawn, workType, priority);
