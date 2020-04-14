@@ -21,6 +21,8 @@ namespace WorkManager
             DefDatabase<WorkTypeDef>.GetNamed("PatientBedRest"), DefDatabase<WorkTypeDef>.GetNamed("BasicWorker")
         };
 
+        private readonly Dictionary<Pawn, DayTime> _idlePawns = new Dictionary<Pawn, DayTime>();
+
         private readonly HashSet<Pawn> _managedPawns = new HashSet<Pawn>();
         private readonly HashSet<WorkTypeDef> _managedWorkTypes = new HashSet<WorkTypeDef>();
 
@@ -353,9 +355,23 @@ namespace WorkManager
         {
             #if DEBUG
             Log.Message("-- Work Manager: Assigning work for idle pawns... --", true);
+            foreach (var idlePawn in _idlePawns)
+            {
+                Log.Message(
+                    $"{idlePawn.Key.LabelShort} is registered as idle ({idlePawn.Value.Day}, {idlePawn.Value.Hour:N1})",
+                    true);
+            }
             #endif
-            var pawns = _capablePawns.Intersect(_managedPawns).Where(pawn => !pawn.Drafted && pawn.mindState.IsIdle)
-                .ToList();
+            var noLongerIdlePawns = (from idlePawn in _idlePawns
+                let hoursPassed =
+                    _currentDay != idlePawn.Value.Day
+                        ? 24 + (_currentTime - idlePawn.Value.Hour)
+                        : _currentTime - idlePawn.Value.Hour
+                where hoursPassed > 12
+                select idlePawn.Key).ToList();
+            foreach (var pawn in noLongerIdlePawns) { _idlePawns.Remove(pawn); }
+            var pawns = _capablePawns.Intersect(_managedPawns)
+                .Where(p => _idlePawns.ContainsKey(p) || !p.Drafted && p.mindState.IsIdle).ToList();
             if (!pawns.Any()) { return; }
             var workTypes = _managedWorkTypes.Where(o =>
                 !_commonWorkTypes.Contains(o) && o != WorkTypeDefOf.Doctor && o != WorkTypeDefOf.Hunting).ToList();
@@ -367,11 +383,12 @@ namespace WorkManager
                 {
                     #if DEBUG
                     Log.Message(
-                        $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {priority}",
+                        $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {priority} (idle)",
                         true);
                     #endif
                     SetPawnWorkTypePriority(pawn, workType, priority);
                 }
+                if (!_idlePawns.ContainsKey(pawn)) { _idlePawns.Add(pawn, new DayTime(_currentDay, _currentTime)); }
             }
             #if DEBUG
             Log.Message("---------------------", true);

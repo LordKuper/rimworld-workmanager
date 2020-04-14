@@ -57,6 +57,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DayTime.cs" />
     <Compile Include="DefOfs\PawnColumnDefOf.cs" />
     <Compile Include="Patches\DefGeneratorPatch.cs" />
     <Compile Include="Patches\MainTabWindowWorkPatch.cs" />
