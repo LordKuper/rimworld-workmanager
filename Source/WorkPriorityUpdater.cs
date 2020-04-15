@@ -202,23 +202,6 @@ namespace WorkManager
             if (!_capablePawns.Any()) { return; }
             var workTypes = _managedWorkTypes.Where(o =>
                 !_commonWorkTypes.Contains(o) && o != WorkTypeDefOf.Doctor && o != WorkTypeDefOf.Hunting).ToList();
-            if (Settings.AssignAllWorkTypes)
-            {
-                foreach (var pawn in _capablePawns.Intersect(_managedPawns))
-                {
-                    foreach (var workType in workTypes.Where(w => !IsBadWork(pawn, w) &&
-                                                                  !pawn.WorkTypeIsDisabled(w) &&
-                                                                  !IsPawnWorkTypeActive(pawn, w)))
-                    {
-                        #if DEBUG
-                        Log.Message(
-                            $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {4}",
-                            true);
-                        #endif
-                        SetPawnWorkTypePriority(pawn, workType, 4);
-                    }
-                }
-            }
             var leftoverWorkTypes = workTypes.Where(w => !_capablePawns.Any(p => IsPawnWorkTypeActive(p, w)));
             foreach (var workType in leftoverWorkTypes)
             {
@@ -266,6 +249,23 @@ namespace WorkManager
                         !IsBadWork(pawn, cleaning) && !IsPawnWorkTypeActive(pawn, cleaning))
                     {
                         SetPawnWorkTypePriority(pawn, cleaning, Settings.AssignAllWorkTypes ? 3 : 4);
+                    }
+                }
+            }
+            if (Settings.AssignAllWorkTypes)
+            {
+                foreach (var pawn in _capablePawns.Intersect(_managedPawns))
+                {
+                    foreach (var workType in workTypes.Where(w => !IsBadWork(pawn, w) &&
+                                                                  !pawn.WorkTypeIsDisabled(w) &&
+                                                                  !IsPawnWorkTypeActive(pawn, w)))
+                    {
+                        #if DEBUG
+                        Log.Message(
+                            $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {4}",
+                            true);
+                        #endif
+                        SetPawnWorkTypePriority(pawn, workType, 4);
                     }
                 }
             }
