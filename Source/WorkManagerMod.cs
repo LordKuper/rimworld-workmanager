@@ -15,12 +15,13 @@ namespace WorkManager
             GetSettings<Settings>();
             var harmony = new Harmony("LordKuper.WorkManager");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
-            if (Harmony.HasAnyPatches("fluffy.worktab")) { ApplyWorkTabPatch(harmony); }
-            if (Harmony.HasAnyPatches("rimworld.moreThanCapable"))
+            if (LoadedModManager.RunningModsListForReading.Any(m => m.PackageId == "fluffy.worktab"))
             {
-                #if DEBUG
-                Log.Message("Work Manager: MoreThanCapable detected.", true);
-                #endif
+                ApplyWorkTabPatch(harmony);
+            }
+            if (LoadedModManager.RunningModsListForReading.Any(m => m.PackageId == "notfood.MoreThanCapable"))
+            {
+                if (Prefs.DevMode) { Log.Message("Work Manager: MoreThanCapable detected.", true); }
                 Settings.IsBadWorkMethod =
                     AccessTools.Method(AccessTools.TypeByName("MoreThanCapable.MoreThanCapableMod"), "IsBadWork");
             }
@@ -28,9 +29,7 @@ namespace WorkManager
 
         private void ApplyWorkTabPatch(Harmony harmony)
         {
-            #if DEBUG
-            Log.Message("Work Manager: Fluffy's WorkTab detected.", true);
-            #endif
+            if (Prefs.DevMode) { Log.Message("Work Manager: Fluffy's WorkTab detected.", true); }
             harmony.Patch(
                 AccessTools.Method(AccessTools.TypeByName("WorkTab.MainTabWindow_WorkTab"), "DoWindowContents"),
                 postfix: new HarmonyMethod(typeof(WorkTabPatch), nameof(WorkTabPatch.DoWindowContentsPostfix)));
@@ -39,6 +38,11 @@ namespace WorkManager
                 postfix: new HarmonyMethod(typeof(WorkTabPatch), nameof(WorkTabPatch.GetMinHeaderHeightPostfix)));
             harmony.Patch(AccessTools.Method(AccessTools.TypeByName("WorkTab.PawnColumnWorker_WorkType"), "DoHeader"),
                 new HarmonyMethod(typeof(WorkTabPatch), nameof(WorkTabPatch.DoHeaderPrefix)));
+            harmony.Patch(AccessTools.Method(AccessTools.TypeByName("WorkTab.PawnColumnWorker_WorkType"), "HandleInteractionsDetailed"),
+                new HarmonyMethod(typeof(WorkTabPatch), nameof(WorkTabPatch.HandleInteractionsDetailedPrefix)));
+
+            harmony.Patch(AccessTools.Method(AccessTools.TypeByName("WorkTab.PawnColumnWorker_WorkType"), "DrawWorkTypeBoxFor"),
+                postfix:new HarmonyMethod(typeof(WorkTabPatch), nameof(WorkTabPatch.DrawWorkTypeBoxForPostfix)));
         }
 
         public override void DoSettingsWindowContents(Rect inRect)

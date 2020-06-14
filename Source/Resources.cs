@@ -29,6 +29,8 @@ namespace WorkManager
 
             internal static readonly string UpdateInterval = "WorkManager.UpdateInterval".Translate();
             internal static readonly string UpdateIntervalTooltip = "WorkManager.UpdateIntervalTooltip".Translate();
+            internal static readonly string VerboseLogging = "WorkManager.VerboseLogging".Translate();
+            internal static readonly string VerboseLoggingTooltip = "WorkManager.VerboseLoggingTooltip".Translate();
             internal static readonly string WorkManager = "WorkManager".Translate();
             internal static readonly string WorkTypeDisableTooltip = "WorkManager.WorkTypeDisableTooltip".Translate();
             internal static readonly string WorkTypeEnableTooltip = "WorkManager.WorkTypeEnableTooltip".Translate();
@@ -51,6 +53,9 @@ namespace WorkManager
 
             internal static readonly Texture2D PawnToggleButtonInactive =
                 ContentFinder<Texture2D>.Get("work-manager-pawn-inactive");
+
+            internal static readonly Texture2D PawnWorkTypeDisabled =
+                ContentFinder<Texture2D>.Get("work-manager-pawn-work-type-off");
 
             internal static readonly Texture2D WorkTypeToggleButtonDisabled =
                 ContentFinder<Texture2D>.Get("work-manager-work-type-off");

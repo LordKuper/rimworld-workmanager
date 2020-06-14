@@ -1,9 +1,11 @@
-﻿using RimWorld;
+﻿using JetBrains.Annotations;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
 namespace WorkManager.PawnColumnWorkers
 {
+    [UsedImplicitly]
     public class AutoWorkPriorities : PawnColumnWorker
     {
         public override void DoCell(Rect rect, Pawn pawn, PawnTable table)
@@ -12,7 +14,7 @@ namespace WorkManager.PawnColumnWorkers
             var component = Current.Game.GetComponent<WorkManagerGameComponent>();
             if (component.Enabled)
             {
-                CustomWidgets.ButtonImageToggle(() => !component.DisabledPawns.Contains(pawn),
+                CustomWidgets.ButtonImageToggle(() => component.GetPawnEnabled(pawn),
                     newValue => component.SetPawnEnabled(pawn, newValue),
                     new Rect(rect.center.x - 8, rect.center.y - 8, 16, 16), Resources.Strings.PawnDisableTooltip,
                     Resources.Textures.PawnToggleButtonEnabled, Resources.Strings.PawnEnableTooltip,

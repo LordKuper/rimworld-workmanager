@@ -18,4 +18,6 @@
   <WorkManager.PawnDisableTooltip>Disable automatic work type priority assignment for pawn</WorkManager.PawnDisableTooltip>
   <WorkManager.WorkTypeEnableTooltip>Enable automatic priority assignment for work type</WorkManager.WorkTypeEnableTooltip>
   <WorkManager.WorkTypeDisableTooltip>Disable automatic priority assignment for work type</WorkManager.WorkTypeDisableTooltip>
+  <WorkManager.VerboseLogging>Verbose logging</WorkManager.VerboseLogging>
+  <WorkManager.VerboseLoggingTooltip>Show mod execution details in log (only works when development mode is enabled)</WorkManager.VerboseLoggingTooltip>
 </LanguageData>

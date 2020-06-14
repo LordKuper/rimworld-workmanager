@@ -61,9 +61,11 @@
     <Compile Include="DefOfs\PawnColumnDefOf.cs" />
     <Compile Include="Patches\DefGeneratorPatch.cs" />
     <Compile Include="Patches\MainTabWindowWorkPatch.cs" />
+    <Compile Include="Patches\WidgetsWorkPatch.cs" />
     <Compile Include="Patches\PawnColumnWorkerWorkPriorityPatch.cs" />
     <Compile Include="Patches\WorkTabPatch.cs" />
     <Compile Include="PawnColumnWorkers\AutoWorkPriorities.cs" />
+    <Compile Include="PawnWorkType.cs" />
     <Compile Include="Resources.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="CustomWidgets.cs" />

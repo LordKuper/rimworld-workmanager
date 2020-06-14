@@ -18,7 +18,7 @@ namespace WorkManager.Patches
             var component = Current.Game.GetComponent<WorkManagerGameComponent>();
             if (component.Enabled)
             {
-                CustomWidgets.ButtonImageToggle(() => !component.DisabledWorkTypes.Contains(__instance.def.workType),
+                CustomWidgets.ButtonImageToggle(() => component.GetWorkTypeEnabled(__instance.def.workType),
                     newValue => component.SetWorkTypeEnabled(__instance.def.workType, newValue), buttonRect,
                     Resources.Strings.WorkTypeDisableTooltip, Resources.Textures.WorkTypeToggleButtonEnabled,
                     Resources.Strings.WorkTypeEnableTooltip, Resources.Textures.WorkTypeToggleButtonDisabled);
@@ -42,9 +42,42 @@ namespace WorkManager.Patches
 
         [UsedImplicitly]
         [SuppressMessage("ReSharper", "InconsistentNaming")]
+        [SuppressMessage("ReSharper", "IdentifierTypo")]
+        public static void DrawWorkTypeBoxForPostfix(Rect box, Pawn pawn, WorkTypeDef worktype)
+        {
+            var component = Current.Game.GetComponent<WorkManagerGameComponent>();
+            if (!component.Enabled || !Find.PlaySettings.useWorkPriorities) { return; }
+            var enabled = component.GetPawnWorkTypeEnabled(pawn, worktype);
+            if (!enabled)
+            {
+                GUI.color = new Color(1f, 1f, 1f, 0.6f);
+                var position = box;
+                position.xMax = box.center.x;
+                position.yMax = box.center.y;
+                GUI.DrawTexture(position.ContractedBy(2f), Resources.Textures.PawnWorkTypeDisabled);
+            }
+            GUI.color = Color.white;
+        }
+
+        [UsedImplicitly]
+        [SuppressMessage("ReSharper", "InconsistentNaming")]
         public static void GetMinHeaderHeightPostfix(ref int __result)
         {
             __result += 30;
+        }
+
+        [UsedImplicitly]
+        [SuppressMessage("ReSharper", "InconsistentNaming")]
+        public static void HandleInteractionsDetailedPrefix(PawnColumnWorker __instance, Rect rect, Pawn pawn)
+        {
+            var component = Current.Game.GetComponent<WorkManagerGameComponent>();
+            if (!component.Enabled || !Find.PlaySettings.useWorkPriorities) { return; }
+            var workType = __instance.def.workType;
+            var enabled = component.GetPawnWorkTypeEnabled(pawn, workType);
+            if (Event.current.type == EventType.MouseDown && Mouse.IsOver(rect) && Event.current.button == 2)
+            {
+                component.SetPawnWorkTypeEnabled(pawn, workType, !enabled);
+            }
         }
     }
 }

@@ -14,6 +14,7 @@ namespace WorkManager
         public static bool AssignMultipleDoctors = true;
         internal static MethodInfo IsBadWorkMethod;
         public static int UpdateFrequency = 24;
+        public static bool VerboseLogging;
 
         public static void DoWindowContents(Rect rect)
         {
@@ -37,6 +38,8 @@ namespace WorkManager
             options.CheckboxLabeled(Resources.Strings.AllHaulers, ref AllHaulers, Resources.Strings.AllHaulersTooltip);
             options.CheckboxLabeled(Resources.Strings.AllCleaners, ref AllCleaners,
                 Resources.Strings.AllCleanersTooltip);
+            options.CheckboxLabeled(Resources.Strings.VerboseLogging, ref VerboseLogging,
+                Resources.Strings.VerboseLoggingTooltip);
             options.End();
         }
 
@@ -48,6 +51,7 @@ namespace WorkManager
             Scribe_Values.Look(ref AssignAllWorkTypes, "AssignAllWorkTypes");
             Scribe_Values.Look(ref AllHaulers, "AllHaulers", true);
             Scribe_Values.Look(ref AllCleaners, "AllCleaners", true);
+            Scribe_Values.Look(ref VerboseLogging, "VerboseLogging");
         }
     }
 }

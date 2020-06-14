@@ -23,7 +23,7 @@ namespace WorkManager.Patches
             var component = Current.Game.GetComponent<WorkManagerGameComponent>();
             if (component.Enabled)
             {
-                CustomWidgets.ButtonImageToggle(() => !component.DisabledWorkTypes.Contains(__instance.def.workType),
+                CustomWidgets.ButtonImageToggle(() => component.GetWorkTypeEnabled(__instance.def.workType),
                     newValue => component.SetWorkTypeEnabled(__instance.def.workType, newValue), buttonRect,
                     Resources.Strings.WorkTypeDisableTooltip, Resources.Textures.WorkTypeToggleButtonEnabled,
                     Resources.Strings.WorkTypeEnableTooltip, Resources.Textures.WorkTypeToggleButtonDisabled);
