@@ -12,7 +12,9 @@ namespace WorkManager
         public static bool AllHaulers = true;
         public static bool AssignAllWorkTypes;
         public static bool AssignMultipleDoctors = true;
+        public static bool AssignWorkToIdlePawns = true;
         internal static MethodInfo IsBadWorkMethod;
+        public static bool SpecialRulesForHunters = true;
         public static int UpdateFrequency = 24;
         public static bool VerboseLogging;
 
@@ -33,8 +35,12 @@ namespace WorkManager
             options.Gap(options.verticalSpacing);
             options.CheckboxLabeled(Resources.Strings.AssignMultipleDoctors, ref AssignMultipleDoctors,
                 Resources.Strings.AssignMultipleDoctorsTooltip);
+            options.CheckboxLabeled(Resources.Strings.SpecialRulesForHunters, ref SpecialRulesForHunters,
+                Resources.Strings.SpecialRulesForHuntersTooltip);
             options.CheckboxLabeled(Resources.Strings.AssignAllWorkTypes, ref AssignAllWorkTypes,
                 Resources.Strings.AssignAllWorkTypesTooltip);
+            options.CheckboxLabeled(Resources.Strings.AssignWorkToIdlePawns, ref AssignWorkToIdlePawns,
+                Resources.Strings.AssignWorkToIdlePawnsTooltip);
             options.CheckboxLabeled(Resources.Strings.AllHaulers, ref AllHaulers, Resources.Strings.AllHaulersTooltip);
             options.CheckboxLabeled(Resources.Strings.AllCleaners, ref AllCleaners,
                 Resources.Strings.AllCleanersTooltip);
@@ -46,12 +52,14 @@ namespace WorkManager
         public override void ExposeData()
         {
             base.ExposeData();
-            Scribe_Values.Look(ref UpdateFrequency, "UpdateFrequency", 24);
-            Scribe_Values.Look(ref AssignMultipleDoctors, "AssignMultipleDoctors", true);
-            Scribe_Values.Look(ref AssignAllWorkTypes, "AssignAllWorkTypes");
-            Scribe_Values.Look(ref AllHaulers, "AllHaulers", true);
-            Scribe_Values.Look(ref AllCleaners, "AllCleaners", true);
-            Scribe_Values.Look(ref VerboseLogging, "VerboseLogging");
+            Scribe_Values.Look(ref UpdateFrequency, nameof(UpdateFrequency), 24);
+            Scribe_Values.Look(ref AssignMultipleDoctors, nameof(AssignMultipleDoctors), true);
+            Scribe_Values.Look(ref SpecialRulesForHunters, nameof(SpecialRulesForHunters), true);
+            Scribe_Values.Look(ref AssignAllWorkTypes, nameof(AssignAllWorkTypes));
+            Scribe_Values.Look(ref AssignWorkToIdlePawns, nameof(AssignWorkToIdlePawns), true);
+            Scribe_Values.Look(ref AllHaulers, nameof(AllHaulers), true);
+            Scribe_Values.Look(ref AllCleaners, nameof(AllCleaners), true);
+            Scribe_Values.Look(ref VerboseLogging, nameof(VerboseLogging));
         }
     }
 }

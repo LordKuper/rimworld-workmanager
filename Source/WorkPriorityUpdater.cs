@@ -145,17 +145,19 @@ namespace WorkManager
 
         private void AssignHunters()
         {
+            if (!Settings.SpecialRulesForHunters) { return; }
             if (!WorkManager.GetWorkTypeEnabled(WorkTypeDefOf.Hunting)) { return; }
-            var hunters = _capablePawns.Where(pawn =>
-                    !pawn.WorkTypeIsDisabled(WorkTypeDefOf.Hunting) && !IsBadWork(pawn, WorkTypeDefOf.Hunting) &&
-                    !pawn.story.traits.HasTrait(TraitDefOf.Brawler) &&
-                    (pawn.skills.GetSkill(SkillDefOf.Shooting).LearnRateFactor() >
-                     pawn.skills.GetSkill(SkillDefOf.Melee).LearnRateFactor() ||
-                     Math.Abs(pawn.skills.GetSkill(SkillDefOf.Shooting).LearnRateFactor() -
-                              pawn.skills.GetSkill(SkillDefOf.Melee).LearnRateFactor()) < 0.1 &&
-                     pawn.skills.GetSkill(SkillDefOf.Shooting).Level >= pawn.skills.GetSkill(SkillDefOf.Melee).Level))
-                .ToList();
-            if (!hunters.Any()) { return; }
+            var hunters = _capablePawns.Where(pawn => !pawn.WorkTypeIsDisabled(WorkTypeDefOf.Hunting) &&
+                                                      !IsBadWork(pawn, WorkTypeDefOf.Hunting) &&
+                                                      !pawn.story.traits.HasTrait(TraitDefOf.Brawler) &&
+                                                      (pawn.skills.GetSkill(SkillDefOf.Shooting).LearnRateFactor() >
+                                                       pawn.skills.GetSkill(SkillDefOf.Melee).LearnRateFactor() ||
+                                                       Math.Abs(pawn.skills.GetSkill(SkillDefOf.Shooting)
+                                                                    .LearnRateFactor() -
+                                                                pawn.skills.GetSkill(SkillDefOf.Melee)
+                                                                    .LearnRateFactor()) < 0.1 &&
+                                                       pawn.skills.GetSkill(SkillDefOf.Shooting).Level >=
+                                                       pawn.skills.GetSkill(SkillDefOf.Melee).Level)).ToList();
             var maxSkillValue =
                 (int) Math.Floor(hunters.Max(pawn => pawn.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Hunting)));
             if (Prefs.DevMode && Settings.VerboseLogging)
@@ -193,7 +195,7 @@ namespace WorkManager
                     SetPawnWorkTypePriority(pawn, WorkTypeDefOf.Hunting, 3);
                 }
             }
-            if (hunters.Count(p => p.workSettings.WorkIsActive(WorkTypeDefOf.Hunting)) == 0)
+            if (_capablePawns.Count(p => IsPawnWorkTypeActive(p, WorkTypeDefOf.Hunting)) == 0)
             {
                 var pawn = _capablePawns.Intersect(_managedPawns)
                     .Except(WorkManager.DisabledPawnWorkTypes.Where(pwt => pwt.WorkType == WorkTypeDefOf.Hunting)
@@ -222,8 +224,12 @@ namespace WorkManager
                 Log.Message("-- Work Manager: Assigning leftover work types... --", true);
             }
             if (!_capablePawns.Any()) { return; }
-            var workTypes = _managedWorkTypes.Where(o =>
-                !_commonWorkTypes.Contains(o) && o != WorkTypeDefOf.Doctor && o != WorkTypeDefOf.Hunting).ToList();
+            var workTypes = _managedWorkTypes.Where(o => !_commonWorkTypes.Contains(o) && o != WorkTypeDefOf.Doctor)
+                .ToList();
+            if (Settings.SpecialRulesForHunters)
+            {
+                workTypes = workTypes.Except(new[] {WorkTypeDefOf.Hunting}).ToList();
+            }
             var leftoverWorkTypes = workTypes.Where(w => !_capablePawns.Any(p => IsPawnWorkTypeActive(p, w)));
             foreach (var workType in leftoverWorkTypes)
             {
@@ -320,12 +326,13 @@ namespace WorkManager
                 var maxRate = pawn.skills.skills.Max(s => s.LearnRateFactor());
                 var prioritySection = (maxRate - minRate) / 3;
                 if (prioritySection < 0.1) { continue; }
-                foreach (var workType in _managedWorkTypes
+                var workTypes = _managedWorkTypes
                     .Except(
                         WorkManager.DisabledPawnWorkTypes.Where(pwt => pwt.Pawn == pawn).Select(pwt => pwt.WorkType))
                     .Where(w => !_commonWorkTypes.Contains(w) && w != WorkTypeDefOf.Doctor &&
-                                w != WorkTypeDefOf.Hunting && !pawn.WorkTypeIsDisabled(w) && !IsBadWork(pawn, w) &&
-                                !IsPawnWorkTypeActive(pawn, w)))
+                                !pawn.WorkTypeIsDisabled(w) && !IsBadWork(pawn, w) && !IsPawnWorkTypeActive(pawn, w));
+                if (Settings.SpecialRulesForHunters) { workTypes = workTypes.Except(new[] {WorkTypeDefOf.Hunting}); }
+                foreach (var workType in workTypes)
                 {
                     var relevantSkills = workType.relevantSkills;
                     if (!relevantSkills.Any()) { continue; }
@@ -367,8 +374,8 @@ namespace WorkManager
             }
             if (!_capablePawns.Any()) { return; }
             var workTypes = _managedWorkTypes.Where(w =>
-                !_commonWorkTypes.Contains(w) && w != WorkTypeDefOf.Doctor && w != WorkTypeDefOf.Hunting &&
-                w.relevantSkills.Any());
+                !_commonWorkTypes.Contains(w) && w != WorkTypeDefOf.Doctor && w.relevantSkills.Any());
+            if (Settings.SpecialRulesForHunters) { workTypes = workTypes.Except(new[] {WorkTypeDefOf.Hunting}); }
             const int priority = 1;
             foreach (var workType in workTypes)
             {
@@ -397,8 +404,22 @@ namespace WorkManager
             if (Prefs.DevMode && Settings.VerboseLogging) { Log.Message("---------------------", true); }
         }
 
-        private void AssignWorkForIdlePawns()
+        private void AssignWorkPriorities()
         {
+            ResetWorkPriorities();
+            AssignCommonWork();
+            AssignDoctors();
+            AssignHunters();
+            AssignWorkersBySkill();
+            AssignWorkersByLearningRate();
+            AssignLeftoverWorkTypes();
+            AssignWorkToIdlePawns();
+            ApplyWorkPriorities();
+        }
+
+        private void AssignWorkToIdlePawns()
+        {
+            if (!Settings.AssignWorkToIdlePawns) { return; }
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
                 Log.Message("-- Work Manager: Assigning work for idle pawns... --", true);
@@ -420,8 +441,12 @@ namespace WorkManager
             var pawns = _capablePawns.Intersect(_managedPawns)
                 .Where(p => _idlePawns.ContainsKey(p) || !p.Drafted && p.mindState.IsIdle).ToList();
             if (!pawns.Any()) { return; }
-            var workTypes = _managedWorkTypes.Where(o =>
-                !_commonWorkTypes.Contains(o) && o != WorkTypeDefOf.Doctor && o != WorkTypeDefOf.Hunting).ToList();
+            var workTypes = _managedWorkTypes.Where(o => !_commonWorkTypes.Contains(o) && o != WorkTypeDefOf.Doctor)
+                .ToList();
+            if (Settings.SpecialRulesForHunters)
+            {
+                workTypes = workTypes.Except(new[] {WorkTypeDefOf.Hunting}).ToList();
+            }
             const int priority = 4;
             foreach (var pawn in pawns)
             {
@@ -441,19 +466,6 @@ namespace WorkManager
                 if (!_idlePawns.ContainsKey(pawn)) { _idlePawns.Add(pawn, new DayTime(_currentDay, _currentTime)); }
             }
             if (Prefs.DevMode && Settings.VerboseLogging) { Log.Message("---------------------", true); }
-        }
-
-        private void AssignWorkPriorities()
-        {
-            ResetWorkPriorities();
-            AssignCommonWork();
-            AssignDoctors();
-            AssignHunters();
-            AssignWorkersBySkill();
-            AssignWorkersByLearningRate();
-            AssignLeftoverWorkTypes();
-            AssignWorkForIdlePawns();
-            ApplyWorkPriorities();
         }
 
         [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]

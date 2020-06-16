@@ -4,6 +4,10 @@
   <WorkManager>Work Manager</WorkManager>
   <WorkManager.UpdateInterval>Update frequency (1-120)</WorkManager.UpdateInterval>
   <WorkManager.UpdateIntervalTooltip>How many times to update work priorities per in-game day</WorkManager.UpdateIntervalTooltip>
+  <WorkManager.AssignWorkToIdlePawns>Assign work to idle pawns</WorkManager.AssignWorkToIdlePawns>
+  <WorkManager.AssignWorkToIdlePawnsTooltip>Assign idle pawns all work types (except special ones) with lowest priority for 12 hours</WorkManager.AssignWorkToIdlePawnsTooltip>
+  <WorkManager.SpecialRulesForHunters>Special rules for hunters</WorkManager.SpecialRulesForHunters>
+  <WorkManager.SpecialRulesForHuntersTooltip>Use special rules to determine which pawns are considered hunters</WorkManager.SpecialRulesForHuntersTooltip>
   <WorkManager.AssignMultipleDoctors>Assign multiple doctors</WorkManager.AssignMultipleDoctors>
   <WorkManager.AssignMultipleDoctorsTooltip>Assign multiple doctors when there are multiple downed pawns</WorkManager.AssignMultipleDoctorsTooltip>
   <WorkManager.AssignAllWorkTypes>Assign all work types</WorkManager.AssignAllWorkTypes>
