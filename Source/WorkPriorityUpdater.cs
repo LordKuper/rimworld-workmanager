@@ -79,49 +79,45 @@ namespace WorkManager
             {
                 Log.Message($"Work Manager: Max doctoring skill value = '{maxSkillValue}'", true);
             }
-            var skilledDoctors = doctors.Intersect(_managedPawns)
+            foreach (var pawn in doctors.Intersect(_managedPawns)
                 .Except(WorkManager.DisabledPawnWorkTypes.Where(pwt => pwt.WorkType == WorkTypeDefOf.Doctor)
-                    .Select(pwt => pwt.Pawn)).Where(p =>
-                    p.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Doctor) >= maxSkillValue);
-            foreach (var pawn in skilledDoctors.OrderBy(p => IsBadWork(p, WorkTypeDefOf.Doctor)))
+                    .Select(pwt => pwt.Pawn))
+                .OrderByDescending(p => p.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Doctor))
+                .ThenBy(p => IsBadWork(p, WorkTypeDefOf.Doctor)))
             {
                 if (Settings.RecoveringPawnsUnfitForWork && HealthAIUtility.ShouldSeekMedicalRest(pawn))
                 {
                     if (Prefs.DevMode && Settings.VerboseLogging)
                     {
-                        Log.Message($"Work Manager: Not assigning '{pawn.LabelShort}' as a primary doctor (recovering)",
+                        Log.Message($"Work Manager: Not assigning '{pawn.LabelShort}' as primary doctor (recovering)",
                             true);
                     }
                     continue;
                 }
-                if (doctorCount == 0 || !IsBadWork(pawn, WorkTypeDefOf.Doctor))
+                if (pawn.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Doctor) >= maxSkillValue)
                 {
-                    if (Prefs.DevMode && Settings.VerboseLogging)
+                    if (doctorCount == 0 || !IsBadWork(pawn, WorkTypeDefOf.Doctor))
                     {
-                        Log.Message(
-                            $"Work Manager: Assigning '{pawn.LabelShort}' as a primary doctor (highest skill value)",
-                            true);
+                        if (Prefs.DevMode && Settings.VerboseLogging)
+                        {
+                            Log.Message(
+                                $"Work Manager: Assigning '{pawn.LabelShort}' as primary doctor (highest skill value)",
+                                true);
+                        }
+                        SetPawnWorkTypePriority(pawn, WorkTypeDefOf.Doctor, 1);
+                        doctorCount++;
+                        continue;
                     }
-                    SetPawnWorkTypePriority(pawn, WorkTypeDefOf.Doctor, 1);
                 }
-                doctorCount++;
-            }
-            if (doctorCount == 0)
-            {
-                var pawn = doctors.Intersect(_managedPawns)
-                    .Except(WorkManager.DisabledPawnWorkTypes.Where(pwt => pwt.WorkType == WorkTypeDefOf.Doctor)
-                        .Select(pwt => pwt.Pawn)).Where(p => !IsPawnWorkTypeActive(p, WorkTypeDefOf.Doctor))
-                    .OrderByDescending(p => p.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Doctor))
-                    .ThenBy(p => IsBadWork(p, WorkTypeDefOf.Doctor)).FirstOrDefault();
-                if (pawn != null)
+                if (doctorCount == 0)
                 {
                     if (Prefs.DevMode && Settings.VerboseLogging)
                     {
-                        Log.Message($"Work Manager: Assigning '{pawn.LabelShort}' as a primary doctor (fail-safe)",
-                            true);
+                        Log.Message($"Work Manager: Assigning '{pawn.LabelShort}' as primary doctor (fail-safe)", true);
                     }
                     SetPawnWorkTypePriority(pawn, WorkTypeDefOf.Doctor, 1);
                     doctorCount++;
+                    break;
                 }
             }
             if (doctorCount == 1)
@@ -141,7 +137,7 @@ namespace WorkManager
                             if (Prefs.DevMode && Settings.VerboseLogging)
                             {
                                 Log.Message(
-                                    $"Work Manager: Not assigning '{pawn.LabelShort}' as a secondary doctor (recovering)",
+                                    $"Work Manager: Not assigning '{pawn.LabelShort}' as secondary doctor (recovering)",
                                     true);
                             }
                             continue;
@@ -149,7 +145,7 @@ namespace WorkManager
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
                             Log.Message(
-                                $"Work Manager: Assigning '{pawn.LabelShort}' as a secondary doctor (primary doctor needs tending)",
+                                $"Work Manager: Assigning '{pawn.LabelShort}' as secondary doctor (primary doctor needs tending)",
                                 true);
                         }
                         SetPawnWorkTypePriority(pawn, WorkTypeDefOf.Doctor, 1);
@@ -180,7 +176,7 @@ namespace WorkManager
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
                             Log.Message(
-                                $"Work Manager: Assigning '{pawn.LabelShort}' as a backup doctor (multiple patients)",
+                                $"Work Manager: Assigning '{pawn.LabelShort}' as backup doctor (multiple patients)",
                                 true);
                         }
                         SetPawnWorkTypePriority(pawn, WorkTypeDefOf.Doctor, 1);
