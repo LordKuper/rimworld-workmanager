@@ -14,6 +14,7 @@ namespace WorkManager
         public static bool AssignMultipleDoctors = true;
         public static bool AssignWorkToIdlePawns = true;
         internal static MethodInfo IsBadWorkMethod;
+        public static bool RecoveringPawnsUnfitForWork = true;
         public static bool SpecialRulesForHunters = true;
         public static int UpdateFrequency = 24;
         public static bool VerboseLogging;
@@ -35,6 +36,8 @@ namespace WorkManager
             options.Gap(options.verticalSpacing);
             options.CheckboxLabeled(Resources.Strings.AssignMultipleDoctors, ref AssignMultipleDoctors,
                 Resources.Strings.AssignMultipleDoctorsTooltip);
+            options.CheckboxLabeled(Resources.Strings.RecoveringPawnsUnfitForWork, ref RecoveringPawnsUnfitForWork,
+                Resources.Strings.RecoveringPawnsUnfitForWorkTooltip);
             options.CheckboxLabeled(Resources.Strings.SpecialRulesForHunters, ref SpecialRulesForHunters,
                 Resources.Strings.SpecialRulesForHuntersTooltip);
             options.CheckboxLabeled(Resources.Strings.AssignAllWorkTypes, ref AssignAllWorkTypes,
@@ -54,6 +57,7 @@ namespace WorkManager
             base.ExposeData();
             Scribe_Values.Look(ref UpdateFrequency, nameof(UpdateFrequency), 24);
             Scribe_Values.Look(ref AssignMultipleDoctors, nameof(AssignMultipleDoctors), true);
+            Scribe_Values.Look(ref RecoveringPawnsUnfitForWork, nameof(RecoveringPawnsUnfitForWork), true);
             Scribe_Values.Look(ref SpecialRulesForHunters, nameof(SpecialRulesForHunters), true);
             Scribe_Values.Look(ref AssignAllWorkTypes, nameof(AssignAllWorkTypes));
             Scribe_Values.Look(ref AssignWorkToIdlePawns, nameof(AssignWorkToIdlePawns), true);

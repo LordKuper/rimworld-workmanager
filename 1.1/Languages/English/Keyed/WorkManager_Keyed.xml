@@ -8,6 +8,8 @@
   <WorkManager.AssignWorkToIdlePawnsTooltip>Assign idle pawns all work types (except special ones) with lowest priority for 12 hours</WorkManager.AssignWorkToIdlePawnsTooltip>
   <WorkManager.SpecialRulesForHunters>Special rules for hunters</WorkManager.SpecialRulesForHunters>
   <WorkManager.SpecialRulesForHuntersTooltip>Use special rules to determine which pawns are considered hunters</WorkManager.SpecialRulesForHuntersTooltip>
+  <WorkManager.RecoveringPawnsUnfitForWork>Recovering pawns are unfit for work</WorkManager.RecoveringPawnsUnfitForWork>
+  <WorkManager.RecoveringPawnsUnfitForWorkTooltip>Do not assign work for pawns needing medical rest</WorkManager.RecoveringPawnsUnfitForWorkTooltip>
   <WorkManager.AssignMultipleDoctors>Assign multiple doctors</WorkManager.AssignMultipleDoctors>
   <WorkManager.AssignMultipleDoctorsTooltip>Assign multiple doctors when there are multiple downed pawns</WorkManager.AssignMultipleDoctorsTooltip>
   <WorkManager.AssignAllWorkTypes>Assign all work types</WorkManager.AssignAllWorkTypes>

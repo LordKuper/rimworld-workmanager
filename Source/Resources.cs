@@ -31,10 +31,17 @@ namespace WorkManager
             internal static readonly string GlobalEnableTooltip = "WorkManager.GlobalEnableTooltip".Translate();
             internal static readonly string PawnDisableTooltip = "WorkManager.PawnDisableTooltip".Translate();
             internal static readonly string PawnEnableTooltip = "WorkManager.PawnEnableTooltip".Translate();
+
+            internal static readonly string RecoveringPawnsUnfitForWork =
+                "WorkManager.RecoveringPawnsUnfitForWork".Translate();
+
+            internal static readonly string RecoveringPawnsUnfitForWorkTooltip =
+                "WorkManager.RecoveringPawnsUnfitForWorkTooltip".Translate();
+
             internal static readonly string SpecialRulesForHunters = "WorkManager.SpecialRulesForHunters".Translate();
 
             internal static readonly string SpecialRulesForHuntersTooltip =
-                "WorkManager.SpecialRulesForHunters".Translate();
+                "WorkManager.SpecialRulesForHuntersTooltip".Translate();
 
             internal static readonly string UpdateInterval = "WorkManager.UpdateInterval".Translate();
             internal static readonly string UpdateIntervalTooltip = "WorkManager.UpdateIntervalTooltip".Translate();
