@@ -228,8 +228,9 @@ namespace WorkManager
                 }
                 hunters.Add(pawn);
             }
-            var maxSkillValue =
-                (int) Math.Floor(hunters.Max(pawn => pawn.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Hunting)));
+            var maxSkillValue = hunters.Any()
+                ? (int) Math.Floor(hunters.Max(pawn => pawn.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Hunting)))
+                : 0;
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
                 Log.Message($"Work Manager: Hunters are {string.Join(", ", hunters.Select(p => p.LabelShort))}", true);
