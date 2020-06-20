@@ -79,11 +79,12 @@ namespace WorkManager
             {
                 Log.Message($"Work Manager: Max doctoring skill value = '{maxSkillValue}'", true);
             }
-            foreach (var pawn in doctors.Intersect(_managedPawns)
+            var managedDoctors = doctors.Intersect(_managedPawns)
                 .Except(WorkManager.DisabledPawnWorkTypes.Where(pwt => pwt.WorkType == WorkTypeDefOf.Doctor)
                     .Select(pwt => pwt.Pawn))
                 .OrderByDescending(p => p.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Doctor))
-                .ThenBy(p => IsBadWork(p, WorkTypeDefOf.Doctor)))
+                .ThenBy(p => IsBadWork(p, WorkTypeDefOf.Doctor)).ToList();
+            foreach (var pawn in managedDoctors)
             {
                 if (Settings.RecoveringPawnsUnfitForWork && HealthAIUtility.ShouldSeekMedicalRest(pawn))
                 {
@@ -110,6 +111,21 @@ namespace WorkManager
                     }
                 }
                 if (doctorCount == 0)
+                {
+                    if (Prefs.DevMode && Settings.VerboseLogging)
+                    {
+                        Log.Message(
+                            $"Work Manager: Assigning '{pawn.LabelShort}' as primary doctor (highest skill value)",
+                            true);
+                    }
+                    SetPawnWorkTypePriority(pawn, WorkTypeDefOf.Doctor, 1);
+                    doctorCount++;
+                    break;
+                }
+            }
+            if (doctorCount == 0)
+            {
+                foreach (var pawn in managedDoctors)
                 {
                     if (Prefs.DevMode && Settings.VerboseLogging)
                     {
