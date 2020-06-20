@@ -278,14 +278,14 @@ namespace WorkManager
                 }
                 else
                 {
-                    var minRate = pawn.skills.skills.Min(s => s.LearnRateFactor());
-                    var maxRate = pawn.skills.skills.Max(s => s.LearnRateFactor());
-                    var prioritySection = (maxRate - minRate) / 3;
-                    if (prioritySection < 0.1) { continue; }
+                    var minLearningRate = pawn.skills.skills.Min(s => s.LearnRateFactor());
+                    var maxLearningRate = pawn.skills.skills.Max(s => s.LearnRateFactor());
+                    var learningRateRange = maxLearningRate - minLearningRate;
+                    if (learningRateRange < 0.1) { continue; }
                     var relevantSkills = WorkTypeDefOf.Hunting.relevantSkills;
                     if (!relevantSkills.Any()) { continue; }
                     var avgLearnRate = relevantSkills.Average(s => pawn.skills.GetSkill(s).LearnRateFactor());
-                    if (avgLearnRate >= minRate + prioritySection * 2)
+                    if (avgLearnRate >= minLearningRate + learningRateRange * 0.6)
                     {
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
@@ -295,7 +295,7 @@ namespace WorkManager
                         }
                         SetPawnWorkTypePriority(pawn, WorkTypeDefOf.Hunting, 2);
                     }
-                    else if (avgLearnRate >= minRate + prioritySection)
+                    else if (avgLearnRate >= minLearningRate + learningRateRange * 0.3)
                     {
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
@@ -464,10 +464,10 @@ namespace WorkManager
                     }
                     continue;
                 }
-                var minRate = pawn.skills.skills.Min(s => s.LearnRateFactor());
-                var maxRate = pawn.skills.skills.Max(s => s.LearnRateFactor());
-                var prioritySection = (maxRate - minRate) / 3;
-                if (prioritySection < 0.1) { continue; }
+                var minLearningRate = pawn.skills.skills.Min(s => s.LearnRateFactor());
+                var maxLearningRate = pawn.skills.skills.Max(s => s.LearnRateFactor());
+                var learningRateRange = maxLearningRate - minLearningRate;
+                if (learningRateRange < 0.1) { continue; }
                 var workTypes = _managedWorkTypes
                     .Except(
                         WorkManager.DisabledPawnWorkTypes.Where(pwt => pwt.Pawn == pawn).Select(pwt => pwt.WorkType))
@@ -480,25 +480,25 @@ namespace WorkManager
                     if (!relevantSkills.Any()) { continue; }
                     var avgLearnRate = relevantSkills.Average(s => pawn.skills.GetSkill(s).LearnRateFactor());
                     int priority;
-                    if (avgLearnRate >= minRate + prioritySection * 2)
+                    if (avgLearnRate >= minLearningRate + learningRateRange * 0.6)
                     {
                         priority = 2;
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
                             Log.Message(
-                                $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {priority} (rate = {avgLearnRate} [{minRate}, {maxRate}])",
+                                $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {priority} (rate = {avgLearnRate} [{minLearningRate}, {maxLearningRate}])",
                                 true);
                         }
                         SetPawnWorkTypePriority(pawn, workType, priority);
                         continue;
                     }
-                    if (avgLearnRate >= minRate + prioritySection)
+                    if (avgLearnRate >= minLearningRate + learningRateRange * 0.3)
                     {
                         priority = 3;
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
                             Log.Message(
-                                $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {priority} (rate = {avgLearnRate} [{minRate}, {maxRate}])",
+                                $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {priority} (rate = {avgLearnRate} [{minLearningRate}, {maxLearningRate}])",
                                 true);
                         }
                         SetPawnWorkTypePriority(pawn, workType, priority);
