@@ -81,10 +81,9 @@ namespace WorkManager
             }
             var managedDoctors = doctors.Intersect(_managedPawns)
                 .Except(WorkManager.DisabledPawnWorkTypes.Where(pwt => pwt.WorkType == WorkTypeDefOf.Doctor)
-                    .Select(pwt => pwt.Pawn))
-                .OrderByDescending(p => p.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Doctor))
-                .ThenBy(p => IsBadWork(p, WorkTypeDefOf.Doctor)).ToList();
-            foreach (var pawn in managedDoctors)
+                    .Select(pwt => pwt.Pawn)).OrderByDescending(p => IsBadWork(p, WorkTypeDefOf.Doctor))
+                .ThenByDescending(p => p.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Doctor)).ToList();
+            foreach (var pawn in managedDoctors.Where(p => !IsBadWork(p, WorkTypeDefOf.Doctor)))
             {
                 if (Settings.RecoveringPawnsUnfitForWork && HealthAIUtility.ShouldSeekMedicalRest(pawn))
                 {
@@ -125,7 +124,8 @@ namespace WorkManager
             }
             if (doctorCount == 0)
             {
-                foreach (var pawn in managedDoctors)
+                var pawn = managedDoctors.FirstOrDefault();
+                if (pawn != null)
                 {
                     if (Prefs.DevMode && Settings.VerboseLogging)
                     {
@@ -133,7 +133,6 @@ namespace WorkManager
                     }
                     SetPawnWorkTypePriority(pawn, WorkTypeDefOf.Doctor, 1);
                     doctorCount++;
-                    break;
                 }
             }
             if (doctorCount == 1)
