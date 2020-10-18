@@ -81,9 +81,9 @@ namespace WorkManager
             }
             var managedDoctors = doctors.Intersect(_managedPawns)
                 .Except(WorkManager.DisabledPawnWorkTypes.Where(pwt => pwt.WorkType == WorkTypeDefOf.Doctor)
-                    .Select(pwt => pwt.Pawn)).OrderByDescending(p => IsBadWork(p, WorkTypeDefOf.Doctor))
+                    .Select(pwt => pwt.Pawn)).OrderBy(p => IsBadWork(p, WorkTypeDefOf.Doctor))
                 .ThenByDescending(p => p.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Doctor)).ToList();
-            foreach (var pawn in managedDoctors.Where(p => !IsBadWork(p, WorkTypeDefOf.Doctor)))
+            foreach (var pawn in managedDoctors)
             {
                 if (Settings.RecoveringPawnsUnfitForWork && HealthAIUtility.ShouldSeekMedicalRest(pawn))
                 {

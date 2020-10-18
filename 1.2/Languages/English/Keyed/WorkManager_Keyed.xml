@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<LanguageData>
+  <WorkManager>Work Manager</WorkManager>
+  <WorkManager.UpdateInterval>Update frequency (1-120)</WorkManager.UpdateInterval>
+  <WorkManager.UpdateIntervalTooltip>How many times to update work priorities per in-game day</WorkManager.UpdateIntervalTooltip>
+  <WorkManager.AssignWorkToIdlePawns>Assign work to idle pawns</WorkManager.AssignWorkToIdlePawns>
+  <WorkManager.AssignWorkToIdlePawnsTooltip>Assign idle pawns all work types (except special ones) with lowest priority for 12 hours</WorkManager.AssignWorkToIdlePawnsTooltip>
+  <WorkManager.SpecialRulesForHunters>Special rules for hunters</WorkManager.SpecialRulesForHunters>
+  <WorkManager.SpecialRulesForHuntersTooltip>Use special rules to determine which pawns are considered hunters</WorkManager.SpecialRulesForHuntersTooltip>
+  <WorkManager.RecoveringPawnsUnfitForWork>Recovering pawns are unfit for work</WorkManager.RecoveringPawnsUnfitForWork>
+  <WorkManager.RecoveringPawnsUnfitForWorkTooltip>Do not assign work for pawns needing medical rest</WorkManager.RecoveringPawnsUnfitForWorkTooltip>
+  <WorkManager.AssignMultipleDoctors>Assign multiple doctors</WorkManager.AssignMultipleDoctors>
+  <WorkManager.AssignMultipleDoctorsTooltip>Assign multiple doctors when there are multiple downed pawns</WorkManager.AssignMultipleDoctorsTooltip>
+  <WorkManager.AssignAllWorkTypes>Assign all work types</WorkManager.AssignAllWorkTypes>
+  <WorkManager.AssignAllWorkTypesTooltip>Assign every pawn all leftover work types with minimum priority to prevent idling</WorkManager.AssignAllWorkTypesTooltip>
+  <WorkManager.AllHaulers>Everyone is a hauler</WorkManager.AllHaulers>
+  <WorkManager.AllHaulersTooltip>Assign hauling to every pawn</WorkManager.AllHaulersTooltip>
+  <WorkManager.AllCleaners>Everyone is a cleaner</WorkManager.AllCleaners>
+  <WorkManager.AllCleanersTooltip>Assign cleaning to every pawn</WorkManager.AllCleanersTooltip>
+  <WorkManager.GlobalEnableTooltip>Enable automatic work type priority assignment system</WorkManager.GlobalEnableTooltip>
+  <WorkManager.GlobalDisableTooltip>Disable automatic work type priority assignment system</WorkManager.GlobalDisableTooltip>
+  <WorkManager.PawnEnableTooltip>Enable automatic work type priority assignment for pawn</WorkManager.PawnEnableTooltip>
+  <WorkManager.PawnDisableTooltip>Disable automatic work type priority assignment for pawn</WorkManager.PawnDisableTooltip>
+  <WorkManager.WorkTypeEnableTooltip>Enable automatic priority assignment for work type</WorkManager.WorkTypeEnableTooltip>
+  <WorkManager.WorkTypeDisableTooltip>Disable automatic priority assignment for work type</WorkManager.WorkTypeDisableTooltip>
+  <WorkManager.VerboseLogging>Verbose logging</WorkManager.VerboseLogging>
+  <WorkManager.VerboseLoggingTooltip>Show mod execution details in log (only works when development mode is enabled)</WorkManager.VerboseLoggingTooltip>
+</LanguageData>
