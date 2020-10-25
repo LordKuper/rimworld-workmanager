@@ -10,6 +10,8 @@ namespace WorkManager
     {
         public static bool AllCleaners = true;
         public static bool AllHaulers = true;
+        public static bool AllHunters;
+        public static bool AllowMeleeHunters;
         public static bool AssignAllWorkTypes;
         public static bool AssignMultipleDoctors = true;
         public static bool AssignWorkToIdlePawns = true;
@@ -38,8 +40,11 @@ namespace WorkManager
                 Resources.Strings.AssignMultipleDoctorsTooltip);
             options.CheckboxLabeled(Resources.Strings.RecoveringPawnsUnfitForWork, ref RecoveringPawnsUnfitForWork,
                 Resources.Strings.RecoveringPawnsUnfitForWorkTooltip);
+            options.CheckboxLabeled(Resources.Strings.AllHunters, ref AllHunters, Resources.Strings.AllHuntersTooltip);
             options.CheckboxLabeled(Resources.Strings.SpecialRulesForHunters, ref SpecialRulesForHunters,
                 Resources.Strings.SpecialRulesForHuntersTooltip);
+            options.CheckboxLabeled(Resources.Strings.AllowMeleeHunters, ref AllowMeleeHunters,
+                Resources.Strings.AllowMeleeHuntersTooltip);
             options.CheckboxLabeled(Resources.Strings.AssignAllWorkTypes, ref AssignAllWorkTypes,
                 Resources.Strings.AssignAllWorkTypesTooltip);
             options.CheckboxLabeled(Resources.Strings.AssignWorkToIdlePawns, ref AssignWorkToIdlePawns,
@@ -58,7 +63,9 @@ namespace WorkManager
             Scribe_Values.Look(ref UpdateFrequency, nameof(UpdateFrequency), 24);
             Scribe_Values.Look(ref AssignMultipleDoctors, nameof(AssignMultipleDoctors), true);
             Scribe_Values.Look(ref RecoveringPawnsUnfitForWork, nameof(RecoveringPawnsUnfitForWork), true);
+            Scribe_Values.Look(ref AllHunters, nameof(AllHunters));
             Scribe_Values.Look(ref SpecialRulesForHunters, nameof(SpecialRulesForHunters), true);
+            Scribe_Values.Look(ref AllowMeleeHunters, nameof(AllowMeleeHunters));
             Scribe_Values.Look(ref AssignAllWorkTypes, nameof(AssignAllWorkTypes));
             Scribe_Values.Look(ref AssignWorkToIdlePawns, nameof(AssignWorkToIdlePawns), true);
             Scribe_Values.Look(ref AllHaulers, nameof(AllHaulers), true);

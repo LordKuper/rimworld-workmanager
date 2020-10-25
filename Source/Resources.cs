@@ -11,6 +11,14 @@ namespace WorkManager
             internal static readonly string AllCleanersTooltip = "WorkManager.AllCleanersTooltip".Translate();
             internal static readonly string AllHaulers = "WorkManager.AllHaulers".Translate();
             internal static readonly string AllHaulersTooltip = "WorkManager.AllHaulersTooltip".Translate();
+            internal static readonly string AllHunters = "WorkManager.AllHunters".Translate();
+            internal static readonly string AllHuntersTooltip = "WorkManager.AllHuntersTooltip".Translate();
+
+            internal static readonly string AllowMeleeHunters = "WorkManager.AllowMeleeHunters".Translate();
+
+            internal static readonly string AllowMeleeHuntersTooltip =
+                "WorkManager.AllowMeleeHuntersTooltip".Translate();
+
             internal static readonly string AssignAllWorkTypes = "WorkManager.AssignAllWorkTypes".Translate();
 
             internal static readonly string AssignAllWorkTypesTooltip =
