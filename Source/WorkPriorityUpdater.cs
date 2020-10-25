@@ -48,7 +48,7 @@ namespace WorkManager
                     foreach (var workType in workTypes)
                     {
                         var workTypeDef = DefDatabase<WorkTypeDef>.GetNamed(workType.Key, false);
-                        if (workTypeDef != null) { CommonWorkTypes.Add(workTypeDef, workType.Value); }
+                        if (workTypeDef != null) { _commonWorkTypes.Add(workTypeDef, workType.Value); }
                     }
                 }
                 return _commonWorkTypes;
