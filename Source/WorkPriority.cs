@@ -11,6 +11,6 @@ namespace WorkManager
         }
 
         public int Priority { get; set; }
-        public WorkTypeDef WorkType { get; set; }
+        public WorkTypeDef WorkType { get; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 using Verse;
@@ -9,9 +10,9 @@ namespace WorkManager
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public class WorkManagerGameComponent : GameComponent
     {
-        public List<Pawn> DisabledPawns = new List<Pawn>();
-        public List<PawnWorkType> DisabledPawnWorkTypes = new List<PawnWorkType>();
-        public List<WorkTypeDef> DisabledWorkTypes = new List<WorkTypeDef>();
+        private List<Pawn> _disabledPawns = new List<Pawn>();
+        private List<PawnWorkType> _disabledPawnWorkTypes = new List<PawnWorkType>();
+        private List<WorkTypeDef> _disabledWorkTypes = new List<WorkTypeDef>();
         public bool Enabled = true;
 
         [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Game API")]
@@ -20,63 +21,71 @@ namespace WorkManager
         public override void ExposeData()
         {
             base.ExposeData();
-            DisabledPawns?.RemoveAll(pawn => pawn?.Destroyed ?? true);
-            DisabledWorkTypes?.RemoveAll(workType =>
-                !DefDatabase<WorkTypeDef>.AllDefsListForReading.Contains(workType));
+            _disabledPawns?.RemoveAll(pawn => pawn?.Destroyed ?? true);
+            _disabledWorkTypes?.RemoveAll(
+                workType => !DefDatabase<WorkTypeDef>.AllDefsListForReading.Contains(workType));
             Scribe_Values.Look(ref Enabled, nameof(Enabled), true);
-            Scribe_Collections.Look(ref DisabledWorkTypes, nameof(DisabledWorkTypes), LookMode.Def);
-            Scribe_Collections.Look(ref DisabledPawns, nameof(DisabledPawns), LookMode.Reference);
-            Scribe_Collections.Look(ref DisabledPawnWorkTypes, nameof(DisabledPawnWorkTypes), LookMode.Deep);
+            Scribe_Collections.Look(ref _disabledWorkTypes, "DisabledWorkTypes", LookMode.Def);
+            Scribe_Collections.Look(ref _disabledPawns, "DisabledPawns", LookMode.Reference);
+            Scribe_Collections.Look(ref _disabledPawnWorkTypes, "DisabledPawnWorkTypes", LookMode.Deep);
         }
 
-        public bool GetPawnEnabled(Pawn pawn)
+        public bool GetPawnEnabled([NotNull] Pawn pawn)
         {
-            if (DisabledPawns == null) { DisabledPawns = new List<Pawn>(); }
-            return !DisabledPawns.Contains(pawn);
+            if (pawn == null) { throw new ArgumentNullException(nameof(pawn)); }
+            if (_disabledPawns == null) { _disabledPawns = new List<Pawn>(); }
+            return !_disabledPawns.Contains(pawn);
         }
 
-        public bool GetPawnWorkTypeEnabled(Pawn pawn, WorkTypeDef workType)
+        public bool GetPawnWorkTypeEnabled([NotNull] Pawn pawn, [NotNull] WorkTypeDef workType)
         {
-            if (DisabledPawnWorkTypes == null) { DisabledPawnWorkTypes = new List<PawnWorkType>(); }
-            return !DisabledPawnWorkTypes.Any(pwt => pwt.Pawn == pawn && pwt.WorkType == workType);
+            if (pawn == null) { throw new ArgumentNullException(nameof(pawn)); }
+            if (workType == null) { throw new ArgumentNullException(nameof(workType)); }
+            if (_disabledPawnWorkTypes == null) { _disabledPawnWorkTypes = new List<PawnWorkType>(); }
+            return !_disabledPawnWorkTypes.Any(pwt => pwt.Pawn == pawn && pwt.WorkType == workType);
         }
 
-        public bool GetWorkTypeEnabled(WorkTypeDef workType)
+        public bool GetWorkTypeEnabled([NotNull] WorkTypeDef workType)
         {
-            if (DisabledWorkTypes == null) { DisabledWorkTypes = new List<WorkTypeDef>(); }
-            return !DisabledWorkTypes.Contains(workType);
+            if (workType == null) { throw new ArgumentNullException(nameof(workType)); }
+            if (_disabledWorkTypes == null) { _disabledWorkTypes = new List<WorkTypeDef>(); }
+            return !_disabledWorkTypes.Contains(workType);
         }
 
-        public void SetPawnEnabled(Pawn pawn, bool enabled)
+        public void SetPawnEnabled([NotNull] Pawn pawn, bool enabled)
         {
-            if (DisabledPawns == null) { DisabledPawns = new List<Pawn>(); }
-            if (enabled) { DisabledPawns.RemoveAll(p => p == pawn); }
+            if (pawn == null) { throw new ArgumentNullException(nameof(pawn)); }
+            if (_disabledPawns == null) { _disabledPawns = new List<Pawn>(); }
+            if (enabled) { _disabledPawns.RemoveAll(p => p == pawn); }
             else
             {
-                if (!DisabledPawns.Contains(pawn)) { DisabledPawns.Add(pawn); }
+                if (!_disabledPawns.Contains(pawn)) { _disabledPawns.Add(pawn); }
             }
         }
 
-        public void SetPawnWorkTypeEnabled(Pawn pawn, WorkTypeDef workType, bool enabled)
+        public void SetPawnWorkTypeEnabled([NotNull] Pawn pawn, [NotNull] WorkTypeDef workType, bool enabled)
         {
-            if (DisabledPawnWorkTypes == null) { DisabledPawnWorkTypes = new List<PawnWorkType>(); }
-            if (enabled) { DisabledPawnWorkTypes.RemoveAll(pwt => pwt.Pawn == pawn && pwt.WorkType == workType); }
+            if (pawn == null) { throw new ArgumentNullException(nameof(pawn)); }
+            if (workType == null) { throw new ArgumentNullException(nameof(workType)); }
+            if (_disabledPawnWorkTypes == null) { _disabledPawnWorkTypes = new List<PawnWorkType>(); }
+            if (enabled) { _disabledPawnWorkTypes.RemoveAll(pwt => pwt.Pawn == pawn && pwt.WorkType == workType); }
             else
             {
-                if (!DisabledPawnWorkTypes.Any(pwt => pwt.Pawn == pawn && pwt.WorkType == workType))
+                if (!_disabledPawnWorkTypes.Any(pwt => pwt.Pawn == pawn && pwt.WorkType == workType))
                 {
-                    DisabledPawnWorkTypes.Add(new PawnWorkType {Pawn = pawn, WorkType = workType});
+                    _disabledPawnWorkTypes.Add(new PawnWorkType {Pawn = pawn, WorkType = workType});
                 }
             }
         }
 
-        public void SetWorkTypeEnabled(WorkTypeDef workType, bool enabled)
+        public void SetWorkTypeEnabled([NotNull] WorkTypeDef workType, bool enabled)
         {
-            if (DisabledWorkTypes == null) { DisabledWorkTypes = new List<WorkTypeDef>(); }
-            if (enabled) { DisabledWorkTypes.RemoveAll(wt => wt == workType); }
+            if (workType == null) { throw new ArgumentNullException(nameof(workType)); }
+            if (_disabledWorkTypes == null) { _disabledWorkTypes = new List<WorkTypeDef>(); }
+            if (enabled) { _disabledWorkTypes.RemoveAll(wt => wt == workType); }
             else
             {
-                if (!DisabledWorkTypes.Contains(workType)) { DisabledWorkTypes.Add(workType); }
+                if (!_disabledWorkTypes.Contains(workType)) { _disabledWorkTypes.Add(workType); }
             }
         }
     }

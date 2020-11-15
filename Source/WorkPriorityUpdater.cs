@@ -15,8 +15,6 @@ namespace WorkManager
         private readonly HashSet<WorkTypeDef> _allWorkTypes = new HashSet<WorkTypeDef>();
         private readonly HashSet<Pawn> _capablePawns = new HashSet<Pawn>();
 
-        private readonly Dictionary<WorkTypeDef, int> _commonWorkTypes = new Dictionary<WorkTypeDef, int>();
-
         private readonly Dictionary<Pawn, DayTime> _idlePawns = new Dictionary<Pawn, DayTime>();
 
         private readonly HashSet<Pawn> _managedPawns = new HashSet<Pawn>();
@@ -29,31 +27,6 @@ namespace WorkManager
         private float _currentTime = -1;
 
         public WorkPriorityUpdater(Map map) : base(map) { }
-
-        private Dictionary<WorkTypeDef, int> CommonWorkTypes
-        {
-            get
-            {
-                if (!_commonWorkTypes.Any())
-                {
-                    var workTypes = new Dictionary<string, int>
-                    {
-                        {"Firefighter", 1},
-                        {"Patient", 1},
-                        {"PatientBedRest", 1},
-                        {"BasicWorker", 1},
-                        {"VBE_Writing", 1},
-                        {"Training", 3}
-                    };
-                    foreach (var workType in workTypes)
-                    {
-                        var workTypeDef = DefDatabase<WorkTypeDef>.GetNamed(workType.Key, false);
-                        if (workTypeDef != null) { _commonWorkTypes.Add(workTypeDef, workType.Value); }
-                    }
-                }
-                return _commonWorkTypes;
-            }
-        }
 
         private static WorkManagerGameComponent WorkManager => Current.Game.GetComponent<WorkManagerGameComponent>();
 
@@ -72,52 +45,161 @@ namespace WorkManager
 
         private void AssignCommonWork()
         {
-            foreach (var pawn in _managedPawns.Intersect(_capablePawns))
+            if (Prefs.DevMode && Settings.VerboseLogging)
             {
-                foreach (var workType in _managedWorkTypes.Intersect(CommonWorkTypes.Keys)
-                    .Except(
-                        WorkManager.DisabledPawnWorkTypes.Where(pwt => pwt.Pawn == pawn).Select(pwt => pwt.WorkType))
-                    .Where(w => !pawn.WorkTypeIsDisabled(w) && !IsBadWork(pawn, w)))
+                Log.Message(
+                    $"-- Work Manager: Assigning common work types ({string.Join(", ", Settings.AssignEveryoneWorkTypes.Select(workType => $"{workType.Label}[{workType.Priority}]"))}) --",
+                    true);
+            }
+            var relevantWorkTypes = Settings.AssignEveryoneWorkTypes.Where(wt => wt.IsWorkTypeLoaded)
+                .Select(wt => wt.WorkTypeDef).Intersect(_managedWorkTypes);
+            foreach (var workTypeDef in relevantWorkTypes)
+            {
+                foreach (var pawn in _managedPawns.Intersect(_capablePawns).Where(pawn =>
+                    WorkManager.GetPawnWorkTypeEnabled(pawn, workTypeDef) && !pawn.WorkTypeIsDisabled(workTypeDef) &&
+                    !IsBadWork(pawn, workTypeDef)))
                 {
-                    SetPawnWorkTypePriority(pawn, workType, CommonWorkTypes[workType]);
+                    if (Settings.RecoveringPawnsUnfitForWork && HealthAIUtility.ShouldSeekMedicalRest(pawn))
+                    {
+                        continue;
+                    }
+                    SetPawnWorkTypePriority(pawn, workTypeDef,
+                        Settings.AssignEveryoneWorkTypes.First(wt => wt.WorkTypeDef == workTypeDef).Priority);
                 }
+            }
+        }
+
+        private void AssignDedicatedWorkers()
+        {
+            if (!Settings.UseDedicatedWorkers) { return; }
+            if (!_capablePawns.Any()) { return; }
+            if (Prefs.DevMode && Settings.VerboseLogging)
+            {
+                Log.Message("-- Work Manager: Assigning dedicated workers --", true);
+            }
+            var workTypes = _allWorkTypes.Intersect(_managedWorkTypes).Where(wt =>
+                    Settings.AssignEveryoneWorkTypes.FirstOrDefault(a => a.WorkTypeDef == wt)?.AllowDedicated ?? true)
+                .ToList();
+            if (Settings.SpecialRulesForDoctors)
+            {
+                workTypes.Remove(_allWorkTypes.FirstOrDefault(workTypeDef =>
+                    "Doctor".Equals(workTypeDef.defName, StringComparison.OrdinalIgnoreCase)));
+            }
+            if (Settings.SpecialRulesForHunters)
+            {
+                workTypes.Remove(_allWorkTypes.FirstOrDefault(workTypeDef =>
+                    "Hunting".Equals(workTypeDef.defName, StringComparison.OrdinalIgnoreCase)));
+            }
+            if (!workTypes.Any()) { return; }
+            var targetWorkers = (int) Math.Ceiling((float) _capablePawns.Count / workTypes.Count);
+            if (Prefs.DevMode && Settings.VerboseLogging)
+            {
+                Log.Message($"-- Work Manager: Target dedicated workers by work type = {targetWorkers} --", true);
+            }
+            foreach (var workType in workTypes.OrderByDescending(wt => wt.naturalPriority))
+            {
+                var pawnSkills = new Dictionary<Pawn, float>(_capablePawns.ToDictionary(pawn => pawn,
+                    pawn => pawn.skills.AverageOfRelevantSkillsFor(workType)));
+                var skillRange = pawnSkills.Max(pair => pair.Value) - pawnSkills.Min(pair => pair.Value);
+                var pawnLearnRates =
+                    new Dictionary<Pawn, float>(_capablePawns.ToDictionary(pawn => pawn,
+                        pawn => GetPawnLearningRate(pawn, workType)));
+                var learnRateRange = pawnLearnRates.Max(pair => pair.Value) - pawnLearnRates.Min(pair => pair.Value);
+                var pawnDedicationsCounts = new Dictionary<Pawn, int>(_capablePawns.ToDictionary(pawn => pawn,
+                    pawn => workTypes.Count(wt => GetPawnWorkTypePriority(pawn, wt) == 1)));
+                var dedicationsCountRange = pawnDedicationsCounts.Max(pair => pair.Value) -
+                                            pawnDedicationsCounts.Min(pair => pair.Value);
+                var pawnScores = new Dictionary<Pawn, float>();
+                foreach (var pawn in _capablePawns)
+                {
+                    if (pawn.WorkTypeIsDisabled(workType) || IsBadWork(pawn, workType)) { continue; }
+                    if (Settings.RecoveringPawnsUnfitForWork && HealthAIUtility.ShouldSeekMedicalRest(pawn))
+                    {
+                        continue;
+                    }
+                    var normalizedSkill = skillRange == 0 ? 0 : pawnSkills[pawn] / skillRange;
+                    var normalizedLearnRate = learnRateRange == 0 ? 0 : pawnLearnRates[pawn] / learnRateRange;
+                    var normalizedDedications = dedicationsCountRange == 0
+                        ? 0
+                        : pawnDedicationsCounts[pawn] / dedicationsCountRange;
+                    var score = normalizedSkill + 0.75f * normalizedLearnRate - normalizedDedications;
+                    pawnScores.Add(pawn, score);
+                }
+                if (Prefs.DevMode && Settings.VerboseLogging)
+                {
+                    Log.Message(
+                        $"-- Work Manager: {string.Join(", ", pawnScores.OrderByDescending(pair => pair.Value).Select(pair => $"{pair.Key.LabelShort}({pair.Value:N2})"))} --",
+                        true);
+                }
+                while (_capablePawns.Count(pawn => GetPawnWorkTypePriority(pawn, workType) == 1) < targetWorkers)
+                {
+                    var dedicatedWorker = pawnScores.Any()
+                        ? pawnScores.OrderByDescending(pair => pair.Value).First().Key
+                        : null;
+                    if (dedicatedWorker == null) { break; }
+                    if (Prefs.DevMode && Settings.VerboseLogging)
+                    {
+                        Log.Message(
+                            $"Work Manager: Assigning '{dedicatedWorker.LabelShort}' as dedicated worker for '{workType.labelShort}'",
+                            true);
+                    }
+                    SetPawnWorkTypePriority(dedicatedWorker, workType, 1);
+                    pawnScores.Remove(dedicatedWorker);
+                }
+            }
+            if (Prefs.DevMode && Settings.VerboseLogging)
+            {
+                Log.Message("----------------------------------------------------", true);
             }
         }
 
         private void AssignDoctors()
         {
-            if (!WorkManager.GetWorkTypeEnabled(WorkTypeDefOf.Doctor)) { return; }
+            if (!Settings.SpecialRulesForDoctors) { return; }
+            var workType = _allWorkTypes.FirstOrDefault(workTypeDef =>
+                "Doctor".Equals(workTypeDef.defName, StringComparison.OrdinalIgnoreCase));
+            if (workType == null) { return; }
+            if (!WorkManager.GetWorkTypeEnabled(workType)) { return; }
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
                 Log.Message("-- Work Manager: Assigning doctors... --", true);
             }
-            var doctors = _capablePawns.Where(pawn => !pawn.WorkTypeIsDisabled(WorkTypeDefOf.Doctor)).ToList();
+            var doctors = _capablePawns.Where(pawn => !pawn.WorkTypeIsDisabled(workType)).ToList();
             if (!doctors.Any()) { return; }
-            var doctorCount = doctors.Count(p => IsPawnWorkTypeActive(p, WorkTypeDefOf.Doctor));
-            var maxSkillValue =
-                (int) Math.Floor(doctors.Max(pawn => pawn.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Doctor)));
+            var doctorsCount = doctors.Count(p => IsPawnWorkTypeActive(p, workType));
+            var maxSkillValue = (int) Math.Floor(doctors.Max(pawn => pawn.skills.AverageOfRelevantSkillsFor(workType)));
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
                 Log.Message($"Work Manager: Max doctoring skill value = '{maxSkillValue}'", true);
             }
+            var assignEveryone = Settings.AssignEveryoneWorkTypes.FirstOrDefault(wt => wt.WorkTypeDef == workType);
             var managedDoctors = doctors.Intersect(_managedPawns)
-                .Except(WorkManager.DisabledPawnWorkTypes.Where(pwt => pwt.WorkType == WorkTypeDefOf.Doctor)
-                    .Select(pwt => pwt.Pawn)).OrderBy(p => IsBadWork(p, WorkTypeDefOf.Doctor))
-                .ThenByDescending(p => p.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Doctor)).ToList();
-            foreach (var pawn in managedDoctors)
+                .Where(pawn => WorkManager.GetPawnWorkTypeEnabled(pawn, workType)).OrderBy(p => IsBadWork(p, workType))
+                .ThenByDescending(p => p.skills.AverageOfRelevantSkillsFor(workType)).ToList();
+            if (assignEveryone == null || assignEveryone.AllowDedicated)
             {
-                if (Settings.RecoveringPawnsUnfitForWork && HealthAIUtility.ShouldSeekMedicalRest(pawn))
+                foreach (var pawn in managedDoctors)
                 {
-                    if (Prefs.DevMode && Settings.VerboseLogging)
+                    if (Settings.RecoveringPawnsUnfitForWork && HealthAIUtility.ShouldSeekMedicalRest(pawn))
                     {
-                        Log.Message($"Work Manager: Not assigning '{pawn.LabelShort}' as primary doctor (recovering)",
-                            true);
+                        continue;
                     }
-                    continue;
-                }
-                if (pawn.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Doctor) >= maxSkillValue)
-                {
-                    if (doctorCount == 0 || !IsBadWork(pawn, WorkTypeDefOf.Doctor))
+                    if (pawn.skills.AverageOfRelevantSkillsFor(workType) >= maxSkillValue)
+                    {
+                        if (doctorsCount == 0 || !IsBadWork(pawn, workType))
+                        {
+                            if (Prefs.DevMode && Settings.VerboseLogging)
+                            {
+                                Log.Message(
+                                    $"Work Manager: Assigning '{pawn.LabelShort}' as primary doctor (highest skill value)",
+                                    true);
+                            }
+                            SetPawnWorkTypePriority(pawn, workType, 1);
+                            doctorsCount++;
+                            continue;
+                        }
+                    }
+                    if (doctorsCount == 0)
                     {
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
@@ -125,25 +207,13 @@ namespace WorkManager
                                 $"Work Manager: Assigning '{pawn.LabelShort}' as primary doctor (highest skill value)",
                                 true);
                         }
-                        SetPawnWorkTypePriority(pawn, WorkTypeDefOf.Doctor, 1);
-                        doctorCount++;
-                        continue;
+                        SetPawnWorkTypePriority(pawn, workType, 1);
+                        doctorsCount++;
+                        break;
                     }
-                }
-                if (doctorCount == 0)
-                {
-                    if (Prefs.DevMode && Settings.VerboseLogging)
-                    {
-                        Log.Message(
-                            $"Work Manager: Assigning '{pawn.LabelShort}' as primary doctor (highest skill value)",
-                            true);
-                    }
-                    SetPawnWorkTypePriority(pawn, WorkTypeDefOf.Doctor, 1);
-                    doctorCount++;
-                    break;
                 }
             }
-            if (doctorCount == 0)
+            if (doctorsCount == 0)
             {
                 var pawn = managedDoctors.FirstOrDefault();
                 if (pawn != null)
@@ -152,30 +222,25 @@ namespace WorkManager
                     {
                         Log.Message($"Work Manager: Assigning '{pawn.LabelShort}' as primary doctor (fail-safe)", true);
                     }
-                    SetPawnWorkTypePriority(pawn, WorkTypeDefOf.Doctor, 1);
-                    doctorCount++;
+                    SetPawnWorkTypePriority(pawn, workType,
+                        assignEveryone == null || assignEveryone.AllowDedicated ? 1 : assignEveryone.Priority);
+                    doctorsCount++;
                 }
             }
-            if (doctorCount == 1)
+            if (doctorsCount == 1)
             {
-                var doctor = doctors.First(p => IsPawnWorkTypeActive(p, WorkTypeDefOf.Doctor));
+                var doctor = doctors.First(p => IsPawnWorkTypeActive(p, workType));
                 if (doctor.health.HasHediffsNeedingTend() || doctor.health.hediffSet.HasTendableInjury() ||
                     doctor.health.hediffSet.HasTendableHediff())
                 {
                     foreach (var pawn in doctors.Intersect(_managedPawns)
-                        .Except(WorkManager.DisabledPawnWorkTypes.Where(pwt => pwt.WorkType == WorkTypeDefOf.Doctor)
-                            .Select(pwt => pwt.Pawn)).Where(p => !IsPawnWorkTypeActive(p, WorkTypeDefOf.Doctor))
-                        .OrderByDescending(p => p.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Doctor))
-                        .ThenBy(p => IsBadWork(p, WorkTypeDefOf.Doctor)))
+                        .Where(pawn =>
+                            WorkManager.GetPawnWorkTypeEnabled(pawn, workType) && !IsPawnWorkTypeActive(pawn, workType))
+                        .OrderByDescending(pawn => pawn.skills.AverageOfRelevantSkillsFor(workType))
+                        .ThenBy(pawn => IsBadWork(pawn, workType)))
                     {
                         if (Settings.RecoveringPawnsUnfitForWork && HealthAIUtility.ShouldSeekMedicalRest(pawn))
                         {
-                            if (Prefs.DevMode && Settings.VerboseLogging)
-                            {
-                                Log.Message(
-                                    $"Work Manager: Not assigning '{pawn.LabelShort}' as secondary doctor (recovering)",
-                                    true);
-                            }
                             continue;
                         }
                         if (Prefs.DevMode && Settings.VerboseLogging)
@@ -184,40 +249,51 @@ namespace WorkManager
                                 $"Work Manager: Assigning '{pawn.LabelShort}' as secondary doctor (primary doctor needs tending)",
                                 true);
                         }
-                        SetPawnWorkTypePriority(pawn, WorkTypeDefOf.Doctor, 1);
-                        doctorCount++;
+                        SetPawnWorkTypePriority(pawn, workType,
+                            assignEveryone == null || assignEveryone.AllowDedicated ? 1 : assignEveryone.Priority);
+                        doctorsCount++;
                         break;
                     }
                 }
             }
-            if (Settings.AssignMultipleDoctors)
+            if (Settings.AssignMultipleDoctors && (assignEveryone == null || assignEveryone.AllowDedicated))
             {
+                var patientCount = 0;
+                if (Settings.CountDownedColonists) { patientCount += _allPawns.Count(pawn => pawn.Downed); }
+                if (Settings.CountDownedGuests && map.IsPlayerHome)
                 {
-                    var patientCount = _allPawns.Count(pawn => pawn.Downed);
+                    patientCount += map.mapPawns.AllPawnsSpawned.Count(pawn =>
+                        pawn.guest != null && !pawn.IsPrisoner && pawn.Downed);
+                }
+                if (Settings.CountDownedPrisoners && map.IsPlayerHome)
+                {
+                    patientCount += map.mapPawns.PrisonersOfColonySpawned.Count(pawn => pawn.Downed);
+                }
+                if (Settings.CountDownedAnimals && map.IsPlayerHome)
+                {
+                    patientCount += map.mapPawns.PawnsInFaction(Faction.OfPlayer).Where(p => p.RaceProps.Animal)
+                        .Count(pawn => pawn.Downed);
+                }
+                if (Prefs.DevMode && Settings.VerboseLogging)
+                {
+                    Log.Message($"Work Manager: Patient count = '{patientCount}'", true);
+                }
+                while (doctorsCount < patientCount)
+                {
+                    var pawn = doctors.Intersect(_managedPawns)
+                        .Where(p => WorkManager.GetPawnWorkTypeEnabled(p, workType) &&
+                                    !IsPawnWorkTypeActive(p, workType) && (!Settings.RecoveringPawnsUnfitForWork ||
+                                                                           !HealthAIUtility.ShouldSeekMedicalRest(p)))
+                        .OrderByDescending(p => p.skills.AverageOfRelevantSkillsFor(workType))
+                        .ThenBy(p => IsBadWork(p, workType)).FirstOrDefault();
+                    if (pawn == null) { break; }
                     if (Prefs.DevMode && Settings.VerboseLogging)
                     {
-                        Log.Message($"Work Manager: Patient count = '{patientCount}'", true);
+                        Log.Message($"Work Manager: Assigning '{pawn.LabelShort}' as backup doctor (multiple patients)",
+                            true);
                     }
-                    while (doctorCount < patientCount)
-                    {
-                        var pawn = doctors.Intersect(_managedPawns)
-                            .Except(WorkManager.DisabledPawnWorkTypes.Where(pwt => pwt.WorkType == WorkTypeDefOf.Doctor)
-                                .Select(pwt => pwt.Pawn))
-                            .Where(p => !IsPawnWorkTypeActive(p, WorkTypeDefOf.Doctor) &&
-                                        (!Settings.RecoveringPawnsUnfitForWork ||
-                                         !HealthAIUtility.ShouldSeekMedicalRest(p)))
-                            .OrderByDescending(p => p.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Doctor))
-                            .ThenBy(p => IsBadWork(p, WorkTypeDefOf.Doctor)).FirstOrDefault();
-                        if (pawn == null) { break; }
-                        if (Prefs.DevMode && Settings.VerboseLogging)
-                        {
-                            Log.Message(
-                                $"Work Manager: Assigning '{pawn.LabelShort}' as backup doctor (multiple patients)",
-                                true);
-                        }
-                        SetPawnWorkTypePriority(pawn, WorkTypeDefOf.Doctor, 1);
-                        doctorCount++;
-                    }
+                    SetPawnWorkTypePriority(pawn, workType, 1);
+                    doctorsCount++;
                 }
             }
             if (Prefs.DevMode && Settings.VerboseLogging) { Log.Message("---------------------", true); }
@@ -225,70 +301,55 @@ namespace WorkManager
 
         private void AssignHunters()
         {
-            if (!WorkManager.GetWorkTypeEnabled(WorkTypeDefOf.Hunting)) { return; }
-            if (Settings.AllHunters)
+            if (!Settings.SpecialRulesForHunters) { return; }
+            var workType = _allWorkTypes.FirstOrDefault(workTypeDef =>
+                "Hunting".Equals(workTypeDef.defName, StringComparison.OrdinalIgnoreCase));
+            if (workType == null) { return; }
+            if (!WorkManager.GetWorkTypeEnabled(workType)) { return; }
+            if (Prefs.DevMode && Settings.VerboseLogging)
             {
-                if (Prefs.DevMode && Settings.VerboseLogging)
+                Log.Message("-- Work Manager: Assigning hunters... --", true);
+            }
+            var assignEveryone = Settings.AssignEveryoneWorkTypes.FirstOrDefault(wt => wt.WorkTypeDef == workType);
+            if (assignEveryone != null)
+            {
+                foreach (var pawn in _capablePawns.Intersect(_managedPawns).Where(pawn =>
+                    WorkManager.GetPawnWorkTypeEnabled(pawn, workType) && IsPawnWorkTypeActive(pawn, workType) &&
+                    !IsHunter(pawn)))
                 {
-                    Log.Message("-- Work Manager: Assigning hunters... --", true);
-                }
-                foreach (var pawn in _capablePawns.Intersect(_managedPawns).Where(IsHunter))
-                {
-                    if (Settings.RecoveringPawnsUnfitForWork && HealthAIUtility.ShouldSeekMedicalRest(pawn))
-                    {
-                        if (Prefs.DevMode && Settings.VerboseLogging)
-                        {
-                            Log.Message($"Work Manager: Not assigning '{pawn.LabelShort}' as a hunter (recovering)",
-                                true);
-                        }
-                        continue;
-                    }
                     if (Prefs.DevMode && Settings.VerboseLogging)
                     {
                         Log.Message(
-                            $"Work Manager: Assigning '{pawn.LabelShort}' as a hunter with priority 1 (all hunters)",
-                            true);
+                            $"Work Manager: Removing hunting assignment from '{pawn.LabelShort}' (not a hunter)", true);
                     }
-                    SetPawnWorkTypePriority(pawn, WorkTypeDefOf.Hunting, 1);
+                    SetPawnWorkTypePriority(pawn, workType, 0);
                 }
                 if (Prefs.DevMode && Settings.VerboseLogging) { Log.Message("---------------------", true); }
             }
-            else
+            var hunters = _capablePawns.Where(pawn => IsHunter(pawn) || IsPawnWorkTypeActive(pawn, workType)).ToList();
+            var maxSkillValue = hunters.Any()
+                ? (int) Math.Floor(hunters.Max(pawn => pawn.skills.AverageOfRelevantSkillsFor(workType)))
+                : 0;
+            if (Prefs.DevMode && Settings.VerboseLogging)
             {
-                if (!Settings.SpecialRulesForHunters) { return; }
-                if (Prefs.DevMode && Settings.VerboseLogging)
-                {
-                    Log.Message("-- Work Manager: Assigning hunters... --", true);
-                }
-                var hunters = _capablePawns
-                    .Where(pawn => IsHunter(pawn) || IsPawnWorkTypeActive(pawn, WorkTypeDefOf.Hunting)).ToList();
-                var maxSkillValue = hunters.Any()
-                    ? (int) Math.Floor(
-                        hunters.Max(pawn => pawn.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Hunting)))
-                    : 0;
-                if (Prefs.DevMode && Settings.VerboseLogging)
-                {
-                    Log.Message(
-                        $"Work Manager: Hunters are {string.Join(", ", hunters.Select(p => $"{p.LabelShortCap} ({p.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Hunting):N2})"))}",
-                        true);
-                    Log.Message($"Work Manager: Max hunting skill value = '{maxSkillValue}'", true);
-                }
+                Log.Message(
+                    $"Work Manager: Hunters are {string.Join(", ", hunters.Select(p => $"{p.LabelShortCap} ({p.skills.AverageOfRelevantSkillsFor(workType):N2})"))}",
+                    true);
+                Log.Message($"Work Manager: Max hunting skill value = '{maxSkillValue}'", true);
+            }
+            if (assignEveryone == null || assignEveryone.AllowDedicated)
+            {
                 foreach (var pawn in hunters.Intersect(_managedPawns)
-                    .Except(WorkManager.DisabledPawnWorkTypes.Where(pwt => pwt.WorkType == WorkTypeDefOf.Hunting)
-                        .Select(pwt => pwt.Pawn)).OrderBy(p => IsBadWork(p, WorkTypeDefOf.Hunting))
-                    .ThenByDescending(p => p.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Hunting)))
+                    .Where(pawn => WorkManager.GetPawnWorkTypeEnabled(pawn, workType))
+                    .OrderBy(p => IsBadWork(p, workType))
+                    .ThenByDescending(p => p.skills.AverageOfRelevantSkillsFor(workType)))
                 {
                     if (Settings.RecoveringPawnsUnfitForWork && HealthAIUtility.ShouldSeekMedicalRest(pawn))
                     {
-                        if (Prefs.DevMode && Settings.VerboseLogging)
-                        {
-                            Log.Message($"Work Manager: Not assigning '{pawn.LabelShort}' as a hunter (recovering)",
-                                true);
-                        }
                         continue;
                     }
-                    if (pawn.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Hunting) >= maxSkillValue ||
-                        _capablePawns.Count(p => IsPawnWorkTypeActive(p, WorkTypeDefOf.Hunting)) == 0)
+                    if (pawn.skills.AverageOfRelevantSkillsFor(workType) >= maxSkillValue ||
+                        _capablePawns.Count(p => IsPawnWorkTypeActive(p, workType)) == 0)
                     {
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
@@ -296,18 +357,11 @@ namespace WorkManager
                                 $"Work Manager: Assigning '{pawn.LabelShort}' as a hunter with priority 1 (highest skill value)",
                                 true);
                         }
-                        SetPawnWorkTypePriority(pawn, WorkTypeDefOf.Hunting, 1);
+                        SetPawnWorkTypePriority(pawn, workType, 1);
                     }
                     else
                     {
-                        var minLearningRate = pawn.skills.skills.Min(s => s.LearnRateFactor());
-                        var maxLearningRate = pawn.skills.skills.Max(s => s.LearnRateFactor());
-                        var learningRateRange = maxLearningRate - minLearningRate;
-                        if (learningRateRange < 0.1) { continue; }
-                        var relevantSkills = WorkTypeDefOf.Hunting.relevantSkills;
-                        if (!relevantSkills.Any()) { continue; }
-                        var avgLearnRate = relevantSkills.Average(s => pawn.skills.GetSkill(s).LearnRateFactor());
-                        if (avgLearnRate >= minLearningRate + learningRateRange * 0.6)
+                        if (IsPawnLearningRateAboveMajorThreshold(pawn, workType))
                         {
                             if (Prefs.DevMode && Settings.VerboseLogging)
                             {
@@ -315,9 +369,9 @@ namespace WorkManager
                                     $"Work Manager: Assigning '{pawn.LabelShort}' as a hunter with priority 2 (major learning rate)",
                                     true);
                             }
-                            SetPawnWorkTypePriority(pawn, WorkTypeDefOf.Hunting, 2);
+                            SetPawnWorkTypePriority(pawn, workType, 2);
                         }
-                        else if (avgLearnRate >= minLearningRate + learningRateRange * 0.3)
+                        else if (IsPawnLearningRateAboveMinorThreshold(pawn, workType))
                         {
                             if (Prefs.DevMode && Settings.VerboseLogging)
                             {
@@ -325,45 +379,35 @@ namespace WorkManager
                                     $"Work Manager: Assigning '{pawn.LabelShort}' as a hunter with priority 3 (minor learning rate)",
                                     true);
                             }
-                            SetPawnWorkTypePriority(pawn, WorkTypeDefOf.Hunting, 3);
+                            SetPawnWorkTypePriority(pawn, workType, 3);
                         }
                     }
                 }
-                if (_capablePawns.Count(p => IsPawnWorkTypeActive(p, WorkTypeDefOf.Hunting)) == 0)
-                {
-                    var pawn = _capablePawns.Intersect(_managedPawns)
-                        .Except(WorkManager.DisabledPawnWorkTypes.Where(pwt => pwt.WorkType == WorkTypeDefOf.Hunting)
-                            .Select(pwt => pwt.Pawn)).Where(p => !p.WorkTypeIsDisabled(WorkTypeDefOf.Hunting))
-                        .OrderBy(p => IsBadWork(p, WorkTypeDefOf.Hunting))
-                        .ThenByDescending(p => p.skills.AverageOfRelevantSkillsFor(WorkTypeDefOf.Hunting))
-                        .FirstOrDefault();
-                    {
-                        if (pawn != null)
-                        {
-                            if (Settings.RecoveringPawnsUnfitForWork && HealthAIUtility.ShouldSeekMedicalRest(pawn))
-                            {
-                                if (Prefs.DevMode && Settings.VerboseLogging)
-                                {
-                                    Log.Message(
-                                        $"Work Manager: Not assigning '{pawn.LabelShort}' as a hunter (recovering)",
-                                        true);
-                                }
-                            }
-                            else
-                            {
-                                if (Prefs.DevMode && Settings.VerboseLogging)
-                                {
-                                    Log.Message(
-                                        $"Work Manager: Setting {pawn.LabelShort}'s priority of '{WorkTypeDefOf.Hunting.labelShort}' to {1} (fail-safe)",
-                                        true);
-                                }
-                                SetPawnWorkTypePriority(pawn, WorkTypeDefOf.Hunting, 1);
-                            }
-                        }
-                    }
-                }
-                if (Prefs.DevMode && Settings.VerboseLogging) { Log.Message("---------------------", true); }
             }
+            if (_capablePawns.Count(p => IsPawnWorkTypeActive(p, workType)) == 0)
+            {
+                var pawn = _capablePawns.Intersect(_managedPawns)
+                    .Where(p => WorkManager.GetPawnWorkTypeEnabled(p, workType) && !p.WorkTypeIsDisabled(workType))
+                    .OrderBy(p => IsBadWork(p, workType))
+                    .ThenByDescending(p => p.skills.AverageOfRelevantSkillsFor(workType)).FirstOrDefault();
+                {
+                    if (pawn != null)
+                    {
+                        if (!Settings.RecoveringPawnsUnfitForWork || !HealthAIUtility.ShouldSeekMedicalRest(pawn))
+                        {
+                            if (Prefs.DevMode && Settings.VerboseLogging)
+                            {
+                                Log.Message(
+                                    $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {(assignEveryone == null || assignEveryone.AllowDedicated ? 1 : assignEveryone.Priority)} (fail-safe)",
+                                    true);
+                            }
+                            SetPawnWorkTypePriority(pawn, workType,
+                                assignEveryone == null || assignEveryone.AllowDedicated ? 1 : assignEveryone.Priority);
+                        }
+                    }
+                }
+            }
+            if (Prefs.DevMode && Settings.VerboseLogging) { Log.Message("---------------------", true); }
         }
 
         private void AssignLeftoverWorkTypes()
@@ -373,74 +417,67 @@ namespace WorkManager
                 Log.Message("-- Work Manager: Assigning leftover work types... --", true);
             }
             if (!_capablePawns.Any()) { return; }
-            var workTypes = _managedWorkTypes.Where(o => !CommonWorkTypes.ContainsKey(o) && o != WorkTypeDefOf.Doctor)
-                .ToList();
+            var workTypes = _managedWorkTypes.Where(workType =>
+                !Settings.AssignEveryoneWorkTypes.Any(a => a.WorkTypeDef == workType) &&
+                workType != WorkTypeDefOf.Doctor).ToList();
+            if (Settings.SpecialRulesForDoctors)
+            {
+                workTypes.Remove(_allWorkTypes.FirstOrDefault(workTypeDef =>
+                    "Doctor".Equals(workTypeDef.defName, StringComparison.OrdinalIgnoreCase)));
+            }
             if (Settings.SpecialRulesForHunters)
             {
-                workTypes = workTypes.Except(new[] {WorkTypeDefOf.Hunting}).ToList();
+                workTypes.Remove(_allWorkTypes.FirstOrDefault(workTypeDef =>
+                    "Hunting".Equals(workTypeDef.defName, StringComparison.OrdinalIgnoreCase)));
             }
-            var leftoverWorkTypes = workTypes.Where(w => !_capablePawns.Any(p => IsPawnWorkTypeActive(p, w)));
-            foreach (var workType in leftoverWorkTypes)
+            if (!Settings.UseDedicatedWorkers)
             {
-                var pawn = _capablePawns.Intersect(_managedPawns)
-                    .Except(WorkManager.DisabledPawnWorkTypes.Where(pwt => pwt.WorkType == workType)
-                        .Select(pwt => pwt.Pawn))
-                    .Where(p => !p.WorkTypeIsDisabled(workType) && (!Settings.RecoveringPawnsUnfitForWork ||
-                                                                    !HealthAIUtility.ShouldSeekMedicalRest(p)))
-                    .OrderBy(p => IsBadWork(p, workType)).ThenBy(p => workTypes.Count(w => IsPawnWorkTypeActive(p, w)))
-                    .FirstOrDefault();
-                if (pawn != null)
+                const int priority = 1;
+                var leftoverWorkTypes = workTypes.Where(w => !_capablePawns.Any(p => IsPawnWorkTypeActive(p, w)));
+                foreach (var workType in leftoverWorkTypes)
                 {
-                    if (Prefs.DevMode && Settings.VerboseLogging)
+                    var pawns = _capablePawns.Intersect(_managedPawns)
+                        .Where(p => WorkManager.GetPawnWorkTypeEnabled(p, workType) &&
+                                    !p.WorkTypeIsDisabled(workType) && (!Settings.RecoveringPawnsUnfitForWork ||
+                                                                        !HealthAIUtility.ShouldSeekMedicalRest(p)))
+                        .OrderBy(p => IsBadWork(p, workType))
+                        .ThenBy(p => workTypes.Count(w => IsPawnWorkTypeActive(p, w)));
+                    foreach (var pawn in pawns)
                     {
-                        Log.Message(
-                            $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {1}",
-                            true);
-                    }
-                    SetPawnWorkTypePriority(pawn, workType, 1);
-                }
-            }
-            foreach (var pawn in _capablePawns.Intersect(_managedPawns).Where(p =>
-                (!Settings.RecoveringPawnsUnfitForWork || !HealthAIUtility.ShouldSeekMedicalRest(p)) &&
-                workTypes.Count(w => IsPawnWorkTypeActive(p, w)) == 0))
-            {
-                var workType = workTypes
-                    .Except(
-                        WorkManager.DisabledPawnWorkTypes.Where(pwt => pwt.Pawn == pawn).Select(pwt => pwt.WorkType))
-                    .Where(w => !pawn.WorkTypeIsDisabled(w)).OrderBy(w => IsBadWork(pawn, w))
-                    .ThenBy(w => _capablePawns.Count(p => IsPawnWorkTypeActive(p, w))).FirstOrDefault();
-                if (workType != null)
-                {
-                    if (Prefs.DevMode && Settings.VerboseLogging)
-                    {
-                        Log.Message(
-                            $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {1}",
-                            true);
-                    }
-                    SetPawnWorkTypePriority(pawn, workType, 1);
-                }
-            }
-            foreach (var pawn in _capablePawns.Intersect(_managedPawns))
-            {
-                if (Settings.RecoveringPawnsUnfitForWork && HealthAIUtility.ShouldSeekMedicalRest(pawn)) { continue; }
-                if (Settings.AllHaulers)
-                {
-                    var hauling = DefDatabase<WorkTypeDef>.GetNamed("Hauling");
-                    if (_managedWorkTypes.Contains(hauling) && WorkManager.GetPawnWorkTypeEnabled(pawn, hauling) &&
-                        !pawn.WorkTypeIsDisabled(hauling) && !IsBadWork(pawn, hauling) &&
-                        !IsPawnWorkTypeActive(pawn, hauling))
-                    {
-                        SetPawnWorkTypePriority(pawn, hauling, Settings.AssignAllWorkTypes ? 3 : 4);
+                        if (Settings.RecoveringPawnsUnfitForWork && HealthAIUtility.ShouldSeekMedicalRest(pawn))
+                        {
+                            continue;
+                        }
+                        if (Prefs.DevMode && Settings.VerboseLogging)
+                        {
+                            Log.Message(
+                                $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {priority}",
+                                true);
+                        }
+                        SetPawnWorkTypePriority(pawn, workType, priority);
+                        break;
                     }
                 }
-                if (Settings.AllCleaners)
+                foreach (var pawn in _capablePawns.Intersect(_managedPawns).Where(p =>
+                    workTypes.Count(w => IsPawnWorkTypeActive(p, w)) == 0))
                 {
-                    var cleaning = DefDatabase<WorkTypeDef>.GetNamed("Cleaning");
-                    if (_managedWorkTypes.Contains(cleaning) && WorkManager.GetPawnWorkTypeEnabled(pawn, cleaning) &&
-                        !pawn.WorkTypeIsDisabled(cleaning) && !IsBadWork(pawn, cleaning) &&
-                        !IsPawnWorkTypeActive(pawn, cleaning))
+                    if (Settings.RecoveringPawnsUnfitForWork && HealthAIUtility.ShouldSeekMedicalRest(pawn))
                     {
-                        SetPawnWorkTypePriority(pawn, cleaning, Settings.AssignAllWorkTypes ? 3 : 4);
+                        continue;
+                    }
+                    var workType = workTypes
+                        .Where(wt => WorkManager.GetPawnWorkTypeEnabled(pawn, wt) && !pawn.WorkTypeIsDisabled(wt))
+                        .OrderBy(w => IsBadWork(pawn, w))
+                        .ThenBy(w => _capablePawns.Count(p => IsPawnWorkTypeActive(p, w))).FirstOrDefault();
+                    if (workType != null)
+                    {
+                        if (Prefs.DevMode && Settings.VerboseLogging)
+                        {
+                            Log.Message(
+                                $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {priority}",
+                                true);
+                        }
+                        SetPawnWorkTypePriority(pawn, workType, priority);
                     }
                 }
             }
@@ -452,10 +489,10 @@ namespace WorkManager
                     {
                         continue;
                     }
-                    foreach (var workType in workTypes
-                        .Except(WorkManager.DisabledPawnWorkTypes.Where(pwt => pwt.Pawn == pawn)
-                            .Select(pwt => pwt.WorkType)).Where(w =>
-                            !IsBadWork(pawn, w) && !pawn.WorkTypeIsDisabled(w) && !IsPawnWorkTypeActive(pawn, w)))
+                    foreach (var workType in workTypes.Where(wt => WorkManager.GetPawnWorkTypeEnabled(pawn, wt) &&
+                                                                   !IsBadWork(pawn, wt) &&
+                                                                   !pawn.WorkTypeIsDisabled(wt) &&
+                                                                   !IsPawnWorkTypeActive(pawn, wt)))
                     {
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
@@ -479,54 +516,32 @@ namespace WorkManager
             if (!_capablePawns.Any()) { return; }
             foreach (var pawn in _capablePawns.Intersect(_managedPawns))
             {
-                if (Settings.RecoveringPawnsUnfitForWork && HealthAIUtility.ShouldSeekMedicalRest(pawn))
+                if (Settings.RecoveringPawnsUnfitForWork && HealthAIUtility.ShouldSeekMedicalRest(pawn)) { continue; }
+                var workTypes = _managedWorkTypes.Where(workType =>
+                    WorkManager.GetPawnWorkTypeEnabled(pawn, workType) &&
+                    !Settings.AssignEveryoneWorkTypes.Any(a => a.WorkTypeDef == workType) &&
+                    !pawn.WorkTypeIsDisabled(workType) && !IsBadWork(pawn, workType) &&
+                    !IsPawnWorkTypeActive(pawn, workType)).ToList();
+                if (Settings.SpecialRulesForDoctors)
                 {
-                    if (Prefs.DevMode && Settings.VerboseLogging)
-                    {
-                        Log.Message(
-                            $"Work Manager: Not assigning work by learning rates to '{pawn.LabelShort}' (recovering)",
-                            true);
-                    }
-                    continue;
+                    workTypes.Remove(_allWorkTypes.FirstOrDefault(workTypeDef =>
+                        "Doctor".Equals(workTypeDef.defName, StringComparison.OrdinalIgnoreCase)));
                 }
-                var minLearningRate = pawn.skills.skills.Min(s => s.LearnRateFactor());
-                var maxLearningRate = pawn.skills.skills.Max(s => s.LearnRateFactor());
-                var learningRateRange = maxLearningRate - minLearningRate;
-                if (learningRateRange < 0.1) { continue; }
-                var workTypes = _managedWorkTypes
-                    .Except(
-                        WorkManager.DisabledPawnWorkTypes.Where(pwt => pwt.Pawn == pawn).Select(pwt => pwt.WorkType))
-                    .Where(w => !CommonWorkTypes.ContainsKey(w) && w != WorkTypeDefOf.Doctor &&
-                                !pawn.WorkTypeIsDisabled(w) && !IsBadWork(pawn, w) && !IsPawnWorkTypeActive(pawn, w));
-                if (Settings.SpecialRulesForHunters) { workTypes = workTypes.Except(new[] {WorkTypeDefOf.Hunting}); }
+                if (Settings.SpecialRulesForHunters)
+                {
+                    workTypes.Remove(_allWorkTypes.FirstOrDefault(workTypeDef =>
+                        "Hunting".Equals(workTypeDef.defName, StringComparison.OrdinalIgnoreCase)));
+                }
                 foreach (var workType in workTypes)
                 {
-                    var relevantSkills = workType.relevantSkills;
-                    if (!relevantSkills.Any()) { continue; }
-                    var avgLearnRate = relevantSkills.Average(s => pawn.skills.GetSkill(s).LearnRateFactor());
-                    int priority;
-                    if (avgLearnRate >= minLearningRate + learningRateRange * 0.6)
+                    if (IsPawnLearningRateAboveMajorThreshold(pawn, workType))
                     {
-                        priority = 2;
-                        if (Prefs.DevMode && Settings.VerboseLogging)
-                        {
-                            Log.Message(
-                                $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {priority} (rate = {avgLearnRate} [{minLearningRate}, {maxLearningRate}])",
-                                true);
-                        }
-                        SetPawnWorkTypePriority(pawn, workType, priority);
+                        SetPawnWorkTypePriority(pawn, workType, 2);
                         continue;
                     }
-                    if (avgLearnRate >= minLearningRate + learningRateRange * 0.3)
+                    if (IsPawnLearningRateAboveMinorThreshold(pawn, workType))
                     {
-                        priority = 3;
-                        if (Prefs.DevMode && Settings.VerboseLogging)
-                        {
-                            Log.Message(
-                                $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {priority} (rate = {avgLearnRate} [{minLearningRate}, {maxLearningRate}])",
-                                true);
-                        }
-                        SetPawnWorkTypePriority(pawn, workType, priority);
+                        SetPawnWorkTypePriority(pawn, workType, 3);
                     }
                 }
             }
@@ -535,14 +550,24 @@ namespace WorkManager
 
         private void AssignWorkersBySkill()
         {
+            if (Settings.UseDedicatedWorkers) { return; }
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
                 Log.Message("-- Work Manager: Assigning workers by skill... --", true);
             }
             if (!_capablePawns.Any()) { return; }
             var workTypes = _managedWorkTypes.Where(w =>
-                !CommonWorkTypes.ContainsKey(w) && w != WorkTypeDefOf.Doctor && w.relevantSkills.Any());
-            if (Settings.SpecialRulesForHunters) { workTypes = workTypes.Except(new[] {WorkTypeDefOf.Hunting}); }
+                !Settings.AssignEveryoneWorkTypes.Any(wt => wt.WorkTypeDef == w) && w.relevantSkills.Any()).ToList();
+            if (Settings.SpecialRulesForDoctors)
+            {
+                workTypes.Remove(_allWorkTypes.FirstOrDefault(workTypeDef =>
+                    "Doctor".Equals(workTypeDef.defName, StringComparison.OrdinalIgnoreCase)));
+            }
+            if (Settings.SpecialRulesForHunters)
+            {
+                workTypes.Remove(_allWorkTypes.FirstOrDefault(workTypeDef =>
+                    "Hunting".Equals(workTypeDef.defName, StringComparison.OrdinalIgnoreCase)));
+            }
             const int priority = 1;
             foreach (var workType in workTypes)
             {
@@ -550,18 +575,12 @@ namespace WorkManager
                 var maxSkillValue =
                     (int) Math.Floor(relevantPawns.Max(p => p.skills.AverageOfRelevantSkillsFor(workType)));
                 foreach (var pawn in relevantPawns.Intersect(_managedPawns)
-                    .Except(WorkManager.DisabledPawnWorkTypes.Where(pwt => pwt.WorkType == workType)
-                        .Select(pwt => pwt.Pawn)).OrderBy(p => IsBadWork(p, workType))
+                    .Where(pawn => WorkManager.GetPawnWorkTypeEnabled(pawn, workType))
+                    .OrderBy(p => IsBadWork(p, workType))
                     .ThenByDescending(p => p.skills.AverageOfRelevantSkillsFor(workType)))
                 {
                     if (Settings.RecoveringPawnsUnfitForWork && HealthAIUtility.ShouldSeekMedicalRest(pawn))
                     {
-                        if (Prefs.DevMode && Settings.VerboseLogging)
-                        {
-                            Log.Message(
-                                $"Work Manager: Not assigning work by skill value to '{pawn.LabelShort}' (recovering)",
-                                true);
-                        }
                         continue;
                     }
                     if (!IsBadWork(pawn, workType) &&
@@ -581,12 +600,31 @@ namespace WorkManager
             if (Prefs.DevMode && Settings.VerboseLogging) { Log.Message("---------------------", true); }
         }
 
+        private void AssignWorkForRecoveringPawns()
+        {
+            if (!Settings.RecoveringPawnsUnfitForWork) { return; }
+            if (Prefs.DevMode && Settings.VerboseLogging)
+            {
+                Log.Message("-- Work Manager: Assigning work for recovering pawns --", true);
+            }
+            var relevantWorkTypes = _allWorkTypes.Where(wt => new[] {"Patient", "PatientBedRest"}.Contains(wt.defName))
+                .Intersect(_managedWorkTypes);
+            foreach (var workTypeDef in relevantWorkTypes)
+            {
+                foreach (var pawn in _managedPawns.Intersect(_capablePawns).Where(pawn =>
+                    WorkManager.GetPawnWorkTypeEnabled(pawn, workTypeDef) && !pawn.WorkTypeIsDisabled(workTypeDef) &&
+                    !IsBadWork(pawn, workTypeDef))) { SetPawnWorkTypePriority(pawn, workTypeDef, 1); }
+            }
+        }
+
         private void AssignWorkPriorities()
         {
             ResetWorkPriorities();
+            AssignWorkForRecoveringPawns();
             AssignCommonWork();
             AssignDoctors();
             AssignHunters();
+            AssignDedicatedWorkers();
             AssignWorkersBySkill();
             AssignWorkersByLearningRate();
             AssignLeftoverWorkTypes();
@@ -618,8 +656,8 @@ namespace WorkManager
             var pawns = _capablePawns.Intersect(_managedPawns)
                 .Where(p => _idlePawns.ContainsKey(p) || !p.Drafted && p.mindState.IsIdle).ToList();
             if (!pawns.Any()) { return; }
-            var workTypes = _managedWorkTypes.Where(o => !CommonWorkTypes.ContainsKey(o) && o != WorkTypeDefOf.Doctor)
-                .ToList();
+            var workTypes = _managedWorkTypes.Where(o =>
+                !Settings.AssignEveryoneWorkTypes.Any(wt => wt.WorkTypeDef == o) && o != WorkTypeDefOf.Doctor).ToList();
             if (Settings.SpecialRulesForHunters)
             {
                 workTypes = workTypes.Except(new[] {WorkTypeDefOf.Hunting}).ToList();
@@ -627,30 +665,30 @@ namespace WorkManager
             const int priority = 4;
             foreach (var pawn in pawns)
             {
-                if (Settings.RecoveringPawnsUnfitForWork && HealthAIUtility.ShouldSeekMedicalRest(pawn))
+                if (Settings.RecoveringPawnsUnfitForWork && HealthAIUtility.ShouldSeekMedicalRest(pawn)) { continue; }
+                foreach (var workType in workTypes.Where(wt =>
+                    WorkManager.GetPawnWorkTypeEnabled(pawn, wt) && !pawn.WorkTypeIsDisabled(wt) &&
+                    !IsBadWork(pawn, wt) && !IsPawnWorkTypeActive(pawn, wt)))
                 {
-                    if (Prefs.DevMode && Settings.VerboseLogging)
-                    {
-                        Log.Message($"Work Manager: Not assigning work to idle '{pawn.LabelShort}' (recovering)", true);
-                    }
-                    continue;
-                }
-                foreach (var workType in workTypes
-                    .Except(
-                        WorkManager.DisabledPawnWorkTypes.Where(pwt => pwt.Pawn == pawn).Select(pwt => pwt.WorkType))
-                    .Where(w => !pawn.WorkTypeIsDisabled(w) && !IsBadWork(pawn, w) && !IsPawnWorkTypeActive(pawn, w)))
-                {
-                    if (Prefs.DevMode && Settings.VerboseLogging)
-                    {
-                        Log.Message(
-                            $"Work Manager: Setting {pawn.LabelShort}'s priority of '{workType.labelShort}' to {priority} (idle)",
-                            true);
-                    }
                     SetPawnWorkTypePriority(pawn, workType, priority);
                 }
                 if (!_idlePawns.ContainsKey(pawn)) { _idlePawns.Add(pawn, new DayTime(_currentDay, _currentTime)); }
             }
             if (Prefs.DevMode && Settings.VerboseLogging) { Log.Message("---------------------", true); }
+        }
+
+        private static float GetPawnLearningRate([NotNull] Pawn pawn, [NotNull] WorkTypeDef workType)
+        {
+            if (pawn == null) { throw new ArgumentNullException(nameof(pawn)); }
+            if (workType == null) { throw new ArgumentNullException(nameof(workType)); }
+            return workType.relevantSkills.Any()
+                ? workType.relevantSkills.Average(s => pawn.skills.GetSkill(s).LearnRateFactor())
+                : 0;
+        }
+
+        private int GetPawnWorkTypePriority(Pawn pawn, Def workType)
+        {
+            return _pawnWorkPriorities[pawn].FirstOrDefault(w => w.WorkType == workType)?.Priority ?? 0;
         }
 
         [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]
@@ -663,44 +701,38 @@ namespace WorkManager
         private static bool IsHunter([NotNull] Pawn pawn)
         {
             if (pawn == null) { throw new ArgumentNullException(nameof(pawn)); }
-            if (pawn.WorkTypeIsDisabled(WorkTypeDefOf.Hunting))
-            {
-                if (Prefs.DevMode && Settings.VerboseLogging)
-                {
-                    Log.Message($"-- Work Manager: {pawn.LabelShort} is not a hunter (can not do hunting) --", true);
-                }
-                return false;
-            }
-            if (IsBadWork(pawn, WorkTypeDefOf.Hunting))
-            {
-                if (Prefs.DevMode && Settings.VerboseLogging)
-                {
-                    Log.Message($"-- Work Manager: {pawn.LabelShort} is not a hunter (bad work type) --", true);
-                }
-                return false;
-            }
-            if (pawn.story.traits.HasTrait(TraitDefOf.Brawler) && !Settings.AllowMeleeHunters)
-            {
-                if (Prefs.DevMode && Settings.VerboseLogging)
-                {
-                    Log.Message($"-- Work Manager: {pawn.LabelShort} is not a hunter (brawler trait) --", true);
-                }
-                return false;
-            }
+            if (pawn.WorkTypeIsDisabled(WorkTypeDefOf.Hunting)) { return false; }
+            if (IsBadWork(pawn, WorkTypeDefOf.Hunting)) { return false; }
+            if (pawn.story.traits.HasTrait(TraitDefOf.Brawler) && !Settings.AllowMeleeHunters) { return false; }
             if ((pawn.equipment.Primary == null || pawn.equipment.Primary.def.IsMeleeWeapon) &&
-                !Settings.AllowMeleeHunters)
-            {
-                if (Prefs.DevMode && Settings.VerboseLogging)
-                {
-                    Log.Message($"-- Work Manager: {pawn.LabelShort} is not a hunter (has melee weapon) --", true);
-                }
-                return false;
-            }
-            if (Prefs.DevMode && Settings.VerboseLogging)
-            {
-                Log.Message($"-- Work Manager: {pawn.LabelShort} is a hunter --", true);
-            }
+                !Settings.AllowMeleeHunters) { return false; }
             return true;
+        }
+
+        private bool IsPawnLearningRateAboveMajorThreshold([NotNull] Pawn pawn, [NotNull] WorkTypeDef workType)
+        {
+            if (pawn == null) { throw new ArgumentNullException(nameof(pawn)); }
+            if (workType == null) { throw new ArgumentNullException(nameof(workType)); }
+            var learnRate = GetPawnLearningRate(pawn, workType);
+            if (!Settings.UsePawnLearningRateThresholds) { return learnRate >= Settings.MajorLearningRateThreshold; }
+            var minLearningRate = pawn.skills.skills.Min(s => s.LearnRateFactor());
+            var maxLearningRate = pawn.skills.skills.Max(s => s.LearnRateFactor());
+            var learningRateRange = maxLearningRate - minLearningRate;
+            if (learningRateRange < 0.01) { return false; }
+            return learnRate >= minLearningRate + learningRateRange * Settings.MajorLearningRateThreshold;
+        }
+
+        private bool IsPawnLearningRateAboveMinorThreshold([NotNull] Pawn pawn, [NotNull] WorkTypeDef workType)
+        {
+            if (pawn == null) { throw new ArgumentNullException(nameof(pawn)); }
+            if (workType == null) { throw new ArgumentNullException(nameof(workType)); }
+            var learnRate = GetPawnLearningRate(pawn, workType);
+            if (!Settings.UsePawnLearningRateThresholds) { return learnRate >= Settings.MinorLearningRateThreshold; }
+            var minLearningRate = pawn.skills.skills.Min(s => s.LearnRateFactor());
+            var maxLearningRate = pawn.skills.skills.Max(s => s.LearnRateFactor());
+            var learningRateRange = maxLearningRate - minLearningRate;
+            if (learningRateRange < 0.01) { return false; }
+            return learnRate >= minLearningRate + learningRateRange * Settings.MinorLearningRateThreshold;
         }
 
         private bool IsPawnWorkTypeActive(Pawn pawn, WorkTypeDef workType)
@@ -772,6 +804,11 @@ namespace WorkManager
 
         private void UpdateCache()
         {
+            if (Settings.AssignEveryoneWorkTypes == null)
+            {
+                Settings.AssignEveryoneWorkTypes =
+                    new List<AssignEveryoneWorkType>(Settings.DefaultAssignEveryoneWorkTypes);
+            }
             _allPawns.Clear();
             _allPawns.AddRange(map.mapPawns.FreeColonistsSpawned);
             _capablePawns.Clear();
