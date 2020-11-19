@@ -572,6 +572,7 @@ namespace WorkManager
             foreach (var workType in workTypes)
             {
                 var relevantPawns = _capablePawns.Where(p => !p.WorkTypeIsDisabled(workType)).ToList();
+                if (!relevantPawns.Any()) { continue; }
                 var maxSkillValue =
                     (int) Math.Floor(relevantPawns.Max(p => p.skills.AverageOfRelevantSkillsFor(workType)));
                 foreach (var pawn in relevantPawns.Intersect(_managedPawns)
