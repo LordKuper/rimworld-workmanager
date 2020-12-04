@@ -124,6 +124,10 @@ namespace WorkManager
 
         public static void DoWindowContents(Rect rect)
         {
+            if (AssignEveryoneWorkTypes == null)
+            {
+                AssignEveryoneWorkTypes = new List<AssignEveryoneWorkType>(DefaultAssignEveryoneWorkTypes);
+            }
             var listing = new Listing_Standard();
             const int boolSettingsCount = 14;
             const int numericSettingsCount = 3;

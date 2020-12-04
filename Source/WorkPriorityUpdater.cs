@@ -96,10 +96,11 @@ namespace WorkManager
             {
                 Log.Message($"-- Work Manager: Target dedicated workers by work type = {targetWorkers} --", true);
             }
-            foreach (var workType in workTypes.OrderByDescending(wt => wt.naturalPriority))
+            foreach (var workType in workTypes.OrderByDescending(wt => wt.relevantSkills.Any())
+                .ThenByDescending(wt => wt.naturalPriority))
             {
-                var pawnSkills = new Dictionary<Pawn, float>(_capablePawns.ToDictionary(pawn => pawn,
-                    pawn => pawn.skills.AverageOfRelevantSkillsFor(workType)));
+                var pawnSkills = new Dictionary<Pawn, int>(_capablePawns.ToDictionary(pawn => pawn,
+                    pawn => (int) Math.Floor(pawn.skills.AverageOfRelevantSkillsFor(workType))));
                 var skillRange = pawnSkills.Max(pair => pair.Value) - pawnSkills.Min(pair => pair.Value);
                 var pawnLearnRates =
                     new Dictionary<Pawn, float>(_capablePawns.ToDictionary(pawn => pawn,
@@ -117,12 +118,14 @@ namespace WorkManager
                     {
                         continue;
                     }
-                    var normalizedSkill = skillRange == 0 ? 0 : pawnSkills[pawn] / skillRange;
+                    var skill = pawnSkills[pawn];
+                    var normalizedSkill = skillRange == 0 ? 0 : skill / skillRange;
                     var normalizedLearnRate = learnRateRange == 0 ? 0 : pawnLearnRates[pawn] / learnRateRange;
                     var normalizedDedications = dedicationsCountRange == 0
                         ? 0
                         : pawnDedicationsCounts[pawn] / dedicationsCountRange;
-                    var score = normalizedSkill + 0.75f * normalizedLearnRate - normalizedDedications;
+                    var score = (float) normalizedSkill - normalizedDedications;
+                    score += skill < 20 ? 0.75f * normalizedLearnRate : 0.25f * normalizedLearnRate;
                     pawnScores.Add(pawn, score);
                 }
                 if (Prefs.DevMode && Settings.VerboseLogging)
@@ -263,7 +266,8 @@ namespace WorkManager
                 if (Settings.CountDownedGuests && map.IsPlayerHome)
                 {
                     patientCount += map.mapPawns.AllPawnsSpawned.Count(pawn =>
-                        pawn.guest != null && !pawn.IsPrisoner && pawn.Downed);
+                        pawn.guest != null && !pawn.IsColonist && !pawn.guest.IsPrisoner && !pawn.IsPrisoner &&
+                        pawn.Downed);
                 }
                 if (Settings.CountDownedPrisoners && map.IsPlayerHome)
                 {
@@ -344,6 +348,7 @@ namespace WorkManager
                     .OrderBy(p => IsBadWork(p, workType))
                     .ThenByDescending(p => p.skills.AverageOfRelevantSkillsFor(workType)))
                 {
+                    if (IsBadWork(pawn, workType)) { continue; }
                     if (Settings.RecoveringPawnsUnfitForWork && HealthAIUtility.ShouldSeekMedicalRest(pawn))
                     {
                         continue;
@@ -387,9 +392,9 @@ namespace WorkManager
             if (_capablePawns.Count(p => IsPawnWorkTypeActive(p, workType)) == 0)
             {
                 var pawn = _capablePawns.Intersect(_managedPawns)
-                    .Where(p => WorkManager.GetPawnWorkTypeEnabled(p, workType) && !p.WorkTypeIsDisabled(workType))
-                    .OrderBy(p => IsBadWork(p, workType))
-                    .ThenByDescending(p => p.skills.AverageOfRelevantSkillsFor(workType)).FirstOrDefault();
+                    .Where(p => WorkManager.GetPawnWorkTypeEnabled(p, workType) && !p.WorkTypeIsDisabled(workType) &&
+                                !IsBadWork(p, workType))
+                    .OrderByDescending(p => p.skills.AverageOfRelevantSkillsFor(workType)).FirstOrDefault();
                 {
                     if (pawn != null)
                     {
@@ -436,12 +441,11 @@ namespace WorkManager
                 var leftoverWorkTypes = workTypes.Where(w => !_capablePawns.Any(p => IsPawnWorkTypeActive(p, w)));
                 foreach (var workType in leftoverWorkTypes)
                 {
-                    var pawns = _capablePawns.Intersect(_managedPawns)
-                        .Where(p => WorkManager.GetPawnWorkTypeEnabled(p, workType) &&
-                                    !p.WorkTypeIsDisabled(workType) && (!Settings.RecoveringPawnsUnfitForWork ||
-                                                                        !HealthAIUtility.ShouldSeekMedicalRest(p)))
-                        .OrderBy(p => IsBadWork(p, workType))
-                        .ThenBy(p => workTypes.Count(w => IsPawnWorkTypeActive(p, w)));
+                    var pawns = _capablePawns.Intersect(_managedPawns).Where(p =>
+                        WorkManager.GetPawnWorkTypeEnabled(p, workType) && !p.WorkTypeIsDisabled(workType) &&
+                        !IsBadWork(p, workType) && (!Settings.RecoveringPawnsUnfitForWork ||
+                                                    !HealthAIUtility.ShouldSeekMedicalRest(p))).OrderBy(p =>
+                        workTypes.Count(w => IsPawnWorkTypeActive(p, w)));
                     foreach (var pawn in pawns)
                     {
                         if (Settings.RecoveringPawnsUnfitForWork && HealthAIUtility.ShouldSeekMedicalRest(pawn))
@@ -466,9 +470,10 @@ namespace WorkManager
                         continue;
                     }
                     var workType = workTypes
-                        .Where(wt => WorkManager.GetPawnWorkTypeEnabled(pawn, wt) && !pawn.WorkTypeIsDisabled(wt))
-                        .OrderBy(w => IsBadWork(pawn, w))
-                        .ThenBy(w => _capablePawns.Count(p => IsPawnWorkTypeActive(p, w))).FirstOrDefault();
+                        .Where(wt =>
+                            WorkManager.GetPawnWorkTypeEnabled(pawn, wt) && !pawn.WorkTypeIsDisabled(wt) &&
+                            !IsBadWork(pawn, wt)).OrderBy(w => _capablePawns.Count(p => IsPawnWorkTypeActive(p, w)))
+                        .FirstOrDefault();
                     if (workType != null)
                     {
                         if (Prefs.DevMode && Settings.VerboseLogging)
@@ -576,9 +581,8 @@ namespace WorkManager
                 var maxSkillValue =
                     (int) Math.Floor(relevantPawns.Max(p => p.skills.AverageOfRelevantSkillsFor(workType)));
                 foreach (var pawn in relevantPawns.Intersect(_managedPawns)
-                    .Where(pawn => WorkManager.GetPawnWorkTypeEnabled(pawn, workType))
-                    .OrderBy(p => IsBadWork(p, workType))
-                    .ThenByDescending(p => p.skills.AverageOfRelevantSkillsFor(workType)))
+                    .Where(pawn => WorkManager.GetPawnWorkTypeEnabled(pawn, workType) && !IsBadWork(pawn, workType))
+                    .OrderByDescending(p => p.skills.AverageOfRelevantSkillsFor(workType)))
                 {
                     if (Settings.RecoveringPawnsUnfitForWork && HealthAIUtility.ShouldSeekMedicalRest(pawn))
                     {
