@@ -89,17 +89,18 @@ namespace WorkManager
             foreach (var workType in workTypes.OrderByDescending(wt => wt.relevantSkills.Count)
                 .ThenByDescending(wt => wt.naturalPriority))
             {
-                var pawnSkills = capablePawns.ToDictionary(pc => pc, pc => pc.WorkSkillLevels[workType]);
+                var relevantPawns = capablePawns.Where(pc =>
+                    !pc.IsRecovering && !pc.IsDisabledWork(workType) && !pc.IsBadWork(workType)).ToList();
+                var pawnSkills = relevantPawns.ToDictionary(pc => pc, pc => pc.WorkSkillLevels[workType]);
                 var skillRange = pawnSkills.Max(pair => pair.Value) - pawnSkills.Min(pair => pair.Value);
-                var pawnLearnRates = capablePawns.ToDictionary(pc => pc, pc => pc.WorkSkillLearningRates[workType]);
+                var pawnLearnRates = relevantPawns.ToDictionary(pc => pc, pc => pc.WorkSkillLearningRates[workType]);
                 var learnRateRange = pawnLearnRates.Max(pair => pair.Value) - pawnLearnRates.Min(pair => pair.Value);
-                var pawnDedicationsCounts = capablePawns.ToDictionary(pc => pc,
+                var pawnDedicationsCounts = relevantPawns.ToDictionary(pc => pc,
                     pc => workTypes.Count(wt => pc.WorkPriorities[wt] == 1));
                 var dedicationsCountRange = pawnDedicationsCounts.Max(pair => pair.Value) -
                                             pawnDedicationsCounts.Min(pair => pair.Value);
                 var pawnScores = new Dictionary<PawnCache, float>();
-                foreach (var pawnCache in capablePawns.Where(pc =>
-                    !pc.IsRecovering && !pc.IsDisabledWork(workType) && !pc.IsBadWork(workType)))
+                foreach (var pawnCache in relevantPawns)
                 {
                     var skill = pawnSkills[pawnCache];
                     var normalizedSkill = skillRange == 0 ? 0 : skill / skillRange;
