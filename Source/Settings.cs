@@ -145,7 +145,7 @@ namespace WorkManager
             TooltipHandler.TipRegion(optionRect, Resources.Strings.UpdateIntervalTooltip);
             Widgets.DrawHighlightIfMouseover(optionRect);
             Widgets.Label(labelRect, Resources.Strings.UpdateInterval);
-            UpdateFrequency = (int) Widgets.HorizontalSlider(fieldRect.ContractedBy(4f), UpdateFrequency, 1f, 120f,
+            UpdateFrequency = (int) Widgets.HorizontalSlider(fieldRect.ContractedBy(4f), UpdateFrequency, 0f, 120f,
                 true, UpdateFrequency.ToString(), roundTo: 1);
             listing.Gap(listing.verticalSpacing);
             listing.CheckboxLabeled(Resources.Strings.UsePawnLearningRateThresholds, ref UsePawnLearningRateThresholds,
@@ -159,7 +159,7 @@ namespace WorkManager
             Widgets.DrawHighlightIfMouseover(optionRect);
             Widgets.Label(labelRect, Resources.Strings.MajorLearningRateThreshold);
             MajorLearningRateThreshold = Widgets.HorizontalSlider(fieldRect.ContractedBy(4f),
-                MajorLearningRateThreshold, MinorLearningRateThreshold, UsePawnLearningRateThresholds ? 2f : 1f, true,
+                MajorLearningRateThreshold, MinorLearningRateThreshold, UsePawnLearningRateThresholds ? 1f : 2f, true,
                 MajorLearningRateThreshold.ToStringPercent());
             listing.Gap(listing.verticalSpacing);
             optionRect = listing.GetRect(Text.LineHeight * 1.5f);

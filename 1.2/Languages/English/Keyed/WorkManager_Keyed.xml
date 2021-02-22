@@ -3,7 +3,7 @@
 <LanguageData>
   <WorkManager>Work Manager</WorkManager>
   <WorkManager.UpdateInterval>Update frequency</WorkManager.UpdateInterval>
-  <WorkManager.UpdateIntervalTooltip>How many times to update work priorities per in-game day</WorkManager.UpdateIntervalTooltip>
+  <WorkManager.UpdateIntervalTooltip>How many times to update work priorities per in-game day (0 = run continously)</WorkManager.UpdateIntervalTooltip>
   <WorkManager.UsePawnLearningRateThresholds>Use individual skill learning rate thresholds</WorkManager.UsePawnLearningRateThresholds>
   <WorkManager.UsePawnLearningRateThresholdsTooltip>Use skill learning rate thresholds calculated for each pawn individually, considering their minimal and maximal skill learning rates.</WorkManager.UsePawnLearningRateThresholdsTooltip>
   <WorkManager.MajorLearningRateThreshold>Major skill learning rate threshold</WorkManager.MajorLearningRateThreshold>
