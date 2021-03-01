@@ -24,7 +24,7 @@ namespace WorkManager
             if (LoadedModManager.RunningModsListForReading.Any(m =>
                 "notfood.MoreThanCapable".Equals(m.PackageId, StringComparison.OrdinalIgnoreCase)))
             {
-                if (Prefs.DevMode) { Log.Message("Work Manager: MoreThanCapable detected.", true); }
+                if (Prefs.DevMode) { Log.Message("Work Manager: MoreThanCapable detected."); }
                 Settings.IsBadWorkMethod =
                     AccessTools.Method(AccessTools.TypeByName("MoreThanCapable.MoreThanCapableMod"), "IsBadWork");
             }
@@ -32,7 +32,7 @@ namespace WorkManager
 
         private void ApplyWorkTabPatch(Harmony harmony)
         {
-            if (Prefs.DevMode) { Log.Message("Work Manager: Fluffy's WorkTab detected.", true); }
+            if (Prefs.DevMode) { Log.Message("Work Manager: Fluffy's WorkTab detected."); }
             harmony.Patch(
                 AccessTools.Method(AccessTools.TypeByName("WorkTab.MainTabWindow_WorkTab"), "DoWindowContents"),
                 postfix: new HarmonyMethod(typeof(WorkTabPatch), nameof(WorkTabPatch.DoWindowContentsPostfix)));

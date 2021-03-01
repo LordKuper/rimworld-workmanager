@@ -53,8 +53,8 @@ namespace WorkManager
         {
             return !DisabledWorkTypes.Contains(WorkTypeDefOf.Hunting) && !IsBadWork(WorkTypeDefOf.Hunting) &&
                    (Settings.AllowMeleeHunters || !Pawn.story.traits.HasTrait(TraitDefOf.Brawler)) &&
-                   (Settings.AllowMeleeHunters || Pawn.equipment.Primary != null) &&
-                   !Pawn.equipment.Primary.def.IsMeleeWeapon;
+                   (Settings.AllowMeleeHunters ||
+                    Pawn.equipment.Primary != null && !Pawn.equipment.Primary.def.IsMeleeWeapon);
         }
 
         public bool IsLearningRateAboveThreshold([NotNull] WorkTypeDef workType, bool majorThreshold)

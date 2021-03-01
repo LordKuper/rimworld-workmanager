@@ -91,6 +91,7 @@ namespace WorkManager
             {
                 var relevantPawns = capablePawns.Where(pc =>
                     !pc.IsRecovering && !pc.IsDisabledWork(workType) && !pc.IsBadWork(workType)).ToList();
+                if (!relevantPawns.Any()) { continue; }
                 var pawnSkills = relevantPawns.ToDictionary(pc => pc, pc => pc.WorkSkillLevels[workType]);
                 var skillRange = pawnSkills.Max(pair => pair.Value) - pawnSkills.Min(pair => pair.Value);
                 var pawnLearnRates = relevantPawns.ToDictionary(pc => pc, pc => pc.WorkSkillLearningRates[workType]);
@@ -236,20 +237,20 @@ namespace WorkManager
             {
                 var patientCount = 0;
                 if (Settings.CountDownedColonists) { patientCount += _allPawns.Count(pawn => pawn.Downed); }
-                if (Settings.CountDownedGuests && map.IsPlayerHome)
+                if (Settings.CountDownedGuests && (map?.IsPlayerHome ?? false))
                 {
-                    patientCount += map.mapPawns.AllPawnsSpawned.Count(pawn =>
-                        pawn.guest != null && !pawn.IsColonist && !pawn.guest.IsPrisoner && !pawn.IsPrisoner &&
-                        pawn.Downed);
+                    patientCount += map?.mapPawns?.AllPawnsSpawned?.Count(pawn =>
+                        pawn?.guest != null && !pawn.IsColonist && !pawn.guest.IsPrisoner && !pawn.IsPrisoner &&
+                        pawn.Downed) ?? 0;
                 }
-                if (Settings.CountDownedPrisoners && map.IsPlayerHome)
+                if (Settings.CountDownedPrisoners && (map?.IsPlayerHome ?? false))
                 {
-                    patientCount += map.mapPawns.PrisonersOfColonySpawned.Count(pawn => pawn.Downed);
+                    patientCount += map?.mapPawns?.PrisonersOfColonySpawned?.Count(pawn => pawn.Downed) ?? 0;
                 }
-                if (Settings.CountDownedAnimals && map.IsPlayerHome)
+                if (Settings.CountDownedAnimals && (map?.IsPlayerHome ?? false))
                 {
-                    patientCount += map.mapPawns.PawnsInFaction(Faction.OfPlayer).Where(p => p.RaceProps.Animal)
-                        .Count(pawn => pawn.Downed);
+                    patientCount += map?.mapPawns?.PawnsInFaction(Faction.OfPlayer)?.Where(p => p.RaceProps.Animal)
+                        .Count(pawn => pawn.Downed) ?? 0;
                 }
                 if (Prefs.DevMode && Settings.VerboseLogging)
                 {
@@ -556,19 +557,6 @@ namespace WorkManager
             }
         }
 
-        private void AssignWorkPriorities()
-        {
-            AssignWorkForRecoveringPawns();
-            AssignCommonWork();
-            AssignDoctors();
-            AssignHunters();
-            AssignDedicatedWorkers();
-            AssignWorkersBySkill();
-            AssignWorkersByLearningRate();
-            AssignLeftoverWorkTypes();
-            AssignWorkToIdlePawns();
-        }
-
         private void AssignWorkToIdlePawns()
         {
             if (!Settings.AssignWorkToIdlePawns) { return; }
@@ -623,14 +611,15 @@ namespace WorkManager
             {
                 if (Prefs.DevMode && Settings.VerboseLogging)
                 {
-                    foreach (var message in _logMessages) { Log.Message(message, true); }
-                    Log.Message("----- Work Manager: Applying work priorities... -----", true);
+                    foreach (var message in _logMessages) { Log.Message(message); }
+                    Log.Message("----- Work Manager: Applying work priorities... -----");
                 }
                 _logMessages.Clear();
                 ApplyWorkPriorities();
                 _updaterTask.Dispose();
                 _updaterTask = null;
             }
+            if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused) { return; }
             if ((Find.TickManager.TicksGame + GetHashCode()) % 60 != 0) { return; }
             var day = GenLocalDate.DayOfYear(map);
             var hourFloat = GenLocalDate.HourFloat(map);
@@ -642,32 +631,30 @@ namespace WorkManager
                 foreach (var pawn in PawnsFinder.AllMapsWorldAndTemporary_Alive.Where(pawn =>
                     pawn.Faction == Faction.OfPlayer)) { pawn.workSettings?.Notify_UseWorkPrioritiesChanged(); }
             }
+            if (Settings.AssignEveryoneWorkTypes == null)
+            {
+                Settings.AssignEveryoneWorkTypes =
+                    new List<AssignEveryoneWorkType>(Settings.DefaultAssignEveryoneWorkTypes);
+            }
             if (_updaterTask == null)
             {
                 if (Prefs.DevMode && Settings.VerboseLogging)
                 {
                     Log.Message(
-                        $"----- Work Manager: Updating work priorities... (day = {day}, hour = {hourFloat}) -----",
-                        true);
+                        $"----- Work Manager: Updating work priorities... (day = {day}, hour = {hourFloat}) -----");
                 }
                 _currentDay = day;
                 _currentTime = hourFloat;
-                UpdateCache();
-                if (_allPawns.Any()) { _updaterTask = Task.Run(AssignWorkPriorities); }
+                _updaterTask = Task.Run(UpdateWorkPriorities);
                 if (Prefs.DevMode && Settings.VerboseLogging)
                 {
-                    Log.Message("----------------------------------------------------", true);
+                    Log.Message("----------------------------------------------------");
                 }
             }
         }
 
         private void UpdateCache()
         {
-            if (Settings.AssignEveryoneWorkTypes == null)
-            {
-                Settings.AssignEveryoneWorkTypes =
-                    new List<AssignEveryoneWorkType>(Settings.DefaultAssignEveryoneWorkTypes);
-            }
             if (!_allWorkTypes.Any())
             {
                 _allWorkTypes.AddRange(DefDatabase<WorkTypeDef>.AllDefsListForReading.Where(w => w.visible));
@@ -676,6 +663,10 @@ namespace WorkManager
             _managedWorkTypes.AddRange(_allWorkTypes.Where(w => WorkManager.GetWorkTypeEnabled(w)));
             _allPawns.Clear();
             _allPawns.AddRange(map.mapPawns.FreeColonistsSpawned);
+            foreach (var pawn in _pawnCache.Keys.Where(pawn => !_allPawns.Contains(pawn)).ToList())
+            {
+                _pawnCache.Remove(pawn);
+            }
             foreach (var pawn in _allPawns)
             {
                 if (!_pawnCache.ContainsKey(pawn)) { _pawnCache.Add(pawn, new PawnCache(pawn)); }
@@ -731,6 +722,30 @@ namespace WorkManager
                     cache.WorkPriorities.Add(workType, 0);
                 }
                 else { cache.WorkPriorities.Add(workType, pawn.workSettings.GetPriority(workType)); }
+            }
+        }
+
+        private void UpdateWorkPriorities()
+        {
+            try
+            {
+                UpdateCache();
+                AssignWorkForRecoveringPawns();
+                AssignCommonWork();
+                AssignDoctors();
+                AssignHunters();
+                AssignDedicatedWorkers();
+                AssignWorkersBySkill();
+                AssignWorkersByLearningRate();
+                AssignLeftoverWorkTypes();
+                AssignWorkToIdlePawns();
+            }
+            catch (Exception exception)
+            {
+                Log.Error(
+                    $"-- Work Manager: An error has occurred: {exception.Message} --\n{exception.StackTrace}\n{string.Join("\n", _logMessages)}",
+                    true);
+                _logMessages.Clear();
             }
         }
     }
