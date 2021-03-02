@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
@@ -8,7 +7,6 @@ using Verse;
 
 namespace WorkManager
 {
-    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public class Settings : ModSettings
     {
         private static float _allowDedicatedColumnWidth;
@@ -128,6 +126,7 @@ namespace WorkManager
             {
                 AssignEveryoneWorkTypes = new List<AssignEveryoneWorkType>(DefaultAssignEveryoneWorkTypes);
             }
+            if (UpdateFrequency == 0) { UpdateFrequency = 24; }
             var listing = new Listing_Standard();
             const int boolSettingsCount = 14;
             const int numericSettingsCount = 3;
@@ -145,7 +144,7 @@ namespace WorkManager
             TooltipHandler.TipRegion(optionRect, Resources.Strings.UpdateIntervalTooltip);
             Widgets.DrawHighlightIfMouseover(optionRect);
             Widgets.Label(labelRect, Resources.Strings.UpdateInterval);
-            UpdateFrequency = (int) Widgets.HorizontalSlider(fieldRect.ContractedBy(4f), UpdateFrequency, 0f, 120f,
+            UpdateFrequency = (int) Widgets.HorizontalSlider(fieldRect.ContractedBy(4f), UpdateFrequency, 1f, 120f,
                 true, UpdateFrequency.ToString(), roundTo: 1);
             listing.Gap(listing.verticalSpacing);
             listing.CheckboxLabeled(Resources.Strings.UsePawnLearningRateThresholds, ref UsePawnLearningRateThresholds,
