@@ -12,7 +12,6 @@ namespace WorkManager
     {
         private readonly HashSet<Pawn> _allPawns = new HashSet<Pawn>();
         private readonly HashSet<WorkTypeDef> _allWorkTypes = new HashSet<WorkTypeDef>();
-        private readonly List<string> _logMessages = new List<string>();
         private readonly HashSet<WorkTypeDef> _managedWorkTypes = new HashSet<WorkTypeDef>();
         private readonly Dictionary<Pawn, PawnCache> _pawnCache = new Dictionary<Pawn, PawnCache>();
 
@@ -37,7 +36,7 @@ namespace WorkManager
         {
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
-                _logMessages.Add(
+                Log.Message(
                     $"-- Work Manager: Assigning common work types ({string.Join(", ", Settings.AssignEveryoneWorkTypes.Select(workType => $"{workType.Label}[{workType.Priority}]"))}) --");
             }
             var relevantWorkTypes = Settings.AssignEveryoneWorkTypes.Where(workType => workType.IsWorkTypeLoaded)
@@ -61,7 +60,7 @@ namespace WorkManager
             if (!capablePawns.Any()) { return; }
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
-                _logMessages.Add("-- Work Manager: Assigning dedicated workers --");
+                Log.Message("-- Work Manager: Assigning dedicated workers --");
             }
             var workTypes = _allWorkTypes.Intersect(_managedWorkTypes).Where(wt =>
                     Settings.AssignEveryoneWorkTypes.FirstOrDefault(a => a.WorkTypeDef == wt)?.AllowDedicated ?? true)
@@ -80,7 +79,7 @@ namespace WorkManager
             var targetWorkers = (int) Math.Ceiling((float) capablePawns.Count / workTypes.Count);
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
-                _logMessages.Add($"-- Work Manager: Target dedicated workers by work type = {targetWorkers} --");
+                Log.Message($"-- Work Manager: Target dedicated workers by work type = {targetWorkers} --");
             }
             foreach (var workType in workTypes.OrderByDescending(wt => wt.relevantSkills.Count)
                 .ThenByDescending(wt => wt.naturalPriority))
@@ -110,7 +109,7 @@ namespace WorkManager
                 }
                 if (Prefs.DevMode && Settings.VerboseLogging)
                 {
-                    _logMessages.Add(
+                    Log.Message(
                         $"-- Work Manager: {string.Join(", ", pawnScores.OrderByDescending(pair => pair.Value).Select(pair => $"{pair.Key.Pawn.LabelShort}({pair.Value:N2})"))} --");
                 }
                 while (capablePawns.Count(pc => pc.WorkPriorities[workType] == 1) < targetWorkers)
@@ -121,7 +120,7 @@ namespace WorkManager
                     if (dedicatedWorker == null) { break; }
                     if (Prefs.DevMode && Settings.VerboseLogging)
                     {
-                        _logMessages.Add(
+                        Log.Message(
                             $"Work Manager: Assigning '{dedicatedWorker.Pawn.LabelShort}' as dedicated worker for '{workType.labelShort}'");
                     }
                     dedicatedWorker.WorkPriorities[workType] = 1;
@@ -130,7 +129,7 @@ namespace WorkManager
             }
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
-                _logMessages.Add("----------------------------------------------------");
+                Log.Message("----------------------------------------------------");
             }
         }
 
@@ -141,17 +140,14 @@ namespace WorkManager
                 "Doctor".Equals(workTypeDef.defName, StringComparison.OrdinalIgnoreCase));
             if (workType == null) { return; }
             if (!WorkManager.GetWorkTypeEnabled(workType)) { return; }
-            if (Prefs.DevMode && Settings.VerboseLogging)
-            {
-                _logMessages.Add("-- Work Manager: Assigning doctors... --");
-            }
+            if (Prefs.DevMode && Settings.VerboseLogging) { Log.Message("-- Work Manager: Assigning doctors... --"); }
             var doctors = _pawnCache.Values.Where(pc => pc.IsCapable && !pc.IsDisabledWork(workType)).ToList();
             if (!doctors.Any()) { return; }
             var doctorsCount = doctors.Count(pc => pc.IsActiveWork(workType));
             var maxSkillValue = doctors.Max(pc => pc.GetWorkSkillLevel(workType));
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
-                _logMessages.Add($"Work Manager: Max doctoring skill value = '{maxSkillValue}'");
+                Log.Message($"Work Manager: Max doctoring skill value = '{maxSkillValue}'");
             }
             var assignEveryone = Settings.AssignEveryoneWorkTypes.FirstOrDefault(wt => wt.WorkTypeDef == workType);
             var managedDoctors = doctors.Where(pc => pc.IsManaged && pc.IsManagedWork(workType))
@@ -166,7 +162,7 @@ namespace WorkManager
                         {
                             if (Prefs.DevMode && Settings.VerboseLogging)
                             {
-                                _logMessages.Add(
+                                Log.Message(
                                     $"Work Manager: Assigning '{pawnCache.Pawn.LabelShort}' as primary doctor (highest skill value)");
                             }
                             pawnCache.WorkPriorities[workType] = 1;
@@ -178,7 +174,7 @@ namespace WorkManager
                     {
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
-                            _logMessages.Add(
+                            Log.Message(
                                 $"Work Manager: Assigning '{pawnCache.Pawn.LabelShort}' as primary doctor (highest skill value)");
                         }
                         pawnCache.WorkPriorities[workType] = 1;
@@ -194,7 +190,7 @@ namespace WorkManager
                 {
                     if (Prefs.DevMode && Settings.VerboseLogging)
                     {
-                        _logMessages.Add(
+                        Log.Message(
                             $"Work Manager: Assigning '{pawnCache.Pawn.LabelShort}' as primary doctor (fail-safe)");
                     }
                     pawnCache.WorkPriorities[workType] = assignEveryone == null || assignEveryone.AllowDedicated
@@ -217,7 +213,7 @@ namespace WorkManager
                     {
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
-                            _logMessages.Add(
+                            Log.Message(
                                 $"Work Manager: Assigning '{pawnCache.Pawn.LabelShort}' as secondary doctor (primary doctor needs tending)");
                         }
                         pawnCache.WorkPriorities[workType] = assignEveryone == null || assignEveryone.AllowDedicated
@@ -249,7 +245,7 @@ namespace WorkManager
                 }
                 if (Prefs.DevMode && Settings.VerboseLogging)
                 {
-                    _logMessages.Add($"Work Manager: Patient count = '{patientCount}'");
+                    Log.Message($"Work Manager: Patient count = '{patientCount}'");
                 }
                 while (doctorsCount < patientCount)
                 {
@@ -261,14 +257,14 @@ namespace WorkManager
                     if (pawnCache == null) { break; }
                     if (Prefs.DevMode && Settings.VerboseLogging)
                     {
-                        _logMessages.Add(
+                        Log.Message(
                             $"Work Manager: Assigning '{pawnCache.Pawn.LabelShort}' as backup doctor (multiple patients)");
                     }
                     pawnCache.WorkPriorities[workType] = 1;
                     doctorsCount++;
                 }
             }
-            if (Prefs.DevMode && Settings.VerboseLogging) { _logMessages.Add("---------------------"); }
+            if (Prefs.DevMode && Settings.VerboseLogging) { Log.Message("---------------------"); }
         }
 
         private void AssignHunters()
@@ -278,10 +274,7 @@ namespace WorkManager
                 "Hunting".Equals(workTypeDef.defName, StringComparison.OrdinalIgnoreCase));
             if (workType == null) { return; }
             if (!_managedWorkTypes.Contains(workType)) { return; }
-            if (Prefs.DevMode && Settings.VerboseLogging)
-            {
-                _logMessages.Add("-- Work Manager: Assigning hunters... --");
-            }
+            if (Prefs.DevMode && Settings.VerboseLogging) { Log.Message("-- Work Manager: Assigning hunters... --"); }
             var assignEveryone = Settings.AssignEveryoneWorkTypes.FirstOrDefault(wt => wt.WorkTypeDef == workType);
             if (assignEveryone != null)
             {
@@ -291,21 +284,21 @@ namespace WorkManager
                 {
                     if (Prefs.DevMode && Settings.VerboseLogging)
                     {
-                        _logMessages.Add(
+                        Log.Message(
                             $"Work Manager: Removing hunting assignment from '{pawnCache.Pawn.LabelShort}' (not a hunter)");
                     }
                     pawnCache.WorkPriorities[workType] = 0;
                 }
-                if (Prefs.DevMode && Settings.VerboseLogging) { _logMessages.Add("---------------------"); }
+                if (Prefs.DevMode && Settings.VerboseLogging) { Log.Message("---------------------"); }
             }
             var hunters = _pawnCache.Values.Where(pc => pc.IsCapable && (pc.IsHunter() || pc.IsActiveWork(workType)))
                 .ToList();
             var maxSkillValue = hunters.Any() ? hunters.Max(pc => pc.GetWorkSkillLevel(workType)) : 0;
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
-                _logMessages.Add(
+                Log.Message(
                     $"Work Manager: Hunters are {string.Join(", ", hunters.Select(pc => $"{pc.Pawn.LabelShortCap} ({pc.GetWorkSkillLevel(workType):N2})"))}");
-                _logMessages.Add($"Work Manager: Max hunting skill value = '{maxSkillValue}'");
+                Log.Message($"Work Manager: Max hunting skill value = '{maxSkillValue}'");
             }
             if (assignEveryone == null || assignEveryone.AllowDedicated)
             {
@@ -319,7 +312,7 @@ namespace WorkManager
                     {
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
-                            _logMessages.Add(
+                            Log.Message(
                                 $"Work Manager: Assigning '{pawnCache.Pawn.LabelShort}' as a hunter with priority 1 (highest skill value)");
                         }
                         pawnCache.WorkPriorities[workType] = 1;
@@ -330,7 +323,7 @@ namespace WorkManager
                         {
                             if (Prefs.DevMode && Settings.VerboseLogging)
                             {
-                                _logMessages.Add(
+                                Log.Message(
                                     $"Work Manager: Assigning '{pawnCache.Pawn.LabelShort}' as a hunter with priority 2 (major learning rate)");
                             }
                             pawnCache.WorkPriorities[workType] = 2;
@@ -339,7 +332,7 @@ namespace WorkManager
                         {
                             if (Prefs.DevMode && Settings.VerboseLogging)
                             {
-                                _logMessages.Add(
+                                Log.Message(
                                     $"Work Manager: Assigning '{pawnCache.Pawn.LabelShort}' as a hunter with priority 3 (minor learning rate)");
                             }
                             pawnCache.WorkPriorities[workType] = 3;
@@ -359,7 +352,7 @@ namespace WorkManager
                     {
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
-                            _logMessages.Add(
+                            Log.Message(
                                 $"Work Manager: Setting {pawnCache.Pawn.LabelShort}'s priority of '{workType.labelShort}' to {(assignEveryone == null || assignEveryone.AllowDedicated ? 1 : assignEveryone.Priority)} (fail-safe)");
                         }
                         pawnCache.WorkPriorities[workType] = assignEveryone == null || assignEveryone.AllowDedicated
@@ -368,14 +361,14 @@ namespace WorkManager
                     }
                 }
             }
-            if (Prefs.DevMode && Settings.VerboseLogging) { _logMessages.Add("---------------------"); }
+            if (Prefs.DevMode && Settings.VerboseLogging) { Log.Message("---------------------"); }
         }
 
         private void AssignLeftoverWorkTypes()
         {
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
-                _logMessages.Add("-- Work Manager: Assigning leftover work types... --");
+                Log.Message("-- Work Manager: Assigning leftover work types... --");
             }
             if (!_pawnCache.Values.Any(pc => pc.IsCapable)) { return; }
             var workTypes = _managedWorkTypes.Where(workType =>
@@ -403,7 +396,7 @@ namespace WorkManager
                     {
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
-                            _logMessages.Add(
+                            Log.Message(
                                 $"Work Manager: Setting {pawnCache.Pawn.LabelShort}'s priority of '{workType.labelShort}' to 1");
                         }
                         pawnCache.WorkPriorities[workType] = 1;
@@ -422,7 +415,7 @@ namespace WorkManager
                     {
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
-                            _logMessages.Add(
+                            Log.Message(
                                 $"Work Manager: Setting {pawnCache.Pawn.LabelShort}'s priority of '{workType.labelShort}' to 1");
                         }
                         pawnCache.WorkPriorities[workType] = 1;
@@ -440,21 +433,21 @@ namespace WorkManager
                     {
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
-                            _logMessages.Add(
+                            Log.Message(
                                 $"Work Manager: Setting {pawnCache.Pawn.LabelShort}'s priority of '{workType.labelShort}' to 4");
                         }
                         pawnCache.WorkPriorities[workType] = 4;
                     }
                 }
             }
-            if (Prefs.DevMode && Settings.VerboseLogging) { _logMessages.Add("---------------------"); }
+            if (Prefs.DevMode && Settings.VerboseLogging) { Log.Message("---------------------"); }
         }
 
         private void AssignWorkersByLearningRate()
         {
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
-                _logMessages.Add("-- Work Manager: Assigning workers by learning rate... --");
+                Log.Message("-- Work Manager: Assigning workers by learning rate... --");
             }
             if (!_pawnCache.Values.Any(pc => pc.IsCapable)) { return; }
             foreach (var pawnCache in _pawnCache.Values.Where(pc => pc.IsCapable && pc.IsManaged && !pc.IsRecovering))
@@ -492,7 +485,7 @@ namespace WorkManager
             if (Settings.UseDedicatedWorkers) { return; }
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
-                _logMessages.Add("-- Work Manager: Assigning workers by skill... --");
+                Log.Message("-- Work Manager: Assigning workers by skill... --");
             }
             if (!_pawnCache.Values.Any(pc => pc.IsCapable)) { return; }
             var workTypes = _managedWorkTypes.Where(w =>
@@ -523,14 +516,14 @@ namespace WorkManager
                     {
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
-                            _logMessages.Add(
+                            Log.Message(
                                 $"Work Manager: Setting {pawnCache.Pawn.LabelShort}'s priority of '{workType.labelShort}' to 1 (skill = {pawnCache.GetWorkSkillLevel(workType)}, max = {maxSkillValue})");
                         }
                         pawnCache.WorkPriorities[workType] = 1;
                     }
                 }
             }
-            if (Prefs.DevMode && Settings.VerboseLogging) { _logMessages.Add("---------------------"); }
+            if (Prefs.DevMode && Settings.VerboseLogging) { Log.Message("---------------------"); }
         }
 
         private void AssignWorkForRecoveringPawns()
@@ -538,7 +531,7 @@ namespace WorkManager
             if (!Settings.RecoveringPawnsUnfitForWork) { return; }
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
-                _logMessages.Add("-- Work Manager: Assigning work for recovering pawns --");
+                Log.Message("-- Work Manager: Assigning work for recovering pawns --");
             }
             var relevantWorkTypes = _allWorkTypes.Where(wt => new[] {"Patient", "PatientBedRest"}.Contains(wt.defName))
                 .Intersect(_managedWorkTypes);
@@ -557,10 +550,10 @@ namespace WorkManager
             if (!Settings.AssignWorkToIdlePawns) { return; }
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
-                _logMessages.Add("-- Work Manager: Assigning work for idle pawns... --");
+                Log.Message("-- Work Manager: Assigning work for idle pawns... --");
                 foreach (var idlePawn in _pawnCache.Values.Where(pc => pc.IdleSince != null))
                 {
-                    _logMessages.Add(
+                    Log.Message(
                         $"{idlePawn.Pawn.LabelShort} is registered as idle ({idlePawn.IdleSince.Day}, {idlePawn.IdleSince.Hour:N1})");
                 }
             }
@@ -594,7 +587,7 @@ namespace WorkManager
                     pawnCache.IdleSince = new DayTime(_updateDayTime.Day, _updateDayTime.Hour);
                 }
             }
-            if (Prefs.DevMode && Settings.VerboseLogging) { _logMessages.Add("---------------------"); }
+            if (Prefs.DevMode && Settings.VerboseLogging) { Log.Message("---------------------"); }
         }
 
         public override void MapComponentTick()
@@ -659,25 +652,15 @@ namespace WorkManager
 
         private void UpdateWorkPriorities()
         {
-            try
-            {
-                AssignWorkForRecoveringPawns();
-                AssignCommonWork();
-                AssignDoctors();
-                AssignHunters();
-                AssignDedicatedWorkers();
-                AssignWorkersBySkill();
-                AssignWorkersByLearningRate();
-                AssignLeftoverWorkTypes();
-                AssignWorkToIdlePawns();
-            }
-            catch (Exception exception)
-            {
-                Log.Error(
-                    $"-- Work Manager: An error has occurred: {exception.Message} --\n{exception.StackTrace}\n{string.Join("\n", _logMessages)}",
-                    true);
-                _logMessages.Clear();
-            }
+            AssignWorkForRecoveringPawns();
+            AssignCommonWork();
+            AssignDoctors();
+            AssignHunters();
+            AssignDedicatedWorkers();
+            AssignWorkersBySkill();
+            AssignWorkersByLearningRate();
+            AssignLeftoverWorkTypes();
+            AssignWorkToIdlePawns();
         }
     }
 }
