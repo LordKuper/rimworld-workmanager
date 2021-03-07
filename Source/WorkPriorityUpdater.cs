@@ -226,28 +226,34 @@ namespace WorkManager
             }
             if (Settings.AssignMultipleDoctors && (assignEveryone == null || assignEveryone.AllowDedicated))
             {
-                var patientCount = 0;
-                if (Settings.CountDownedColonists) { patientCount += _allPawns.Count(pawn => pawn.Downed); }
-                if (Settings.CountDownedGuests && (map?.IsPlayerHome ?? false))
+                var patients = new List<Pawn>();
+                if (Settings.CountDownedColonists) { patients.AddRange(_allPawns.Where(pawn => pawn.Downed)); }
+                if (Settings.CountDownedGuests && map != null && map.IsPlayerHome)
                 {
-                    patientCount += map?.mapPawns?.AllPawnsSpawned?.Count(pawn =>
+                    patients.AddRange(map.mapPawns.AllPawnsSpawned.Where(pawn =>
                         pawn?.guest != null && !pawn.IsColonist && !pawn.guest.IsPrisoner && !pawn.IsPrisoner &&
-                        pawn.Downed) ?? 0;
+                        (pawn.Downed || pawn.health.HasHediffsNeedingTend() ||
+                         pawn.health.hediffSet.HasTendableInjury() || pawn.health.hediffSet.HasTendableHediff())));
                 }
-                if (Settings.CountDownedPrisoners && (map?.IsPlayerHome ?? false))
+                if (Settings.CountDownedPrisoners && map != null && map.IsPlayerHome)
                 {
-                    patientCount += map?.mapPawns?.PrisonersOfColonySpawned?.Count(pawn => pawn.Downed) ?? 0;
+                    patients.AddRange(map.mapPawns.PrisonersOfColonySpawned.Where(pawn =>
+                        pawn.Downed || pawn.health.HasHediffsNeedingTend() ||
+                        pawn.health.hediffSet.HasTendableInjury() || pawn.health.hediffSet.HasTendableHediff()));
                 }
-                if (Settings.CountDownedAnimals && (map?.IsPlayerHome ?? false))
+                if (Settings.CountDownedAnimals && map != null && map.IsPlayerHome)
                 {
-                    patientCount += map?.mapPawns?.PawnsInFaction(Faction.OfPlayer)?.Where(p => p.RaceProps.Animal)
-                        .Count(pawn => pawn.Downed) ?? 0;
+                    patients.AddRange(map.mapPawns.PawnsInFaction(Faction.OfPlayer).Where(p => p.RaceProps.Animal)
+                        .Where(pawn => pawn.Downed || pawn.health.HasHediffsNeedingTend() ||
+                                       pawn.health.hediffSet.HasTendableInjury() ||
+                                       pawn.health.hediffSet.HasTendableHediff()));
                 }
                 if (Prefs.DevMode && Settings.VerboseLogging)
                 {
-                    Log.Message($"Work Manager: Patient count = '{patientCount}'");
+                    Log.Message(
+                        $"Work Manager: Patient count = '{patients.Count}' ({string.Join(", ", patients.Select(pawn => pawn.LabelShort))})");
                 }
-                while (doctorsCount < patientCount)
+                while (doctorsCount < patients.Count)
                 {
                     var pawnCache = doctors
                         .Where(pc =>
@@ -598,11 +604,9 @@ namespace WorkManager
             if ((Find.TickManager.TicksGame + GetHashCode()) % 60 != 0) { return; }
             var day = GenLocalDate.DayOfYear(map);
             var hourFloat = GenLocalDate.HourFloat(map);
+            var hoursPassed = (day - _updateDayTime.Day) * 24 + hourFloat - _updateDayTime.Hour;
             if (Settings.UpdateFrequency == 0) { Settings.UpdateFrequency = 24; }
-            if ((day - _updateDayTime.Day) * 24 + hourFloat - _updateDayTime.Hour < 24f / Settings.UpdateFrequency)
-            {
-                return;
-            }
+            if (hoursPassed < 24f / Settings.UpdateFrequency) { return; }
             if (!Current.Game.playSettings.useWorkPriorities)
             {
                 Current.Game.playSettings.useWorkPriorities = true;
@@ -616,7 +620,8 @@ namespace WorkManager
             }
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
-                Log.Message($"----- Work Manager: Updating work priorities... (day = {day}, hour = {hourFloat}) -----");
+                Log.Message(
+                    $"----- Work Manager: Updating work priorities... (day = {day}, hour = {hourFloat}, passed = {hoursPassed:N1}) -----");
             }
             _updateDayTime.Day = day;
             _updateDayTime.Hour = hourFloat;

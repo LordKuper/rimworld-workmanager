@@ -123,8 +123,16 @@ namespace WorkManager
         public void Update(DayTime dayTime)
         {
             var hoursPassed = (dayTime.Day - _updateDayTime.Day) * 24 + dayTime.Hour - _updateDayTime.Hour;
+            _updateDayTime.Day = dayTime.Day;
+            _updateDayTime.Hour = dayTime.Hour;
+            if (Prefs.DevMode && Settings.VerboseLogging)
+            {
+                Log.Message(
+                    $"----- Work Manager: Updating cache for {Pawn.LabelShort} (hours passed = {hoursPassed})... -----");
+            }
             IsCapable = !Pawn.Dead && !Pawn.Downed && !Pawn.InMentalState;
-            IsRecovering = Settings.RecoveringPawnsUnfitForWork && HealthAIUtility.ShouldSeekMedicalRest(Pawn);
+            IsRecovering = IsCapable && Settings.RecoveringPawnsUnfitForWork &&
+                           HealthAIUtility.ShouldSeekMedicalRest(Pawn);
             IsManaged = WorkManager.GetPawnEnabled(Pawn);
             WorkPriorities.Clear();
             _managedWorkTypes.Clear();
@@ -133,6 +141,7 @@ namespace WorkManager
             {
                 WorkPriorities.Add(workType, IsManagedWork(workType) ? 0 : Pawn.workSettings.GetPriority(workType));
             }
+            if (!IsCapable) { return; }
             if (hoursPassed >= 24)
             {
                 DisabledWorkTypes.Clear();
@@ -151,8 +160,6 @@ namespace WorkManager
                 _workSkillLearningRates.Clear();
                 _workSkillLevels.Clear();
             }
-            _updateDayTime.Day = dayTime.Day;
-            _updateDayTime.Hour = dayTime.Hour;
         }
     }
 }

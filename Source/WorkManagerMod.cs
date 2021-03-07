@@ -13,6 +13,10 @@ namespace WorkManager
     {
         public WorkManagerMod(ModContentPack content) : base(content)
         {
+            if (Prefs.DevMode)
+            {
+                Log.Message($"Work Manager: Initializing (v.{Assembly.GetExecutingAssembly().GetName().Version})...");
+            }
             GetSettings<Settings>();
             var harmony = new Harmony("LordKuper.WorkManager");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
