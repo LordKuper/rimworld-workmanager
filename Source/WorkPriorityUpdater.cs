@@ -15,11 +15,12 @@ namespace WorkManager
         private readonly HashSet<WorkTypeDef> _managedWorkTypes = new HashSet<WorkTypeDef>();
         private readonly Dictionary<Pawn, PawnCache> _pawnCache = new Dictionary<Pawn, PawnCache>();
 
-        private readonly DayTime _updateDayTime = new DayTime(-1, -1);
+        private readonly RimworldTime _updateTime = new RimworldTime(-1, -1, -1);
 
         public WorkPriorityUpdater(Map map) : base(map) { }
 
-        private static WorkManagerGameComponent WorkManager => Current.Game.GetComponent<WorkManagerGameComponent>();
+        private static WorkManagerGameComponent WorkManager { get; } =
+            Current.Game.GetComponent<WorkManagerGameComponent>();
 
         private void ApplyWorkPriorities()
         {
@@ -564,8 +565,8 @@ namespace WorkManager
                 }
             }
             var noLongerIdlePawns = _pawnCache.Values.Where(pc =>
-                pc.IdleSince != null && (_updateDayTime.Day - pc.IdleSince.Day) * 24 + _updateDayTime.Hour -
-                pc.IdleSince.Hour > 12).ToList();
+                pc.IdleSince != null && (_updateTime.Year - pc.IdleSince.Year) * 60 * 24 +
+                (_updateTime.Day - pc.IdleSince.Day) * 24 + _updateTime.Hour - pc.IdleSince.Hour > 12).ToList();
             foreach (var pawnCache in noLongerIdlePawns) { pawnCache.IdleSince = null; }
             var idlePawns = _pawnCache.Values.Where(pc =>
                 pc.IsCapable && pc.IsManaged && !pc.IsRecovering &&
@@ -590,7 +591,7 @@ namespace WorkManager
                     !pawnCache.IsActiveWork(wt))) { pawnCache.WorkPriorities[workType] = 4; }
                 if (pawnCache.IdleSince == null)
                 {
-                    pawnCache.IdleSince = new DayTime(_updateDayTime.Day, _updateDayTime.Hour);
+                    pawnCache.IdleSince = new RimworldTime(_updateTime.Year, _updateTime.Day, _updateTime.Hour);
                 }
             }
             if (Prefs.DevMode && Settings.VerboseLogging) { Log.Message("---------------------"); }
@@ -602,9 +603,11 @@ namespace WorkManager
             if (!WorkManager.Enabled) { return; }
             if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused) { return; }
             if ((Find.TickManager.TicksGame + GetHashCode()) % 60 != 0) { return; }
+            var year = GenLocalDate.Year(map);
             var day = GenLocalDate.DayOfYear(map);
             var hourFloat = GenLocalDate.HourFloat(map);
-            var hoursPassed = (day - _updateDayTime.Day) * 24 + hourFloat - _updateDayTime.Hour;
+            var hoursPassed = (year - _updateTime.Year) * 60 * 24 + (day - _updateTime.Day) * 24 + hourFloat -
+                              _updateTime.Hour;
             if (Settings.UpdateFrequency == 0) { Settings.UpdateFrequency = 24; }
             if (hoursPassed < 24f / Settings.UpdateFrequency) { return; }
             if (!Current.Game.playSettings.useWorkPriorities)
@@ -623,8 +626,8 @@ namespace WorkManager
                 Log.Message(
                     $"----- Work Manager: Updating work priorities... (day = {day}, hour = {hourFloat}, passed = {hoursPassed:N1}) -----");
             }
-            _updateDayTime.Day = day;
-            _updateDayTime.Hour = hourFloat;
+            _updateTime.Day = day;
+            _updateTime.Hour = hourFloat;
             UpdateCache();
             UpdateWorkPriorities();
             ApplyWorkPriorities();
@@ -651,7 +654,7 @@ namespace WorkManager
             foreach (var pawn in _allPawns)
             {
                 if (!_pawnCache.ContainsKey(pawn)) { _pawnCache.Add(pawn, new PawnCache(pawn)); }
-                _pawnCache[pawn].Update(_updateDayTime);
+                _pawnCache[pawn].Update(_updateTime);
             }
         }
 

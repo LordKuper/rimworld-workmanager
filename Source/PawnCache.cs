@@ -11,7 +11,7 @@ namespace WorkManager
     {
         private readonly Dictionary<WorkTypeDef, bool> _managedWorkTypes = new Dictionary<WorkTypeDef, bool>();
         private readonly Dictionary<SkillDef, float> _skillLearningRates = new Dictionary<SkillDef, float>();
-        private readonly DayTime _updateDayTime = new DayTime(-1, -1);
+        private readonly RimworldTime _updateTime = new RimworldTime(-1, -1, -1);
         private readonly Dictionary<WorkTypeDef, float> _workSkillLearningRates = new Dictionary<WorkTypeDef, float>();
 
         private readonly Dictionary<WorkTypeDef, int> _workSkillLevels = new Dictionary<WorkTypeDef, int>();
@@ -24,7 +24,7 @@ namespace WorkManager
         private Dictionary<WorkTypeDef, bool> BadWorkTypes { get; } = new Dictionary<WorkTypeDef, bool>();
         private Dictionary<WorkTypeDef, bool> DisabledWorkTypes { get; } = new Dictionary<WorkTypeDef, bool>();
 
-        public DayTime IdleSince { get; set; }
+        public RimworldTime IdleSince { get; set; }
         public bool IsCapable { get; private set; }
         public bool IsManaged { get; private set; }
         public bool IsRecovering { get; private set; }
@@ -120,11 +120,12 @@ namespace WorkManager
             return value;
         }
 
-        public void Update(DayTime dayTime)
+        public void Update(RimworldTime time)
         {
-            var hoursPassed = (dayTime.Day - _updateDayTime.Day) * 24 + dayTime.Hour - _updateDayTime.Hour;
-            _updateDayTime.Day = dayTime.Day;
-            _updateDayTime.Hour = dayTime.Hour;
+            var hoursPassed = (time.Year - _updateTime.Year) * 60 * 24 + (time.Day - _updateTime.Day) * 24 + time.Hour -
+                              _updateTime.Hour;
+            _updateTime.Day = time.Day;
+            _updateTime.Hour = time.Hour;
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
                 Log.Message(

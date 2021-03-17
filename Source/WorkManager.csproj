@@ -62,7 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssignEveryoneWorkType.cs" />
-    <Compile Include="DayTime.cs" />
+    <Compile Include="RimworldTime.cs" />
     <Compile Include="DefOfs\PawnColumnDefOf.cs" />
     <Compile Include="Patches\DefGeneratorPatch.cs" />
     <Compile Include="Patches\MainTabWindowWorkPatch.cs" />

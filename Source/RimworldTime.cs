@@ -1,14 +1,16 @@
 ﻿namespace WorkManager
 {
-    public class DayTime
+    public class RimworldTime
     {
-        public DayTime(int day, float hour)
+        public RimworldTime(int year, int day, float hour)
         {
+            Year = year;
             Day = day;
             Hour = hour;
         }
 
         public int Day { get; set; }
         public float Hour { get; set; }
+        public int Year { get; set; }
     }
 }
