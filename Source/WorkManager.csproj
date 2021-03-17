@@ -69,6 +69,7 @@
     <Compile Include="Patches\WidgetsWorkPatch.cs" />
     <Compile Include="Patches\PawnColumnWorkerWorkPriorityPatch.cs" />
     <Compile Include="Patches\WorkTabPatch.cs" />
+    <Compile Include="PawnCache.cs" />
     <Compile Include="PawnColumnWorkers\AutoWorkPriorities.cs" />
     <Compile Include="PawnWorkType.cs" />
     <Compile Include="Resources.cs" />
