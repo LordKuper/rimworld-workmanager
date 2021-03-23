@@ -11,6 +11,7 @@ namespace WorkManager
     public class WorkManagerGameComponent : GameComponent
     {
         private List<Pawn> _disabledPawns = new List<Pawn>();
+        private List<Pawn> _disabledPawnSchedules = new List<Pawn>();
         private List<PawnWorkType> _disabledPawnWorkTypes = new List<PawnWorkType>();
         private List<WorkTypeDef> _disabledWorkTypes = new List<WorkTypeDef>();
         public bool Enabled = true;
@@ -22,12 +23,14 @@ namespace WorkManager
         {
             base.ExposeData();
             _disabledPawns?.RemoveAll(pawn => pawn?.Destroyed ?? true);
+            _disabledPawnSchedules?.RemoveAll(pawn => pawn?.Destroyed ?? true);
             _disabledWorkTypes?.RemoveAll(
                 workType => !DefDatabase<WorkTypeDef>.AllDefsListForReading.Contains(workType));
             Scribe_Values.Look(ref Enabled, nameof(Enabled), true);
             Scribe_Collections.Look(ref _disabledWorkTypes, "DisabledWorkTypes", LookMode.Def);
             Scribe_Collections.Look(ref _disabledPawns, "DisabledPawns", LookMode.Reference);
             Scribe_Collections.Look(ref _disabledPawnWorkTypes, "DisabledPawnWorkTypes", LookMode.Deep);
+            Scribe_Collections.Look(ref _disabledPawnSchedules, "DisabledPawnSchedules", LookMode.Reference);
         }
 
         public bool GetPawnEnabled([NotNull] Pawn pawn)
@@ -35,6 +38,13 @@ namespace WorkManager
             if (pawn == null) { throw new ArgumentNullException(nameof(pawn)); }
             if (_disabledPawns == null) { _disabledPawns = new List<Pawn>(); }
             return !_disabledPawns.Contains(pawn);
+        }
+
+        public bool GetPawnScheduleEnabled([NotNull] Pawn pawn)
+        {
+            if (pawn == null) { throw new ArgumentNullException(nameof(pawn)); }
+            if (_disabledPawnSchedules == null) { _disabledPawnSchedules = new List<Pawn>(); }
+            return !_disabledPawnSchedules.Contains(pawn);
         }
 
         public bool GetPawnWorkTypeEnabled([NotNull] Pawn pawn, [NotNull] WorkTypeDef workType)
@@ -60,6 +70,17 @@ namespace WorkManager
             else
             {
                 if (!_disabledPawns.Contains(pawn)) { _disabledPawns.Add(pawn); }
+            }
+        }
+
+        public void SetPawnScheduleEnabled([NotNull] Pawn pawn, bool enabled)
+        {
+            if (pawn == null) { throw new ArgumentNullException(nameof(pawn)); }
+            if (_disabledPawnSchedules == null) { _disabledPawnSchedules = new List<Pawn>(); }
+            if (enabled) { _disabledPawnSchedules.RemoveAll(p => p == pawn); }
+            else
+            {
+                if (!_disabledPawnSchedules.Contains(pawn)) { _disabledPawnSchedules.Add(pawn); }
             }
         }
 

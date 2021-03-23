@@ -14,9 +14,12 @@ namespace WorkManager.Patches
         [UsedImplicitly]
         public static void Postfix()
         {
-            var workTable = PawnTableDefOf.Work;
-            var labelIndex = workTable.columns.FindIndex(x => x.defName.Equals("Label", StringComparison.Ordinal));
-            workTable.columns.Insert(labelIndex + 1, PawnColumnDefOf.AutoWorkPriorities);
+            PawnTableDefOf.Work.columns.Insert(
+                PawnTableDefOf.Work.columns.FindIndex(x => x.defName.Equals("Label", StringComparison.Ordinal)) + 1,
+                PawnColumnDefOf.AutoWorkPriorities);
+            PawnTableDefOf.Restrict.columns.Insert(
+                PawnTableDefOf.Restrict.columns.FindIndex(x => x.defName.Equals("Label", StringComparison.Ordinal)) + 1,
+                PawnColumnDefOf.AutoWorkSchedule);
         }
     }
 }

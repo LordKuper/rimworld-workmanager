@@ -5,4 +5,8 @@
     <defName>AutoWorkPriorities</defName>
     <workerClass>WorkManager.PawnColumnWorkers.AutoWorkPriorities</workerClass>
   </PawnColumnDef>
+  <PawnColumnDef>
+    <defName>AutoWorkSchedule</defName>
+    <workerClass>WorkManager.PawnColumnWorkers.AutoWorkSchedule</workerClass>
+  </PawnColumnDef>
 </Defs>

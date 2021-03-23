@@ -14,8 +14,19 @@ namespace WorkManager
         private readonly HashSet<WorkTypeDef> _allWorkTypes = new HashSet<WorkTypeDef>();
         private readonly HashSet<WorkTypeDef> _managedWorkTypes = new HashSet<WorkTypeDef>();
         private readonly Dictionary<Pawn, PawnCache> _pawnCache = new Dictionary<Pawn, PawnCache>();
+        private readonly RimworldTime _scheduleUpdateTime = new RimworldTime(-1, -1, -1);
 
-        private readonly RimworldTime _updateTime = new RimworldTime(-1, -1, -1);
+        private readonly HashSet<WorkShift> _workShifts = new HashSet<WorkShift>
+        {
+            new WorkShift(WorkShiftName.Morning, new[] {6, 7, 8, 9, 10, 11, 12, 13},
+                new[] {14, 15, 16, 17, 18, 19, 20, 21}),
+            new WorkShift(WorkShiftName.Afternoon, new[] {0, 1, 18, 19, 20, 21, 22, 23},
+                new[] {10, 11, 12, 13, 14, 15, 16, 17}),
+            new WorkShift(WorkShiftName.Night, new[] {2, 3, 4, 5, 14, 15, 16, 17},
+                new[] {0, 1, 18, 19, 20, 21, 22, 23})
+        };
+
+        private readonly RimworldTime _workUpdateTime = new RimworldTime(-1, -1, -1);
 
         public WorkPriorityUpdater(Map map) : base(map) { }
 
@@ -565,8 +576,8 @@ namespace WorkManager
                 }
             }
             var noLongerIdlePawns = _pawnCache.Values.Where(pc =>
-                pc.IdleSince != null && (_updateTime.Year - pc.IdleSince.Year) * 60 * 24 +
-                (_updateTime.Day - pc.IdleSince.Day) * 24 + _updateTime.Hour - pc.IdleSince.Hour > 12).ToList();
+                pc.IdleSince != null && (_workUpdateTime.Year - pc.IdleSince.Year) * 60 * 24 +
+                (_workUpdateTime.Day - pc.IdleSince.Day) * 24 + _workUpdateTime.Hour - pc.IdleSince.Hour > 12).ToList();
             foreach (var pawnCache in noLongerIdlePawns) { pawnCache.IdleSince = null; }
             var idlePawns = _pawnCache.Values.Where(pc =>
                 pc.IsCapable && pc.IsManaged && !pc.IsRecovering &&
@@ -591,7 +602,8 @@ namespace WorkManager
                     !pawnCache.IsActiveWork(wt))) { pawnCache.WorkPriorities[workType] = 4; }
                 if (pawnCache.IdleSince == null)
                 {
-                    pawnCache.IdleSince = new RimworldTime(_updateTime.Year, _updateTime.Day, _updateTime.Hour);
+                    pawnCache.IdleSince =
+                        new RimworldTime(_workUpdateTime.Year, _workUpdateTime.Day, _workUpdateTime.Hour);
                 }
             }
             if (Prefs.DevMode && Settings.VerboseLogging) { Log.Message("---------------------"); }
@@ -601,13 +613,12 @@ namespace WorkManager
         {
             base.MapComponentTick();
             if (!WorkManager.Enabled) { return; }
-            if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused) { return; }
-            if ((Find.TickManager.TicksGame + GetHashCode()) % 60 != 0) { return; }
+            if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused || Find.TickManager.TicksGame % 60 != 0) { return; }
             var year = GenLocalDate.Year(map);
             var day = GenLocalDate.DayOfYear(map);
             var hourFloat = GenLocalDate.HourFloat(map);
-            var hoursPassed = (year - _updateTime.Year) * 60 * 24 + (day - _updateTime.Day) * 24 + hourFloat -
-                              _updateTime.Hour;
+            var hoursPassed = (year - _workUpdateTime.Year) * 60 * 24 + (day - _workUpdateTime.Day) * 24 + hourFloat -
+                              _workUpdateTime.Hour;
             if (Settings.UpdateFrequency == 0) { Settings.UpdateFrequency = 24; }
             if (hoursPassed < 24f / Settings.UpdateFrequency) { return; }
             if (!Current.Game.playSettings.useWorkPriorities)
@@ -626,11 +637,20 @@ namespace WorkManager
                 Log.Message(
                     $"----- Work Manager: Updating work priorities... (day = {day}, hour = {hourFloat}, passed = {hoursPassed:N1}) -----");
             }
-            _updateTime.Day = day;
-            _updateTime.Hour = hourFloat;
+            _workUpdateTime.Year = year;
+            _workUpdateTime.Day = day;
+            _workUpdateTime.Hour = hourFloat;
             UpdateCache();
             UpdateWorkPriorities();
             ApplyWorkPriorities();
+            if (Settings.ManageWorkSchedule && (year - _scheduleUpdateTime.Year) * 60 * 24 +
+                (day - _scheduleUpdateTime.Day) * 24 + hourFloat - _scheduleUpdateTime.Hour >= 24)
+            {
+                _scheduleUpdateTime.Year = year;
+                _scheduleUpdateTime.Day = day;
+                _scheduleUpdateTime.Hour = hourFloat;
+                UpdateSchedule();
+            }
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
                 Log.Message("----------------------------------------------------");
@@ -654,7 +674,63 @@ namespace WorkManager
             foreach (var pawn in _allPawns)
             {
                 if (!_pawnCache.ContainsKey(pawn)) { _pawnCache.Add(pawn, new PawnCache(pawn)); }
-                _pawnCache[pawn].Update(_updateTime);
+                _pawnCache[pawn].Update(_workUpdateTime);
+            }
+        }
+
+        private void UpdateSchedule()
+        {
+            if (Prefs.DevMode && Settings.VerboseLogging)
+            {
+                Log.Message("----- Work Manager: Updating work schedule... -----");
+            }
+            foreach (var workShift in _workShifts) { workShift.Workers.Clear(); }
+            _workShifts.First(shift => shift.Name == WorkShiftName.Afternoon).Workers.AddRange(
+                _pawnCache.Keys.Where(pawn => pawn.story.traits.HasTrait(TraitDef.Named("NightOwl"))));
+            foreach (var pawnCache in _pawnCache.Values.Where(pawnCache =>
+                WorkManager.GetPawnScheduleEnabled(pawnCache.Pawn) && pawnCache.IsCapable && !pawnCache.IsRecovering))
+            {
+                if (_workShifts.Any(shift => shift.Workers.Contains(pawnCache.Pawn))) { continue; }
+                var scores = _workShifts.ToDictionary(shift => shift, shift => 0f);
+                foreach (var workType in _allWorkTypes.Where(workType => pawnCache.IsActiveWork(workType)))
+                {
+                    var score = 1f / pawnCache.WorkPriorities[workType];
+                    foreach (var shift in _workShifts)
+                    {
+                        scores[shift] = score + shift.Workers.Where(pawn => _pawnCache[pawn].IsActiveWork(workType))
+                            .Aggregate(scores[shift],
+                                (current, pawn) => current - 1f / _pawnCache[pawn].WorkPriorities[workType]);
+                    }
+                }
+                var workShift = scores.OrderByDescending(shiftScore => shiftScore.Value).First().Key;
+                if (Prefs.DevMode && Settings.VerboseLogging)
+                {
+                    Log.Message(
+                        $"----- Work Manager: Assigning {pawnCache.Pawn.LabelShort} to {workShift.Name} shift... (scores: {string.Join("; ", scores.Select(score => $"{score.Key.Name.ToString().Substring(0, 1)}={score.Value:N2}"))}) -----");
+                }
+                workShift.Workers.Add(pawnCache.Pawn);
+            }
+            foreach (var shift in _workShifts)
+            {
+                foreach (var pawn in shift.Workers)
+                {
+                    foreach (var hour in shift.WorkHours)
+                    {
+                        pawn.timetable.SetAssignment(hour, TimeAssignmentDefOf.Work);
+                    }
+                    foreach (var hour in shift.SleepHours)
+                    {
+                        pawn.timetable.SetAssignment(hour, TimeAssignmentDefOf.Sleep);
+                    }
+                    foreach (var hour in shift.LeftoverHours)
+                    {
+                        if (pawn.timetable.GetAssignment(hour) == TimeAssignmentDefOf.Work ||
+                            pawn.timetable.GetAssignment(hour) == TimeAssignmentDefOf.Sleep)
+                        {
+                            pawn.timetable.SetAssignment(hour, TimeAssignmentDefOf.Anything);
+                        }
+                    }
+                }
             }
         }
 

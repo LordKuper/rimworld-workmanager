@@ -40,6 +40,8 @@
   <WorkManager.PawnDisableTooltip>Disable automatic work type priority assignment for pawn</WorkManager.PawnDisableTooltip>
   <WorkManager.WorkTypeEnableTooltip>Enable automatic priority assignment for work type</WorkManager.WorkTypeEnableTooltip>
   <WorkManager.WorkTypeDisableTooltip>Disable automatic priority assignment for work type</WorkManager.WorkTypeDisableTooltip>
+  <WorkManager.PawnScheduleEnableTooltip>Enable automatic schedule management for pawn</WorkManager.PawnScheduleEnableTooltip>
+  <WorkManager.PawnScheduleDisableTooltip>Disable automatic schedule management for pawn</WorkManager.PawnScheduleDisableTooltip>
   <WorkManager.VerboseLogging>Verbose logging</WorkManager.VerboseLogging>
   <WorkManager.VerboseLoggingTooltip>Show mod execution details in log (only works when development mode is enabled)</WorkManager.VerboseLoggingTooltip>
   <WorkManager.AssignEveryoneWorkTypes>Assign everyone work types</WorkManager.AssignEveryoneWorkTypes>
@@ -54,4 +56,6 @@
   <WorkManager.AllowDedicated>Allow dedicated</WorkManager.AllowDedicated>
   <WorkManager.AllowDedicatedTooltip>Allow work type to be assigned to the most suitable pawn with top priority</WorkManager.AllowDedicatedTooltip>
   <WorkManager.WorkTypeNotLoadedTooltip>This work type is absent from current game setup. It will not affect work assignment until the game is restarted with corresponding work type loaded.</WorkManager.WorkTypeNotLoadedTooltip>
+  <WorkManager.ManageWorkSchedule>Manage work schedule</WorkManager.ManageWorkSchedule>
+  <WorkManager.ManageWorkScheduleTooltip>Automatic colonists' work shift management</WorkManager.ManageWorkScheduleTooltip>
 </LanguageData>

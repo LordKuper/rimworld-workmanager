@@ -27,8 +27,9 @@ namespace WorkManager
         public static bool CountDownedGuests = true;
         public static bool CountDownedPrisoners = true;
         internal static MethodInfo IsBadWorkMethod;
-        public static float MajorLearningRateThreshold = 0.75f;
-        public static float MinorLearningRateThreshold = 0.5f;
+        public static float MajorLearningRateThreshold = 1.2f;
+        public static bool ManageWorkSchedule = true;
+        public static float MinorLearningRateThreshold = 0.8f;
         public static bool RecoveringPawnsUnfitForWork = true;
 
         public static bool SpecialRulesForDoctors = true;
@@ -37,7 +38,7 @@ namespace WorkManager
 
         public static bool UseDedicatedWorkers = true;
 
-        public static bool UsePawnLearningRateThresholds = true;
+        public static bool UsePawnLearningRateThresholds;
         public static bool VerboseLogging;
 
         public static IEnumerable<AssignEveryoneWorkType> DefaultAssignEveryoneWorkTypes =>
@@ -231,6 +232,11 @@ namespace WorkManager
             listing.Gap(listing.verticalSpacing);
             listing.Outdent(16f);
             listing.ColumnWidth += 16f;
+            listing.CheckboxLabeled(Resources.Strings.ManageWorkSchedule, ref ManageWorkSchedule,
+                Resources.Strings.ManageWorkScheduleTooltip);
+            listing.Gap(listing.verticalSpacing);
+            listing.Outdent(16f);
+            listing.ColumnWidth += 16f;
             listing.CheckboxLabeled(Resources.Strings.VerboseLogging, ref VerboseLogging,
                 Resources.Strings.VerboseLoggingTooltip);
             listing.GapLine();
@@ -262,9 +268,9 @@ namespace WorkManager
         {
             base.ExposeData();
             Scribe_Values.Look(ref UpdateFrequency, nameof(UpdateFrequency), 24);
-            Scribe_Values.Look(ref UsePawnLearningRateThresholds, nameof(UsePawnLearningRateThresholds), true);
-            Scribe_Values.Look(ref MajorLearningRateThreshold, nameof(MajorLearningRateThreshold), 0.75f);
-            Scribe_Values.Look(ref MinorLearningRateThreshold, nameof(MinorLearningRateThreshold), 0.5f);
+            Scribe_Values.Look(ref UsePawnLearningRateThresholds, nameof(UsePawnLearningRateThresholds));
+            Scribe_Values.Look(ref MajorLearningRateThreshold, nameof(MajorLearningRateThreshold), 1.2f);
+            Scribe_Values.Look(ref MinorLearningRateThreshold, nameof(MinorLearningRateThreshold), 0.8f);
             Scribe_Values.Look(ref UseDedicatedWorkers, nameof(UseDedicatedWorkers), true);
             Scribe_Values.Look(ref SpecialRulesForDoctors, nameof(SpecialRulesForDoctors), true);
             Scribe_Values.Look(ref AssignMultipleDoctors, nameof(AssignMultipleDoctors), true);
@@ -279,6 +285,7 @@ namespace WorkManager
             Scribe_Values.Look(ref AssignWorkToIdlePawns, nameof(AssignWorkToIdlePawns), true);
             Scribe_Values.Look(ref VerboseLogging, nameof(VerboseLogging));
             Scribe_Collections.Look(ref AssignEveryoneWorkTypes, nameof(AssignEveryoneWorkTypes), LookMode.Deep);
+            Scribe_Values.Look(ref ManageWorkSchedule, nameof(ManageWorkSchedule), true);
         }
     }
 }

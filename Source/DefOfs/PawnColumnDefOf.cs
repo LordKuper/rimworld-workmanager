@@ -10,5 +10,6 @@ namespace WorkManager.DefOfs
     public static class PawnColumnDefOf
     {
         public static PawnColumnDef AutoWorkPriorities;
+        public static PawnColumnDef AutoWorkSchedule;
     }
 }

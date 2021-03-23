@@ -71,6 +71,11 @@ namespace WorkManager
             internal static readonly string MajorLearningRateThresholdTooltip =
                 "WorkManager.MajorLearningRateThresholdTooltip".Translate();
 
+            internal static readonly string ManageWorkSchedule = "WorkManager.ManageWorkSchedule".Translate();
+
+            internal static readonly string ManageWorkScheduleTooltip =
+                "WorkManager.ManageWorkScheduleTooltip".Translate();
+
             internal static readonly string MinorLearningRateThreshold =
                 "WorkManager.MinorLearningRateThreshold".Translate();
 
@@ -79,6 +84,12 @@ namespace WorkManager
 
             internal static readonly string PawnDisableTooltip = "WorkManager.PawnDisableTooltip".Translate();
             internal static readonly string PawnEnableTooltip = "WorkManager.PawnEnableTooltip".Translate();
+
+            internal static readonly string PawnScheduleDisableTooltip =
+                "WorkManager.PawnScheduleDisableTooltip".Translate();
+
+            internal static readonly string PawnScheduleEnableTooltip =
+                "WorkManager.PawnScheduleEnableTooltip".Translate();
 
             internal static readonly string RecoveringPawnsUnfitForWork =
                 "WorkManager.RecoveringPawnsUnfitForWork".Translate();

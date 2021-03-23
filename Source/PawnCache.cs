@@ -148,7 +148,7 @@ namespace WorkManager
                 DisabledWorkTypes.Clear();
                 BadWorkTypes.Clear();
             }
-            if (hoursPassed >= 1)
+            if (hoursPassed >= 6)
             {
                 if (Settings.UsePawnLearningRateThresholds)
                 {
