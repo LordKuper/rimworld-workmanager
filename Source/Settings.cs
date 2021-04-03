@@ -129,7 +129,7 @@ namespace WorkManager
             }
             if (UpdateFrequency == 0) { UpdateFrequency = 24; }
             var listing = new Listing_Standard();
-            const int boolSettingsCount = 14;
+            const int boolSettingsCount = 15;
             const int numericSettingsCount = 3;
             var staticSettingsHeight = boolSettingsCount * (Text.LineHeight + listing.verticalSpacing) +
                                        numericSettingsCount * (Text.LineHeight * 1.5f + listing.verticalSpacing);
@@ -234,9 +234,6 @@ namespace WorkManager
             listing.ColumnWidth += 16f;
             listing.CheckboxLabeled(Resources.Strings.ManageWorkSchedule, ref ManageWorkSchedule,
                 Resources.Strings.ManageWorkScheduleTooltip);
-            listing.Gap(listing.verticalSpacing);
-            listing.Outdent(16f);
-            listing.ColumnWidth += 16f;
             listing.CheckboxLabeled(Resources.Strings.VerboseLogging, ref VerboseLogging,
                 Resources.Strings.VerboseLoggingTooltip);
             listing.GapLine();
