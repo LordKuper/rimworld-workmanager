@@ -136,7 +136,8 @@ namespace WorkManager
             var viewRectHeight = staticSettingsHeight + 12f + Text.LineHeight + 35f + Text.LineHeight * 2 +
                                  Text.SpaceBetweenLines + AssignEveryoneWorkTypes.Count * 35f;
             var viewRect = new Rect(rect.x, 0, rect.width - 16f, viewRectHeight);
-            listing.BeginScrollView(rect, ref _scrollPosition, ref viewRect);
+            Widgets.BeginScrollView(rect, ref _scrollPosition, viewRect);
+            listing.Begin(viewRect);
             var optionRect = listing.GetRect(Text.LineHeight * 1.5f);
             var fieldRect = optionRect;
             var labelRect = optionRect;
@@ -238,7 +239,8 @@ namespace WorkManager
                 Resources.Strings.VerboseLoggingTooltip);
             listing.GapLine();
             DoAssignEveryoneWorkTypesArea(listing);
-            listing.EndScrollView(ref viewRect);
+            listing.End();
+            Widgets.EndScrollView();
         }
 
         private static void DoWorkTypeRow(Rect rect, AssignEveryoneWorkType workType)

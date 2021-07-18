@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<LanguageData>
+  <WorkManager>Work Manager</WorkManager>
+  <WorkManager.UpdateInterval>Update frequency</WorkManager.UpdateInterval>
+  <WorkManager.UpdateIntervalTooltip>How many times to update work priorities per in-game day</WorkManager.UpdateIntervalTooltip>
+  <WorkManager.UsePawnLearningRateThresholds>Use individual skill learning rate thresholds</WorkManager.UsePawnLearningRateThresholds>
+  <WorkManager.UsePawnLearningRateThresholdsTooltip>Use skill learning rate thresholds calculated for each pawn individually, considering their minimal and maximal skill learning rates.</WorkManager.UsePawnLearningRateThresholdsTooltip>
+  <WorkManager.MajorLearningRateThreshold>Major skill learning rate threshold</WorkManager.MajorLearningRateThreshold>
+  <WorkManager.MajorLearningRateThresholdTooltip>Pawns with skill learning rate above this threshold will be assigned to corresponding work types with priority of 2 or higher</WorkManager.MajorLearningRateThresholdTooltip>
+  <WorkManager.MinorLearningRateThreshold>Minor skill learning rate threshold</WorkManager.MinorLearningRateThreshold>
+  <WorkManager.MinorLearningRateThresholdTooltip>Pawns with skill learning rate above this threshold will be assigned to corresponding work types with priority of 3 or higher</WorkManager.MinorLearningRateThresholdTooltip>
+  <WorkManager.UseDedicatedWorkers>Use dedicated workers</WorkManager.UseDedicatedWorkers>
+  <WorkManager.UseDedicatedWorkersTooltip>Try to assign a dedicated worker for every suitable work type.</WorkManager.UseDedicatedWorkersTooltip>
+  <WorkManager.AssignWorkToIdlePawns>Assign work to idle pawns</WorkManager.AssignWorkToIdlePawns>
+  <WorkManager.AssignWorkToIdlePawnsTooltip>Assign idle pawns all work types (except special ones) with lowest priority for 12 hours</WorkManager.AssignWorkToIdlePawnsTooltip>
+  <WorkManager.SpecialRulesForHunters>Special rules for hunters</WorkManager.SpecialRulesForHunters>
+  <WorkManager.SpecialRulesForHuntersTooltip>Use special rules to determine which pawns are considered hunters</WorkManager.SpecialRulesForHuntersTooltip>
+  <WorkManager.AllowMeleeHunters>Allow melee hunters</WorkManager.AllowMeleeHunters>
+  <WorkManager.AllowMeleeHuntersTooltip>Allow barehanded pawns and pawns with melee weapons equipped to be assigned to hunting</WorkManager.AllowMeleeHuntersTooltip>
+  <WorkManager.RecoveringPawnsUnfitForWork>Recovering pawns are unfit for work</WorkManager.RecoveringPawnsUnfitForWork>
+  <WorkManager.RecoveringPawnsUnfitForWorkTooltip>Do not assign work for pawns needing medical rest</WorkManager.RecoveringPawnsUnfitForWorkTooltip>
+  <WorkManager.SpecialRulesForDoctors>Special rules for doctors</WorkManager.SpecialRulesForDoctors>
+  <WorkManager.SpecialRulesForDoctorsTooltip>Use special rules for doctoring assignment. These include assigning doctoring to highest-skilled pawn(s) only; assigning secondary doctor when primary doctor needs tending; assigning multiple doctors if multiple units need rescuing.</WorkManager.SpecialRulesForDoctorsTooltip>
+  <WorkManager.AssignMultipleDoctors>Assign multiple doctors</WorkManager.AssignMultipleDoctors>
+  <WorkManager.AssignMultipleDoctorsTooltip>Assign multiple doctors when there are multiple downed pawns</WorkManager.AssignMultipleDoctorsTooltip>
+  <WorkManager.CountDownedColonists>Count downed colonists</WorkManager.CountDownedColonists>
+  <WorkManager.CountDownedColonistsTooltip>Each downed colonist will require additional doctor to be assigned</WorkManager.CountDownedColonistsTooltip>
+  <WorkManager.CountDownedGuests>Count downed guests</WorkManager.CountDownedGuests>
+  <WorkManager.CountDownedGuestsTooltip>Each downed guest will require additional doctor to be assigned</WorkManager.CountDownedGuestsTooltip>
+  <WorkManager.CountDownedPrisoners>Count downed prisoners</WorkManager.CountDownedPrisoners>
+  <WorkManager.CountDownedPrisonersTooltip>Each downed prisoner will require additional doctor to be assigned</WorkManager.CountDownedPrisonersTooltip>
+  <WorkManager.CountDownedAnimals>Count downed animals</WorkManager.CountDownedAnimals>
+  <WorkManager.CountDownedAnimalsTooltip>Each downed colony animal will require additional doctor to be assigned</WorkManager.CountDownedAnimalsTooltip>
+  <WorkManager.AssignAllWorkTypes>Assign all work types</WorkManager.AssignAllWorkTypes>
+  <WorkManager.AssignAllWorkTypesTooltip>Assign every pawn all leftover work types with minimum priority to prevent idling</WorkManager.AssignAllWorkTypesTooltip>
+  <WorkManager.GlobalEnableTooltip>Enable automatic work type priority assignment system</WorkManager.GlobalEnableTooltip>
+  <WorkManager.GlobalDisableTooltip>Disable automatic work type priority assignment system</WorkManager.GlobalDisableTooltip>
+  <WorkManager.PawnEnableTooltip>Enable automatic work type priority assignment for pawn</WorkManager.PawnEnableTooltip>
+  <WorkManager.PawnDisableTooltip>Disable automatic work type priority assignment for pawn</WorkManager.PawnDisableTooltip>
+  <WorkManager.WorkTypeEnableTooltip>Enable automatic priority assignment for work type</WorkManager.WorkTypeEnableTooltip>
+  <WorkManager.WorkTypeDisableTooltip>Disable automatic priority assignment for work type</WorkManager.WorkTypeDisableTooltip>
+  <WorkManager.PawnScheduleEnableTooltip>Enable automatic schedule management for pawn</WorkManager.PawnScheduleEnableTooltip>
+  <WorkManager.PawnScheduleDisableTooltip>Disable automatic schedule management for pawn</WorkManager.PawnScheduleDisableTooltip>
+  <WorkManager.VerboseLogging>Verbose logging</WorkManager.VerboseLogging>
+  <WorkManager.VerboseLoggingTooltip>Show mod execution details in log (only works when development mode is enabled)</WorkManager.VerboseLoggingTooltip>
+  <WorkManager.AssignEveryoneWorkTypes>Assign everyone work types</WorkManager.AssignEveryoneWorkTypes>
+  <WorkManager.AssignEveryoneWorkTypesTooltip>Work types listed in this section will be assigned to every capable pawn</WorkManager.AssignEveryoneWorkTypesTooltip>
+  <WorkManager.AddAssignEveryoneWorkType>Add...</WorkManager.AddAssignEveryoneWorkType>
+  <WorkManager.DeleteAssignEveryoneWorkType>Delete...</WorkManager.DeleteAssignEveryoneWorkType>
+  <WorkManager.ResetAssignEveryoneWorkTypes>Reset to defaults</WorkManager.ResetAssignEveryoneWorkTypes>
+  <WorkManager.WorkTypeName>Work type's name</WorkManager.WorkTypeName>
+  <WorkManager.WorkTypeNameTooltip>The name of a work type</WorkManager.WorkTypeNameTooltip>
+  <WorkManager.WorkTypePriority>Priority</WorkManager.WorkTypePriority>
+  <WorkManager.WorkTypePriorityTooltip>Priority with which work type will be assigned to a non-dedicated pawn</WorkManager.WorkTypePriorityTooltip>
+  <WorkManager.AllowDedicated>Allow dedicated</WorkManager.AllowDedicated>
+  <WorkManager.AllowDedicatedTooltip>Allow work type to be assigned to the most suitable pawn with top priority</WorkManager.AllowDedicatedTooltip>
+  <WorkManager.WorkTypeNotLoadedTooltip>This work type is absent from current game setup. It will not affect work assignment until the game is restarted with corresponding work type loaded.</WorkManager.WorkTypeNotLoadedTooltip>
+  <WorkManager.ManageWorkSchedule>Manage work schedule</WorkManager.ManageWorkSchedule>
+  <WorkManager.ManageWorkScheduleTooltip>Automatic colonists' work shift management</WorkManager.ManageWorkScheduleTooltip>
+</LanguageData>
