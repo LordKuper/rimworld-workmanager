@@ -87,11 +87,53 @@ namespace WorkManager
                     internal static readonly string CountDownedPrisonersTooltip =
                         "WorkManager.Settings_Priorities_CountDownedPrisonersTooltip".Translate();
 
+                    internal static readonly string DedicatedWorkerPriority =
+                        "WorkManager.Settings_Priorities_DedicatedWorkerPriority".Translate();
+
+                    internal static readonly string DedicatedWorkerPriorityTooltip =
+                        "WorkManager.Settings_Priorities_DedicatedWorkerPriorityTooltip".Translate();
+
+                    internal static readonly string DoctoringPriority =
+                        "WorkManager.Settings_Priorities_DoctoringPriority".Translate();
+
+                    internal static readonly string DoctoringPriorityTooltip =
+                        "WorkManager.Settings_Priorities_DoctoringPriorityTooltip".Translate();
+
+                    internal static readonly string HighestSkillPriority =
+                        "WorkManager.Settings_Priorities_HighestSkillPriority".Translate();
+
+                    internal static readonly string HighestSkillPriorityTooltip =
+                        "WorkManager.Settings_Priorities_HighestSkillPriorityTooltip".Translate();
+
+                    internal static readonly string IdlePriority =
+                        "WorkManager.Settings_Priorities_IdlePriority".Translate();
+
+                    internal static readonly string IdlePriorityTooltip =
+                        "WorkManager.Settings_Priorities_IdlePriorityTooltip".Translate();
+
+                    internal static readonly string LeftoverPriority =
+                        "WorkManager.Settings_Priorities_LeftoverPriority".Translate();
+
+                    internal static readonly string LeftoverPriorityTooltip =
+                        "WorkManager.Settings_Priorities_LeftoverPriorityTooltip".Translate();
+
+                    internal static readonly string MajorLearningRatePriority =
+                        "WorkManager.Settings_Priorities_MajorLearningRatePriority".Translate();
+
+                    internal static readonly string MajorLearningRatePriorityTooltip =
+                        "WorkManager.Settings_Priorities_MajorLearningRatePriorityTooltip".Translate();
+
                     internal static readonly string MajorLearningRateThreshold =
                         "WorkManager.Settings_Priorities_MajorLearningRateThreshold".Translate();
 
                     internal static readonly string MajorLearningRateThresholdTooltip =
                         "WorkManager.Settings_Priorities_MajorLearningRateThresholdTooltip".Translate();
+
+                    internal static readonly string MinorLearningRatePriority =
+                        "WorkManager.Settings_Priorities_MinorLearningRatePriority".Translate();
+
+                    internal static readonly string MinorLearningRatePriorityTooltip =
+                        "WorkManager.Settings_Priorities_MinorLearningRatePriorityTooltip".Translate();
 
                     internal static readonly string MinorLearningRateThreshold =
                         "WorkManager.Settings_Priorities_MinorLearningRateThreshold".Translate();

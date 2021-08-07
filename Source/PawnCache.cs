@@ -58,7 +58,7 @@ namespace WorkManager
             if (workType == null) { throw new ArgumentNullException(nameof(workType)); }
             if (_workSkillLevels.ContainsKey(workType)) { return _workSkillLevels[workType]; }
             var value = workType.relevantSkills.Any()
-                ? (int) Math.Floor(workType.relevantSkills.Select(skill => Pawn.skills.GetSkill(skill).Level).Average())
+                ? (int)Math.Floor(workType.relevantSkills.Select(skill => Pawn.skills.GetSkill(skill).Level).Average())
                 : 0;
             _workSkillLevels.Add(workType, value);
             return value;
@@ -75,7 +75,7 @@ namespace WorkManager
             if (workType == null) { throw new ArgumentNullException(nameof(workType)); }
             if (Settings.IsBadWorkMethod == null) { return false; }
             if (BadWorkTypes.ContainsKey(workType)) { return BadWorkTypes[workType]; }
-            var value = (bool) Settings.IsBadWorkMethod.Invoke(null, new object[] {Pawn, workType});
+            var value = (bool)Settings.IsBadWorkMethod.Invoke(null, new object[] { Pawn, workType });
             BadWorkTypes.Add(workType, value);
             return value;
         }
@@ -124,14 +124,10 @@ namespace WorkManager
         {
             var hoursPassed = (time.Year - _updateTime.Year) * 60 * 24 + (time.Day - _updateTime.Day) * 24 + time.Hour -
                               _updateTime.Hour;
+            _updateTime.Year = time.Year;
             _updateTime.Day = time.Day;
             _updateTime.Hour = time.Hour;
-            if (Prefs.DevMode && Settings.VerboseLogging)
-            {
-                Log.Message(
-                    $"----- Work Manager: Updating cache for {Pawn.LabelShort} (hours passed = {hoursPassed})... -----");
-            }
-            IsCapable = !Pawn.Dead && !Pawn.Downed && !Pawn.InMentalState;
+            IsCapable = !Pawn.Dead && !Pawn.Downed && !Pawn.InMentalState && !Pawn.InContainerEnclosed;
             IsRecovering = IsCapable && Settings.RecoveringPawnsUnfitForWork &&
                            HealthAIUtility.ShouldSeekMedicalRest(Pawn);
             IsManaged = WorkManager.GetPawnEnabled(Pawn);
@@ -140,16 +136,29 @@ namespace WorkManager
             var workTypes = DefDatabase<WorkTypeDef>.AllDefsListForReading.Where(w => w.visible);
             foreach (var workType in workTypes)
             {
-                WorkPriorities.Add(workType, IsManagedWork(workType) ? 0 : Pawn.workSettings.GetPriority(workType));
+                WorkPriorities.Add(workType,
+                    IsManagedWork(workType) ? 0 :
+                    Settings.GetPriorityMethod == null ? Pawn.workSettings.GetPriority(workType) :
+                    (int)Settings.GetPriorityMethod.Invoke(null, new object[] { Pawn, workType, -1 }));
             }
             if (!IsCapable) { return; }
             if (hoursPassed >= 24)
             {
+                if (Prefs.DevMode && Settings.VerboseLogging)
+                {
+                    Log.Message(
+                        $"----- Work Manager: Updating work type cache for {Pawn.LabelShort} (hours passed = {hoursPassed:N1})... -----");
+                }
                 DisabledWorkTypes.Clear();
                 BadWorkTypes.Clear();
             }
             if (hoursPassed >= 6)
             {
+                if (Prefs.DevMode && Settings.VerboseLogging)
+                {
+                    Log.Message(
+                        $"----- Work Manager: Updating skill cache for {Pawn.LabelShort} (hours passed = {hoursPassed:N1})... -----");
+                }
                 if (Settings.UsePawnLearningRateThresholds)
                 {
                     _skillLearningRates.Clear();

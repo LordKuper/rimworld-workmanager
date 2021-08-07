@@ -11,7 +11,6 @@ namespace WorkManager
     public class Settings : ModSettings
     {
         private static float _allowDedicatedColumnWidth;
-
         private static float _nameColumnWidth;
         private static float _priorityColumnWidth;
         private static Vector2 _scrollPosition;
@@ -30,21 +29,28 @@ namespace WorkManager
         public static bool CountDownedColonists = true;
         public static bool CountDownedGuests = true;
         public static bool CountDownedPrisoners = true;
+        public static int DedicatedWorkerPriority;
+        public static int DoctoringPriority;
+        internal static MethodInfo GetPriorityMethod;
+        public static int HighestSkillPriority;
+        public static int IdlePriority;
 
         internal static MethodInfo IsBadWorkMethod;
+
+        public static int LeftoverPriority;
+        public static int MajorLearningRatePriority;
         public static float MajorLearningRateThreshold = 1.2f;
         public static bool ManageWorkSchedule = true;
+        internal static int MaxPriority = 4;
+        public static int MinorLearningRatePriority;
         public static float MinorLearningRateThreshold = 0.8f;
         public static bool RecoveringPawnsUnfitForWork = true;
-
+        internal static MethodInfo SetPriorityMethod;
         public static bool SpecialRulesForDoctors = true;
         public static bool SpecialRulesForHunters = true;
-
         private static readonly List<TabRecord> Tabs = new List<TabRecord>();
         public static int UpdateFrequency = 24;
-
         public static bool UseDedicatedWorkers = true;
-
         public static bool UsePawnLearningRateThresholds;
         public static bool VerboseLogging;
 
@@ -85,8 +91,8 @@ namespace WorkManager
         {
             var listing = new Listing_Standard();
             const int boolSettingsCount = 1;
-            var staticSettingsHeight = boolSettingsCount * (Text.LineHeight + listing.verticalSpacing);
-            var viewRect = new Rect(rect.x, 0, rect.width - 16f, staticSettingsHeight);
+            var height = boolSettingsCount * (Text.LineHeight + listing.verticalSpacing);
+            var viewRect = new Rect(rect.x, 0, rect.width - 16f, height);
             Widgets.BeginScrollView(rect, ref _scrollPosition, viewRect);
             listing.Begin(viewRect);
             listing.CheckboxLabeled(Strings.Misc.VerboseLogging, ref VerboseLogging,
@@ -98,11 +104,20 @@ namespace WorkManager
         private static void DoPrioritiesTab(Rect rect)
         {
             var listing = new Listing_Standard();
-            const int boolSettingsCount = 13;
-            const int numericSettingsCount = 3;
-            var viewRectHeight = boolSettingsCount * (Text.LineHeight + listing.verticalSpacing) +
-                                 numericSettingsCount * (Text.LineHeight * 1.5f + listing.verticalSpacing);
-            var viewRect = new Rect(rect.x, 0, rect.width - 16f, viewRectHeight);
+            var boolSettingsCount = 7;
+            if (SpecialRulesForDoctors)
+            {
+                boolSettingsCount++;
+                if (AssignMultipleDoctors) { boolSettingsCount += 4; }
+            }
+            if (SpecialRulesForHunters) { boolSettingsCount++; }
+            var numericSettingsCount = 6;
+            if (AssignAllWorkTypes) { numericSettingsCount++; }
+            if (AssignWorkToIdlePawns) { numericSettingsCount++; }
+            if (SpecialRulesForDoctors) { numericSettingsCount++; }
+            var height = boolSettingsCount * (Text.LineHeight + listing.verticalSpacing) +
+                         numericSettingsCount * (Text.LineHeight * 1.5f + listing.verticalSpacing);
+            var viewRect = new Rect(rect.x, 0, rect.width - 16f, height);
             Widgets.BeginScrollView(rect, ref _scrollPosition, viewRect);
             listing.Begin(viewRect);
             var optionRect = listing.GetRect(Text.LineHeight * 1.5f);
@@ -116,6 +131,40 @@ namespace WorkManager
             UpdateFrequency = (int)Widgets.HorizontalSlider(fieldRect.ContractedBy(4f), UpdateFrequency, 1f, 120f, true,
                 UpdateFrequency.ToString(), roundTo: 1);
             listing.Gap(listing.verticalSpacing);
+            listing.CheckboxLabeled(Strings.Priorities.UseDedicatedWorkers, ref UseDedicatedWorkers,
+                Strings.Priorities.UseDedicatedWorkersTooltip);
+            listing.Indent(16f);
+            listing.ColumnWidth -= 16f;
+            if (UseDedicatedWorkers)
+            {
+                optionRect = listing.GetRect(Text.LineHeight * 1.5f);
+                fieldRect = optionRect;
+                labelRect = optionRect;
+                fieldRect.xMin = optionRect.xMax - optionRect.width * (1 / 2f);
+                labelRect.xMax = fieldRect.xMin;
+                TooltipHandler.TipRegion(optionRect, Strings.Priorities.DedicatedWorkerPriorityTooltip);
+                Widgets.DrawHighlightIfMouseover(optionRect);
+                Widgets.Label(labelRect, Strings.Priorities.DedicatedWorkerPriority);
+                DedicatedWorkerPriority = (int)Widgets.HorizontalSlider(fieldRect.ContractedBy(4f),
+                    DedicatedWorkerPriority, 1f, MaxPriority, true, DedicatedWorkerPriority.ToString(), roundTo: 1);
+                listing.Gap(listing.verticalSpacing);
+            }
+            else
+            {
+                optionRect = listing.GetRect(Text.LineHeight * 1.5f);
+                fieldRect = optionRect;
+                labelRect = optionRect;
+                fieldRect.xMin = optionRect.xMax - optionRect.width * (1 / 2f);
+                labelRect.xMax = fieldRect.xMin;
+                TooltipHandler.TipRegion(optionRect, Strings.Priorities.HighestSkillPriorityTooltip);
+                Widgets.DrawHighlightIfMouseover(optionRect);
+                Widgets.Label(labelRect, Strings.Priorities.HighestSkillPriority);
+                HighestSkillPriority = (int)Widgets.HorizontalSlider(fieldRect.ContractedBy(4f), HighestSkillPriority,
+                    1f, MaxPriority, true, HighestSkillPriority.ToString(), roundTo: 1);
+                listing.Gap(listing.verticalSpacing);
+            }
+            listing.Outdent(16f);
+            listing.ColumnWidth += 16f;
             listing.CheckboxLabeled(Strings.Priorities.UsePawnLearningRateThresholds, ref UsePawnLearningRateThresholds,
                 Strings.Priorities.UsePawnLearningRateThresholdsTooltip);
             optionRect = listing.GetRect(Text.LineHeight * 1.5f);
@@ -135,6 +184,17 @@ namespace WorkManager
             labelRect = optionRect;
             fieldRect.xMin = optionRect.xMax - optionRect.width * (1 / 2f);
             labelRect.xMax = fieldRect.xMin;
+            TooltipHandler.TipRegion(optionRect, Strings.Priorities.MajorLearningRatePriorityTooltip);
+            Widgets.DrawHighlightIfMouseover(optionRect);
+            Widgets.Label(labelRect, Strings.Priorities.MajorLearningRatePriority);
+            MajorLearningRatePriority = (int)Widgets.HorizontalSlider(fieldRect.ContractedBy(4f),
+                MajorLearningRatePriority, 1f, MaxPriority, true, MajorLearningRatePriority.ToString(), roundTo: 1);
+            listing.Gap(listing.verticalSpacing);
+            optionRect = listing.GetRect(Text.LineHeight * 1.5f);
+            fieldRect = optionRect;
+            labelRect = optionRect;
+            fieldRect.xMin = optionRect.xMax - optionRect.width * (1 / 2f);
+            labelRect.xMax = fieldRect.xMin;
             TooltipHandler.TipRegion(optionRect, Strings.Priorities.MinorLearningRateThresholdTooltip);
             Widgets.DrawHighlightIfMouseover(optionRect);
             Widgets.Label(labelRect, Strings.Priorities.MinorLearningRateThreshold);
@@ -142,64 +202,107 @@ namespace WorkManager
                 MinorLearningRateThreshold, 0.01f, MajorLearningRateThreshold, true,
                 MinorLearningRateThreshold.ToStringPercent());
             listing.Gap(listing.verticalSpacing);
-            listing.CheckboxLabeled(Strings.Priorities.UseDedicatedWorkers, ref UseDedicatedWorkers,
-                Strings.Priorities.UseDedicatedWorkersTooltip);
+            optionRect = listing.GetRect(Text.LineHeight * 1.5f);
+            fieldRect = optionRect;
+            labelRect = optionRect;
+            fieldRect.xMin = optionRect.xMax - optionRect.width * (1 / 2f);
+            labelRect.xMax = fieldRect.xMin;
+            TooltipHandler.TipRegion(optionRect, Strings.Priorities.MinorLearningRatePriorityTooltip);
+            Widgets.DrawHighlightIfMouseover(optionRect);
+            Widgets.Label(labelRect, Strings.Priorities.MinorLearningRatePriority);
+            MinorLearningRatePriority = (int)Widgets.HorizontalSlider(fieldRect.ContractedBy(4f),
+                MinorLearningRatePriority, 1f, MaxPriority, true, MinorLearningRatePriority.ToString(), roundTo: 1);
+            listing.Gap(listing.verticalSpacing);
             listing.CheckboxLabeled(Strings.Priorities.RecoveringPawnsUnfitForWork, ref RecoveringPawnsUnfitForWork,
                 Strings.Priorities.RecoveringPawnsUnfitForWorkTooltip);
             listing.CheckboxLabeled(Strings.Priorities.AssignAllWorkTypes, ref AssignAllWorkTypes,
                 Strings.Priorities.AssignAllWorkTypesTooltip);
+            if (AssignAllWorkTypes)
+            {
+                listing.Indent(16f);
+                listing.ColumnWidth -= 16f;
+                optionRect = listing.GetRect(Text.LineHeight * 1.5f);
+                fieldRect = optionRect;
+                labelRect = optionRect;
+                fieldRect.xMin = optionRect.xMax - optionRect.width * (1 / 2f);
+                labelRect.xMax = fieldRect.xMin;
+                TooltipHandler.TipRegion(optionRect, Strings.Priorities.LeftoverPriorityTooltip);
+                Widgets.DrawHighlightIfMouseover(optionRect);
+                Widgets.Label(labelRect, Strings.Priorities.LeftoverPriority);
+                LeftoverPriority = (int)Widgets.HorizontalSlider(fieldRect.ContractedBy(4f), LeftoverPriority, 1f,
+                    MaxPriority, true, LeftoverPriority.ToString(), roundTo: 1);
+                listing.Gap(listing.verticalSpacing);
+                listing.Outdent(16f);
+                listing.ColumnWidth += 16f;
+            }
             listing.CheckboxLabeled(Strings.Priorities.AssignWorkToIdlePawns, ref AssignWorkToIdlePawns,
                 Strings.Priorities.AssignWorkToIdlePawnsTooltip);
+            if (AssignWorkToIdlePawns)
+            {
+                listing.Indent(16f);
+                listing.ColumnWidth -= 16f;
+                optionRect = listing.GetRect(Text.LineHeight * 1.5f);
+                fieldRect = optionRect;
+                labelRect = optionRect;
+                fieldRect.xMin = optionRect.xMax - optionRect.width * (1 / 2f);
+                labelRect.xMax = fieldRect.xMin;
+                TooltipHandler.TipRegion(optionRect, Strings.Priorities.IdlePriorityTooltip);
+                Widgets.DrawHighlightIfMouseover(optionRect);
+                Widgets.Label(labelRect, Strings.Priorities.IdlePriority);
+                IdlePriority = (int)Widgets.HorizontalSlider(fieldRect.ContractedBy(4f), IdlePriority, 1f, MaxPriority,
+                    true, IdlePriority.ToString(), roundTo: 1);
+                listing.Gap(listing.verticalSpacing);
+                listing.Outdent(16f);
+                listing.ColumnWidth += 16f;
+            }
             listing.CheckboxLabeled(Strings.Priorities.SpecialRulesForDoctors, ref SpecialRulesForDoctors,
                 Strings.Priorities.SpecialRulesForDoctorsTooltip);
-            listing.Indent(16f);
-            listing.ColumnWidth -= 16f;
-            optionRect = listing.GetRect(Text.LineHeight);
-            Widgets.DrawHighlightIfMouseover(optionRect);
-            TooltipHandler.TipRegion(optionRect, Strings.Priorities.AssignMultipleDoctorsTooltip);
-            Widgets.CheckboxLabeled(optionRect, Strings.Priorities.AssignMultipleDoctors, ref AssignMultipleDoctors,
-                !SpecialRulesForDoctors);
-            listing.Gap(listing.verticalSpacing);
-            listing.Indent(16f);
-            listing.ColumnWidth -= 16f;
-            optionRect = listing.GetRect(Text.LineHeight);
-            Widgets.DrawHighlightIfMouseover(optionRect);
-            TooltipHandler.TipRegion(optionRect, Strings.Priorities.CountDownedColonistsTooltip);
-            Widgets.CheckboxLabeled(optionRect, Strings.Priorities.CountDownedColonists, ref CountDownedColonists,
-                !(SpecialRulesForDoctors && AssignMultipleDoctors));
-            listing.Gap(listing.verticalSpacing);
-            optionRect = listing.GetRect(Text.LineHeight);
-            Widgets.DrawHighlightIfMouseover(optionRect);
-            TooltipHandler.TipRegion(optionRect, Strings.Priorities.CountDownedGuestsTooltip);
-            Widgets.CheckboxLabeled(optionRect, Strings.Priorities.CountDownedGuests, ref CountDownedGuests,
-                !(SpecialRulesForDoctors && AssignMultipleDoctors));
-            listing.Gap(listing.verticalSpacing);
-            optionRect = listing.GetRect(Text.LineHeight);
-            Widgets.DrawHighlightIfMouseover(optionRect);
-            TooltipHandler.TipRegion(optionRect, Strings.Priorities.CountDownedPrisonersTooltip);
-            Widgets.CheckboxLabeled(optionRect, Strings.Priorities.CountDownedPrisoners, ref CountDownedPrisoners,
-                !(SpecialRulesForDoctors && AssignMultipleDoctors));
-            listing.Gap(listing.verticalSpacing);
-            optionRect = listing.GetRect(Text.LineHeight);
-            Widgets.DrawHighlightIfMouseover(optionRect);
-            TooltipHandler.TipRegion(optionRect, Strings.Priorities.CountDownedAnimalsTooltip);
-            Widgets.CheckboxLabeled(optionRect, Strings.Priorities.CountDownedAnimals, ref CountDownedAnimals,
-                !(SpecialRulesForDoctors && AssignMultipleDoctors));
-            listing.Gap(listing.verticalSpacing);
-            listing.Outdent(32f);
-            listing.ColumnWidth += 32f;
+            if (SpecialRulesForDoctors)
+            {
+                listing.Indent(16f);
+                listing.ColumnWidth -= 16f;
+                optionRect = listing.GetRect(Text.LineHeight * 1.5f);
+                fieldRect = optionRect;
+                labelRect = optionRect;
+                fieldRect.xMin = optionRect.xMax - optionRect.width * (1 / 2f);
+                labelRect.xMax = fieldRect.xMin;
+                TooltipHandler.TipRegion(optionRect, Strings.Priorities.DoctoringPriorityTooltip);
+                Widgets.DrawHighlightIfMouseover(optionRect);
+                Widgets.Label(labelRect, Strings.Priorities.DoctoringPriority);
+                DoctoringPriority = (int)Widgets.HorizontalSlider(fieldRect.ContractedBy(4f), DoctoringPriority, 1f,
+                    MaxPriority, true, DoctoringPriority.ToString(), roundTo: 1);
+                listing.Gap(listing.verticalSpacing);
+                listing.CheckboxLabeled(Strings.Priorities.AssignMultipleDoctors, ref AssignMultipleDoctors,
+                    Strings.Priorities.AssignMultipleDoctorsTooltip);
+                if (AssignMultipleDoctors)
+                {
+                    listing.Indent(16f);
+                    listing.ColumnWidth -= 16f;
+                    listing.CheckboxLabeled(Strings.Priorities.CountDownedColonists, ref CountDownedColonists,
+                        Strings.Priorities.CountDownedColonistsTooltip);
+                    listing.CheckboxLabeled(Strings.Priorities.CountDownedGuests, ref CountDownedGuests,
+                        Strings.Priorities.CountDownedGuestsTooltip);
+                    listing.CheckboxLabeled(Strings.Priorities.CountDownedPrisoners, ref CountDownedPrisoners,
+                        Strings.Priorities.CountDownedPrisonersTooltip);
+                    listing.CheckboxLabeled(Strings.Priorities.CountDownedAnimals, ref CountDownedAnimals,
+                        Strings.Priorities.CountDownedAnimalsTooltip);
+                    listing.Outdent(16f);
+                    listing.ColumnWidth += 16f;
+                }
+                listing.Outdent(16f);
+                listing.ColumnWidth += 16f;
+            }
             listing.CheckboxLabeled(Strings.Priorities.SpecialRulesForHunters, ref SpecialRulesForHunters,
                 Strings.Priorities.SpecialRulesForHuntersTooltip);
-            listing.Indent(16f);
-            listing.ColumnWidth -= 16f;
-            optionRect = listing.GetRect(Text.LineHeight);
-            Widgets.DrawHighlightIfMouseover(optionRect);
-            TooltipHandler.TipRegion(optionRect, Strings.Priorities.AllowMeleeHuntersTooltip);
-            Widgets.CheckboxLabeled(optionRect, Strings.Priorities.AllowMeleeHunters, ref AllowMeleeHunters,
-                !SpecialRulesForHunters);
-            listing.Gap(listing.verticalSpacing);
-            listing.Outdent(16f);
-            listing.ColumnWidth += 16f;
+            if (SpecialRulesForHunters)
+            {
+                listing.Indent(16f);
+                listing.ColumnWidth -= 16f;
+                listing.CheckboxLabeled(Strings.Priorities.AllowMeleeHunters, ref AllowMeleeHunters,
+                    Strings.Priorities.AllowMeleeHuntersTooltip);
+                listing.Outdent(16f);
+                listing.ColumnWidth += 16f;
+            }
             listing.End();
             Widgets.EndScrollView();
         }
@@ -209,9 +312,9 @@ namespace WorkManager
             var listing = new Listing_Standard();
             const int boolSettingsCount = 1;
             const int numericSettingsCount = 0;
-            var staticSettingsHeight = boolSettingsCount * (Text.LineHeight + listing.verticalSpacing) +
-                                       numericSettingsCount * (Text.LineHeight * 1.5f + listing.verticalSpacing);
-            var viewRect = new Rect(rect.x, 0, rect.width - 16f, staticSettingsHeight);
+            var height = boolSettingsCount * (Text.LineHeight + listing.verticalSpacing) +
+                         numericSettingsCount * (Text.LineHeight * 1.5f + listing.verticalSpacing);
+            var viewRect = new Rect(rect.x, 0, rect.width - 16f, height);
             Widgets.BeginScrollView(rect, ref _scrollPosition, viewRect);
             listing.Begin(viewRect);
             listing.CheckboxLabeled(Strings.Schedule.ManageWorkSchedule, ref ManageWorkSchedule,
@@ -261,7 +364,7 @@ namespace WorkManager
             GUI.color = color;
             workType.Priority = (int)Widgets.HorizontalSlider(
                 new Rect(rect.x + _nameColumnWidth, rect.y, _priorityColumnWidth, rect.height).ContractedBy(4f),
-                workType.Priority, 1f, 4f, true, workType.Priority.ToString(), roundTo: 1);
+                workType.Priority, 1f, MaxPriority, true, workType.Priority.ToString(), roundTo: 1);
             Widgets.Checkbox(rect.x + _nameColumnWidth + _priorityColumnWidth + (_allowDedicatedColumnWidth / 2f - 12),
                 rect.y, ref workType.AllowDedicated, 24f, paintable: true);
             Text.Anchor = TextAnchor.UpperLeft;
@@ -270,9 +373,9 @@ namespace WorkManager
         private static void DoWorkTypesTab(Rect rect)
         {
             var listing = new Listing_Standard();
-            var viewRectHeight = Text.LineHeight + 35f + Text.LineHeight * 2 + Text.SpaceBetweenLines +
-                                 AssignEveryoneWorkTypes.Count * 35f;
-            var viewRect = new Rect(rect.x, 0, rect.width - 16f, viewRectHeight);
+            var height = Text.LineHeight + 35f + Text.LineHeight * 2 + Text.SpaceBetweenLines +
+                         AssignEveryoneWorkTypes.Count * 35f;
+            var viewRect = new Rect(rect.x, 0, rect.width - 16f, height);
             Widgets.BeginScrollView(rect, ref _scrollPosition, viewRect);
             listing.Begin(viewRect);
             var headerRect = listing.GetRect(Text.LineHeight);
@@ -340,6 +443,13 @@ namespace WorkManager
             Scribe_Values.Look(ref VerboseLogging, nameof(VerboseLogging));
             Scribe_Collections.Look(ref AssignEveryoneWorkTypes, nameof(AssignEveryoneWorkTypes), LookMode.Deep);
             Scribe_Values.Look(ref ManageWorkSchedule, nameof(ManageWorkSchedule), true);
+            Scribe_Values.Look(ref DedicatedWorkerPriority, nameof(DedicatedWorkerPriority), 1);
+            Scribe_Values.Look(ref HighestSkillPriority, nameof(HighestSkillPriority), 1);
+            Scribe_Values.Look(ref MajorLearningRatePriority, nameof(MajorLearningRatePriority), 2);
+            Scribe_Values.Look(ref MinorLearningRatePriority, nameof(MinorLearningRatePriority), 3);
+            Scribe_Values.Look(ref IdlePriority, nameof(IdlePriority), 4);
+            Scribe_Values.Look(ref LeftoverPriority, nameof(LeftoverPriority), 4);
+            Scribe_Values.Look(ref DoctoringPriority, nameof(DoctoringPriority), 1);
         }
 
         public static void Initialize()

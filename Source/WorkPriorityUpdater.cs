@@ -39,7 +39,16 @@ namespace WorkManager
             {
                 foreach (var workType in _managedWorkTypes.Where(workType => pawnCache.IsManagedWork(workType)))
                 {
-                    pawnCache.Pawn.workSettings.SetPriority(workType, pawnCache.WorkPriorities[workType]);
+                    var priority = pawnCache.WorkPriorities[workType];
+                    if (Settings.SetPriorityMethod == null)
+                    {
+                        pawnCache.Pawn.workSettings.SetPriority(workType, priority);
+                    }
+                    else
+                    {
+                        Settings.SetPriorityMethod.Invoke(null,
+                            new object[] { pawnCache.Pawn, workType, priority, null });
+                    }
                 }
             }
         }
@@ -100,11 +109,14 @@ namespace WorkManager
                     !pc.IsRecovering && !pc.IsDisabledWork(workType) && !pc.IsBadWork(workType)).ToList();
                 if (!relevantPawns.Any()) { continue; }
                 var pawnSkills = relevantPawns.ToDictionary(pc => pc, pc => pc.GetWorkSkillLevel(workType));
-                var skillRange = pawnSkills.Max(pair => pair.Value) - pawnSkills.Min(pair => pair.Value);
+                var maxSkill = pawnSkills.Max(pair => pair.Value);
+                var minSkill = pawnSkills.Min(pair => pair.Value);
+                var skillRange = maxSkill - minSkill;
                 var pawnDedicationsCounts = relevantPawns.ToDictionary(pc => pc,
-                    pc => workTypes.Count(wt => pc.WorkPriorities[wt] == 1));
-                var dedicationsCountRange = pawnDedicationsCounts.Max(pair => pair.Value) -
-                                            pawnDedicationsCounts.Min(pair => pair.Value);
+                    pc => workTypes.Count(wt => pc.WorkPriorities[wt] == Settings.DedicatedWorkerPriority));
+                var maxDedications = pawnDedicationsCounts.Max(pair => pair.Value);
+                var minDedications = pawnDedicationsCounts.Min(pair => pair.Value);
+                var dedicationsCountRange = maxDedications - minDedications;
                 var pawnScores = new Dictionary<PawnCache, float>();
                 foreach (var pawnCache in relevantPawns)
                 {
@@ -115,16 +127,19 @@ namespace WorkManager
                     var normalizedDedications = dedicationsCountRange == 0
                         ? 0
                         : pawnDedicationsCounts[pawnCache] / dedicationsCountRange;
-                    var score = (float)normalizedSkill - normalizedDedications;
-                    score += skill < 20 ? 0.75f * normalizedLearnRate : 0.25f * normalizedLearnRate;
+                    var score = normalizedSkill - 1.5f * normalizedDedications;
+                    score += skill < 20 ? 0.75f * normalizedLearnRate : 0.5f * normalizedLearnRate;
                     pawnScores.Add(pawnCache, score);
                 }
                 if (Prefs.DevMode && Settings.VerboseLogging)
                 {
                     Log.Message(
+                        $"-- Work Manager: Skill range = {skillRange} [{minSkill};{maxSkill}]. Dedication range = {dedicationsCountRange} [{minDedications}; {maxDedications}] --");
+                    Log.Message(
                         $"-- Work Manager: {string.Join(", ", pawnScores.OrderByDescending(pair => pair.Value).Select(pair => $"{pair.Key.Pawn.LabelShort}({pair.Value:N2})"))} --");
                 }
-                while (capablePawns.Count(pc => pc.WorkPriorities[workType] == 1) < targetWorkers)
+                while (capablePawns.Count(pc => pc.WorkPriorities[workType] == Settings.DedicatedWorkerPriority) <
+                       targetWorkers)
                 {
                     var dedicatedWorker = pawnScores.Any()
                         ? pawnScores.OrderByDescending(pair => pair.Value).First().Key
@@ -135,7 +150,7 @@ namespace WorkManager
                         Log.Message(
                             $"Work Manager: Assigning '{dedicatedWorker.Pawn.LabelShort}' as dedicated worker for '{workType.labelShort}'");
                     }
-                    dedicatedWorker.WorkPriorities[workType] = 1;
+                    dedicatedWorker.WorkPriorities[workType] = Settings.DedicatedWorkerPriority;
                     pawnScores.Remove(dedicatedWorker);
                 }
             }
@@ -177,7 +192,7 @@ namespace WorkManager
                                 Log.Message(
                                     $"Work Manager: Assigning '{pawnCache.Pawn.LabelShort}' as primary doctor (highest skill value)");
                             }
-                            pawnCache.WorkPriorities[workType] = 1;
+                            pawnCache.WorkPriorities[workType] = Settings.DoctoringPriority;
                             doctorsCount++;
                             continue;
                         }
@@ -189,7 +204,7 @@ namespace WorkManager
                             Log.Message(
                                 $"Work Manager: Assigning '{pawnCache.Pawn.LabelShort}' as primary doctor (highest skill value)");
                         }
-                        pawnCache.WorkPriorities[workType] = 1;
+                        pawnCache.WorkPriorities[workType] = Settings.DoctoringPriority;
                         doctorsCount++;
                         break;
                     }
@@ -206,7 +221,7 @@ namespace WorkManager
                             $"Work Manager: Assigning '{pawnCache.Pawn.LabelShort}' as primary doctor (fail-safe)");
                     }
                     pawnCache.WorkPriorities[workType] = assignEveryone == null || assignEveryone.AllowDedicated
-                        ? 1
+                        ? Settings.DoctoringPriority
                         : assignEveryone.Priority;
                     doctorsCount++;
                 }
@@ -229,7 +244,7 @@ namespace WorkManager
                                 $"Work Manager: Assigning '{pawnCache.Pawn.LabelShort}' as secondary doctor (primary doctor needs tending)");
                         }
                         pawnCache.WorkPriorities[workType] = assignEveryone == null || assignEveryone.AllowDedicated
-                            ? 1
+                            ? Settings.DoctoringPriority
                             : assignEveryone.Priority;
                         doctorsCount++;
                         break;
@@ -278,7 +293,7 @@ namespace WorkManager
                         Log.Message(
                             $"Work Manager: Assigning '{pawnCache.Pawn.LabelShort}' as backup doctor (multiple patients)");
                     }
-                    pawnCache.WorkPriorities[workType] = 1;
+                    pawnCache.WorkPriorities[workType] = Settings.DoctoringPriority;
                     doctorsCount++;
                 }
             }
@@ -333,7 +348,9 @@ namespace WorkManager
                             Log.Message(
                                 $"Work Manager: Assigning '{pawnCache.Pawn.LabelShort}' as a hunter with priority 1 (highest skill value)");
                         }
-                        pawnCache.WorkPriorities[workType] = 1;
+                        pawnCache.WorkPriorities[workType] = Settings.UseDedicatedWorkers
+                            ? Settings.DedicatedWorkerPriority
+                            : Settings.HighestSkillPriority;
                     }
                     else
                     {
@@ -344,7 +361,7 @@ namespace WorkManager
                                 Log.Message(
                                     $"Work Manager: Assigning '{pawnCache.Pawn.LabelShort}' as a hunter with priority 2 (major learning rate)");
                             }
-                            pawnCache.WorkPriorities[workType] = 2;
+                            pawnCache.WorkPriorities[workType] = Settings.MajorLearningRatePriority;
                         }
                         else if (pawnCache.IsLearningRateAboveThreshold(workType, false))
                         {
@@ -353,7 +370,7 @@ namespace WorkManager
                                 Log.Message(
                                     $"Work Manager: Assigning '{pawnCache.Pawn.LabelShort}' as a hunter with priority 3 (minor learning rate)");
                             }
-                            pawnCache.WorkPriorities[workType] = 3;
+                            pawnCache.WorkPriorities[workType] = Settings.MinorLearningRatePriority;
                         }
                     }
                 }
@@ -371,10 +388,11 @@ namespace WorkManager
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
                             Log.Message(
-                                $"Work Manager: Setting {pawnCache.Pawn.LabelShort}'s priority of '{workType.labelShort}' to {(assignEveryone == null || assignEveryone.AllowDedicated ? 1 : assignEveryone.Priority)} (fail-safe)");
+                                $"Work Manager: Setting {pawnCache.Pawn.LabelShort}'s priority of '{workType.labelShort}' to {(assignEveryone == null || assignEveryone.AllowDedicated ? Settings.UseDedicatedWorkers ? Settings.DedicatedWorkerPriority : Settings.HighestSkillPriority : assignEveryone.Priority)} (fail-safe)");
                         }
                         pawnCache.WorkPriorities[workType] = assignEveryone == null || assignEveryone.AllowDedicated
-                            ? 1
+                            ? Settings.UseDedicatedWorkers ? Settings.DedicatedWorkerPriority :
+                            Settings.HighestSkillPriority
                             : assignEveryone.Priority;
                     }
                 }
@@ -415,9 +433,9 @@ namespace WorkManager
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
                             Log.Message(
-                                $"Work Manager: Setting {pawnCache.Pawn.LabelShort}'s priority of '{workType.labelShort}' to 1");
+                                $"Work Manager: Setting {pawnCache.Pawn.LabelShort}'s priority of '{workType.labelShort}' to {Settings.HighestSkillPriority}");
                         }
-                        pawnCache.WorkPriorities[workType] = 1;
+                        pawnCache.WorkPriorities[workType] = Settings.HighestSkillPriority;
                         break;
                     }
                 }
@@ -434,9 +452,9 @@ namespace WorkManager
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
                             Log.Message(
-                                $"Work Manager: Setting {pawnCache.Pawn.LabelShort}'s priority of '{workType.labelShort}' to 1");
+                                $"Work Manager: Setting {pawnCache.Pawn.LabelShort}'s priority of '{workType.labelShort}' to {Settings.HighestSkillPriority}");
                         }
-                        pawnCache.WorkPriorities[workType] = 1;
+                        pawnCache.WorkPriorities[workType] = Settings.HighestSkillPriority;
                     }
                 }
             }
@@ -452,9 +470,9 @@ namespace WorkManager
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
                             Log.Message(
-                                $"Work Manager: Setting {pawnCache.Pawn.LabelShort}'s priority of '{workType.labelShort}' to 4");
+                                $"Work Manager: Setting {pawnCache.Pawn.LabelShort}'s priority of '{workType.labelShort}' to {Settings.LeftoverPriority}");
                         }
-                        pawnCache.WorkPriorities[workType] = 4;
+                        pawnCache.WorkPriorities[workType] = Settings.LeftoverPriority;
                     }
                 }
             }
@@ -487,12 +505,12 @@ namespace WorkManager
                 {
                     if (pawnCache.IsLearningRateAboveThreshold(workType, true))
                     {
-                        pawnCache.WorkPriorities[workType] = 2;
+                        pawnCache.WorkPriorities[workType] = Settings.MajorLearningRatePriority;
                         continue;
                     }
                     if (pawnCache.IsLearningRateAboveThreshold(workType, false))
                     {
-                        pawnCache.WorkPriorities[workType] = 3;
+                        pawnCache.WorkPriorities[workType] = Settings.MinorLearningRatePriority;
                     }
                 }
             }
@@ -535,9 +553,9 @@ namespace WorkManager
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
                             Log.Message(
-                                $"Work Manager: Setting {pawnCache.Pawn.LabelShort}'s priority of '{workType.labelShort}' to 1 (skill = {pawnCache.GetWorkSkillLevel(workType)}, max = {maxSkillValue})");
+                                $"Work Manager: Setting {pawnCache.Pawn.LabelShort}'s priority of '{workType.labelShort}' to {Settings.HighestSkillPriority} (skill = {pawnCache.GetWorkSkillLevel(workType)}, max = {maxSkillValue})");
                         }
-                        pawnCache.WorkPriorities[workType] = 1;
+                        pawnCache.WorkPriorities[workType] = Settings.HighestSkillPriority;
                     }
                 }
             }
@@ -599,7 +617,7 @@ namespace WorkManager
             {
                 foreach (var workType in workTypes.Where(wt =>
                     pawnCache.IsManagedWork(wt) && !pawnCache.IsDisabledWork(wt) && !pawnCache.IsBadWork(wt) &&
-                    !pawnCache.IsActiveWork(wt))) { pawnCache.WorkPriorities[workType] = 4; }
+                    !pawnCache.IsActiveWork(wt))) { pawnCache.WorkPriorities[workType] = Settings.IdlePriority; }
                 if (pawnCache.IdleSince == null)
                 {
                     pawnCache.IdleSince =
@@ -630,7 +648,7 @@ namespace WorkManager
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
                 Log.Message(
-                    $"----- Work Manager: Updating work priorities... (day = {day}, hour = {hourFloat}, passed = {hoursPassed:N1}) -----");
+                    $"----- Work Manager: Updating work priorities... (year = {year}, day = {day}, hour = {hourFloat:N1}, passed = {hoursPassed:N1}) -----");
             }
             _workUpdateTime.Year = year;
             _workUpdateTime.Day = day;
