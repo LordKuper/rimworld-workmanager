@@ -18,12 +18,12 @@ namespace WorkManager
 
         private readonly HashSet<WorkShift> _workShifts = new HashSet<WorkShift>
         {
-            new WorkShift(WorkShiftName.Morning, new[] {6, 7, 8, 9, 10, 11, 12, 13},
-                new[] {14, 15, 16, 17, 18, 19, 20, 21}),
-            new WorkShift(WorkShiftName.Afternoon, new[] {0, 1, 18, 19, 20, 21, 22, 23},
-                new[] {10, 11, 12, 13, 14, 15, 16, 17}),
-            new WorkShift(WorkShiftName.Night, new[] {2, 3, 4, 5, 14, 15, 16, 17},
-                new[] {0, 1, 18, 19, 20, 21, 22, 23})
+            new WorkShift(WorkShiftName.Morning, new[] { 6, 7, 8, 9, 10, 11, 12, 13 },
+                new[] { 14, 15, 16, 17, 18, 19, 20, 21 }),
+            new WorkShift(WorkShiftName.Afternoon, new[] { 0, 1, 18, 19, 20, 21, 22, 23 },
+                new[] { 10, 11, 12, 13, 14, 15, 16, 17 }),
+            new WorkShift(WorkShiftName.Night, new[] { 2, 3, 4, 5, 14, 15, 16, 17 },
+                new[] { 0, 1, 18, 19, 20, 21, 22, 23 })
         };
 
         private readonly RimworldTime _workUpdateTime = new RimworldTime(-1, -1, -1);
@@ -88,7 +88,7 @@ namespace WorkManager
                     "Hunting".Equals(workTypeDef.defName, StringComparison.OrdinalIgnoreCase)));
             }
             if (!workTypes.Any()) { return; }
-            var targetWorkers = (int) Math.Ceiling((float) capablePawns.Count / workTypes.Count);
+            var targetWorkers = (int)Math.Ceiling((float)capablePawns.Count / workTypes.Count);
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
                 Log.Message($"-- Work Manager: Target dedicated workers by work type = {targetWorkers} --");
@@ -115,7 +115,7 @@ namespace WorkManager
                     var normalizedDedications = dedicationsCountRange == 0
                         ? 0
                         : pawnDedicationsCounts[pawnCache] / dedicationsCountRange;
-                    var score = (float) normalizedSkill - normalizedDedications;
+                    var score = (float)normalizedSkill - normalizedDedications;
                     score += skill < 20 ? 0.75f * normalizedLearnRate : 0.25f * normalizedLearnRate;
                     pawnScores.Add(pawnCache, score);
                 }
@@ -551,8 +551,8 @@ namespace WorkManager
             {
                 Log.Message("-- Work Manager: Assigning work for recovering pawns --");
             }
-            var relevantWorkTypes = _allWorkTypes.Where(wt => new[] {"Patient", "PatientBedRest"}.Contains(wt.defName))
-                .Intersect(_managedWorkTypes);
+            var relevantWorkTypes = _allWorkTypes
+                .Where(wt => new[] { "Patient", "PatientBedRest" }.Contains(wt.defName)).Intersect(_managedWorkTypes);
             foreach (var workType in relevantWorkTypes)
             {
                 foreach (var pawnCache in _pawnCache.Values.Where(pc =>
@@ -614,23 +614,18 @@ namespace WorkManager
             base.MapComponentTick();
             if (!WorkManager.Enabled) { return; }
             if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused || Find.TickManager.TicksGame % 60 != 0) { return; }
+            if (!Settings.Initialized) { Settings.Initialize(); }
             var year = GenLocalDate.Year(map);
             var day = GenLocalDate.DayOfYear(map);
             var hourFloat = GenLocalDate.HourFloat(map);
             var hoursPassed = (year - _workUpdateTime.Year) * 60 * 24 + (day - _workUpdateTime.Day) * 24 + hourFloat -
                               _workUpdateTime.Hour;
-            if (Settings.UpdateFrequency == 0) { Settings.UpdateFrequency = 24; }
             if (hoursPassed < 24f / Settings.UpdateFrequency) { return; }
             if (!Current.Game.playSettings.useWorkPriorities)
             {
                 Current.Game.playSettings.useWorkPriorities = true;
                 foreach (var pawn in PawnsFinder.AllMapsWorldAndTemporary_Alive.Where(pawn =>
                     pawn.Faction == Faction.OfPlayer)) { pawn.workSettings?.Notify_UseWorkPrioritiesChanged(); }
-            }
-            if (Settings.AssignEveryoneWorkTypes == null)
-            {
-                Settings.AssignEveryoneWorkTypes =
-                    new List<AssignEveryoneWorkType>(Settings.DefaultAssignEveryoneWorkTypes);
             }
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
