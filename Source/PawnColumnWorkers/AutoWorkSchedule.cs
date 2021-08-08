@@ -12,7 +12,7 @@ namespace WorkManager.PawnColumnWorkers
         {
             if (pawn.Dead) { return; }
             var component = Current.Game.GetComponent<WorkManagerGameComponent>();
-            if (component.Enabled)
+            if (component.PriorityManagementEnabled)
             {
                 CustomWidgets.ButtonImageToggle(() => component.GetPawnScheduleEnabled(pawn),
                     newValue => component.SetPawnScheduleEnabled(pawn, newValue),

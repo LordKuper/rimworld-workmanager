@@ -11,8 +11,8 @@
   <WorkManager.PawnScheduleEnableTooltip>Enable automatic schedule management for pawn</WorkManager.PawnScheduleEnableTooltip>
   <WorkManager.PawnScheduleDisableTooltip>Disable automatic schedule management for pawn</WorkManager.PawnScheduleDisableTooltip>
   <WorkManager.Settings_Priorities_Title>Priorities</WorkManager.Settings_Priorities_Title>
-  <WorkManager.Settings_Priorities_UpdateInterval>Update frequency</WorkManager.Settings_Priorities_UpdateInterval>
-  <WorkManager.Settings_Priorities_UpdateIntervalTooltip>How many times to update work priorities per in-game day</WorkManager.Settings_Priorities_UpdateIntervalTooltip>
+  <WorkManager.Settings_Priorities_UpdateFrequency>Update frequency</WorkManager.Settings_Priorities_UpdateFrequency>
+  <WorkManager.Settings_Priorities_UpdateFrequencyTooltip>How many times to update work priorities per in-game day</WorkManager.Settings_Priorities_UpdateFrequencyTooltip>
   <WorkManager.Settings_Priorities_UseDedicatedWorkers>Use dedicated workers</WorkManager.Settings_Priorities_UseDedicatedWorkers>
   <WorkManager.Settings_Priorities_UseDedicatedWorkersTooltip>Try to assign a dedicated worker for every suitable work type</WorkManager.Settings_Priorities_UseDedicatedWorkersTooltip>
   <WorkManager.Settings_Priorities_DedicatedWorkerPriority>Dedicated workers priority</WorkManager.Settings_Priorities_DedicatedWorkerPriority>
@@ -73,6 +73,20 @@
   <WorkManager.Settings_Schedule_Title>Schedule</WorkManager.Settings_Schedule_Title>
   <WorkManager.Settings_Schedule_ManageWorkSchedule>Manage work schedule</WorkManager.Settings_Schedule_ManageWorkSchedule>
   <WorkManager.Settings_Schedule_ManageWorkScheduleTooltip>Automatic colonists' work shift management</WorkManager.Settings_Schedule_ManageWorkScheduleTooltip>
+  <WorkManager.Settings_Schedule_UpdateFrequency>Update frequency</WorkManager.Settings_Schedule_UpdateFrequency>
+  <WorkManager.Settings_Schedule_UpdateFrequencyTooltip>How many times to update schedules per in-game day</WorkManager.Settings_Schedule_UpdateFrequencyTooltip>
+  <WorkManager.Settings_Schedule_ColonistWorkShifts>Colonist work shifts</WorkManager.Settings_Schedule_ColonistWorkShifts>
+  <WorkManager.Settings_Schedule_ColonistWorkShiftsTooltip>Generic work shifts for colonists</WorkManager.Settings_Schedule_ColonistWorkShiftsTooltip>
+  <WorkManager.Settings_Schedule_AddWorkShift>Add</WorkManager.Settings_Schedule_AddWorkShift>
+  <WorkManager.Settings_Schedule_DeleteWorkShift>Delete...</WorkManager.Settings_Schedule_DeleteWorkShift>
+  <WorkManager.Settings_Schedule_ResetWorkShifts>Reset to defaults</WorkManager.Settings_Schedule_ResetWorkShifts>
+  <WorkManager.Settings_Schedule_WorkShiftNumberColumnHeader>#</WorkManager.Settings_Schedule_WorkShiftNumberColumnHeader>
+  <WorkManager.Settings_Schedule_WorkShiftColumnHeader>Work shift</WorkManager.Settings_Schedule_WorkShiftColumnHeader>
+  <WorkManager.Settings_Schedule_WorkShiftColumnHeaderTooltip>Customize work shift time assignment</WorkManager.Settings_Schedule_WorkShiftColumnHeaderTooltip>
+  <WorkManager.Settings_Schedule_WorkShiftThresholdColumnHeader>Pawn threshold</WorkManager.Settings_Schedule_WorkShiftThresholdColumnHeader>
+  <WorkManager.Settings_Schedule_WorkShiftThresholdColumnHeaderTooltip>Pawns will be assigned to a work shift only if number of eligible pawns is equal or higher than this value (always equals 1 for first work shift)</WorkManager.Settings_Schedule_WorkShiftThresholdColumnHeaderTooltip>
+  <WorkManager.Settings_Schedule_NightOwlWorkShifts>Night owl work shifts</WorkManager.Settings_Schedule_NightOwlWorkShifts>
+  <WorkManager.Settings_Schedule_NightOwlWorkShiftsTooltip>Work shifts for colonists with 'Night Owl' trait</WorkManager.Settings_Schedule_NightOwlWorkShiftsTooltip>
   <WorkManager.Settings_Misc_Title>Misc</WorkManager.Settings_Misc_Title>
   <WorkManager.Settings_Misc_VerboseLogging>Verbose logging</WorkManager.Settings_Misc_VerboseLogging>
   <WorkManager.Settings_Misc_VerboseLoggingTooltip>Show mod execution details in log (only works when development mode is enabled)</WorkManager.Settings_Misc_VerboseLoggingTooltip>

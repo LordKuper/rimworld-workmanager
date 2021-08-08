@@ -161,11 +161,11 @@ namespace WorkManager
 
                     internal static readonly string Title = "WorkManager.Settings_Priorities_Title".Translate();
 
-                    internal static readonly string UpdateInterval =
-                        "WorkManager.Settings_Priorities_UpdateInterval".Translate();
+                    internal static readonly string UpdateFrequency =
+                        "WorkManager.Settings_Priorities_UpdateFrequency".Translate();
 
-                    internal static readonly string UpdateIntervalTooltip =
-                        "WorkManager.Settings_Priorities_UpdateIntervalTooltip".Translate();
+                    internal static readonly string UpdateFrequencyTooltip =
+                        "WorkManager.Settings_Priorities_UpdateFrequencyTooltip".Translate();
 
                     internal static readonly string UseDedicatedWorkers =
                         "WorkManager.Settings_Priorities_UseDedicatedWorkers".Translate();
@@ -182,13 +182,55 @@ namespace WorkManager
 
                 internal static class Schedule
                 {
+                    internal static readonly string AddWorkShift =
+                        "WorkManager.Settings_Schedule_AddWorkShift".Translate();
+
+                    internal static readonly string ColonistWorkShifts =
+                        "WorkManager.Settings_Schedule_ColonistWorkShifts".Translate();
+
+                    internal static readonly string ColonistWorkShiftsTooltip =
+                        "WorkManager.Settings_Schedule_ColonistWorkShiftsTooltip".Translate();
+
+                    internal static readonly string DeleteWorkShift =
+                        "WorkManager.Settings_Schedule_DeleteWorkShift".Translate();
+
                     internal static readonly string ManageWorkSchedule =
                         "WorkManager.Settings_Schedule_ManageWorkSchedule".Translate();
 
                     internal static readonly string ManageWorkScheduleTooltip =
                         "WorkManager.Settings_Schedule_ManageWorkScheduleTooltip".Translate();
 
+                    internal static readonly string NightOwlWorkShifts =
+                        "WorkManager.Settings_Schedule_NightOwlWorkShifts".Translate();
+
+                    internal static readonly string NightOwlWorkShiftsTooltip =
+                        "WorkManager.Settings_Schedule_NightOwlWorkShiftsTooltip".Translate();
+
+                    internal static readonly string ResetWorkShifts =
+                        "WorkManager.Settings_Schedule_ResetWorkShifts".Translate();
+
                     internal static readonly string Title = "WorkManager.Settings_Schedule_Title".Translate();
+
+                    internal static readonly string UpdateFrequency =
+                        "WorkManager.Settings_Schedule_UpdateFrequency".Translate();
+
+                    internal static readonly string UpdateFrequencyTooltip =
+                        "WorkManager.Settings_Schedule_UpdateFrequencyTooltip".Translate();
+
+                    internal static readonly string WorkShiftColumnHeader =
+                        "WorkManager.Settings_Schedule_WorkShiftColumnHeader".Translate();
+
+                    internal static readonly string WorkShiftColumnHeaderTooltip =
+                        "WorkManager.Settings_Schedule_WorkShiftColumnHeaderTooltip".Translate();
+
+                    internal static readonly string WorkShiftNumberColumnHeader =
+                        "WorkManager.Settings_Schedule_WorkShiftNumberColumnHeader".Translate();
+
+                    internal static readonly string WorkShiftThresholdColumnHeader =
+                        "WorkManager.Settings_Schedule_WorkShiftThresholdColumnHeader".Translate();
+
+                    internal static readonly string WorkShiftThresholdColumnHeaderTooltip =
+                        "WorkManager.Settings_Schedule_WorkShiftThresholdColumnHeaderTooltip".Translate();
                 }
 
                 internal static class WorkTypes
@@ -237,12 +279,6 @@ namespace WorkManager
         [StaticConstructorOnStartup]
         internal static class Textures
         {
-            internal static readonly Texture2D GlobalToggleButtonDisabled =
-                ContentFinder<Texture2D>.Get("work-manager-global-off");
-
-            internal static readonly Texture2D GlobalToggleButtonEnabled =
-                ContentFinder<Texture2D>.Get("work-manager-global-on");
-
             internal static readonly Texture2D PawnToggleButtonDisabled =
                 ContentFinder<Texture2D>.Get("work-manager-pawn-off");
 
@@ -254,6 +290,18 @@ namespace WorkManager
 
             internal static readonly Texture2D PawnWorkTypeDisabled =
                 ContentFinder<Texture2D>.Get("work-manager-pawn-work-type-off");
+
+            internal static readonly Texture2D PrioritiesToggleButtonDisabled =
+                ContentFinder<Texture2D>.Get("work-manager-priorities-off");
+
+            internal static readonly Texture2D PrioritiesToggleButtonEnabled =
+                ContentFinder<Texture2D>.Get("work-manager-priorities-on");
+
+            internal static readonly Texture2D ScheduleToggleButtonDisabled =
+                ContentFinder<Texture2D>.Get("work-manager-schedule-off");
+
+            internal static readonly Texture2D ScheduleToggleButtonEnabled =
+                ContentFinder<Texture2D>.Get("work-manager-schedule-on");
 
             internal static readonly Texture2D WorkTypeToggleButtonDisabled =
                 ContentFinder<Texture2D>.Get("work-manager-work-type-off");

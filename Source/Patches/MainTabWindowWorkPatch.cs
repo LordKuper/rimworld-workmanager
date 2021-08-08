@@ -14,9 +14,10 @@ namespace WorkManager.Patches
         private static void Postfix(Rect rect)
         {
             var component = Current.Game.GetComponent<WorkManagerGameComponent>();
-            CustomWidgets.ButtonImageToggle(ref component.Enabled, new Rect(rect.x + 175, rect.y + 88, 24, 24),
-                Resources.Strings.GlobalDisableTooltip, Resources.Textures.GlobalToggleButtonEnabled,
-                Resources.Strings.GlobalEnableTooltip, Resources.Textures.GlobalToggleButtonDisabled);
+            CustomWidgets.ButtonImageToggle(ref component.PriorityManagementEnabled,
+                new Rect(rect.x + 175, rect.y + 88, 24, 24), Resources.Strings.GlobalDisableTooltip,
+                Resources.Textures.PrioritiesToggleButtonEnabled, Resources.Strings.GlobalEnableTooltip,
+                Resources.Textures.PrioritiesToggleButtonDisabled);
         }
     }
 }

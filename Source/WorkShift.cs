@@ -1,51 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using JetBrains.Annotations;
+using RimWorld;
 using Verse;
 
 namespace WorkManager
 {
-    internal enum WorkShiftName
+    public class WorkShift : IExposable
     {
-        Morning,
-        Afternoon,
-        Night
-    }
+        private List<string> _hours;
 
-    internal class WorkShift
-    {
-        private readonly HashSet<int> _leftoverHours;
-        private readonly HashSet<int> _sleepHours;
-        private readonly HashSet<int> _workHours;
+        public int PawnThreshold = 1;
 
-        public WorkShift(WorkShiftName name, IEnumerable<int> workHours, IEnumerable<int> sleepHours)
+        public WorkShift()
         {
-            Name = name;
-            _workHours = new HashSet<int>(workHours);
-            if (_workHours.Any(hour => hour < 0 || hour > 23))
-            {
-                throw new ArgumentException($"Invalid work hours provided for {name} shift", nameof(workHours));
-            }
-            _sleepHours = new HashSet<int>(sleepHours);
-            if (_sleepHours.Any(hour => hour < 0 || hour > 23))
-            {
-                throw new ArgumentException($"Invalid sleep hours provided for {name} shift", nameof(sleepHours));
-            }
-            _leftoverHours = new HashSet<int>();
-            for (var hour = 0; hour < 24; hour++)
-            {
-                if (!_workHours.Contains(hour) && !_sleepHours.Contains(hour)) { _leftoverHours.Add(hour); }
-            }
+            _hours = new List<string>(24);
+            for (var i = 0; i < 24; i++) { _hours.Add("Anything"); }
         }
 
-        public IEnumerable<int> LeftoverHours => _leftoverHours;
+        public WorkShift(IEnumerable<string> assignments, int pawnThreshold)
+        {
+            _hours = new List<string>(assignments);
+            if (_hours.Count != 24)
+            {
+                throw new ArgumentException("Invalid schedule for creating work shift", nameof(assignments));
+            }
+            if (pawnThreshold < 1)
+            {
+                throw new ArgumentException("Invalid pawn threshold for creating work shift", nameof(pawnThreshold));
+            }
+            PawnThreshold = pawnThreshold;
+        }
 
-        public WorkShiftName Name { get; }
+        public void ExposeData()
+        {
+            Scribe_Collections.Look(ref _hours, nameof(_hours), LookMode.Value);
+            Scribe_Values.Look(ref PawnThreshold, nameof(PawnThreshold), 1);
+        }
 
-        public IEnumerable<int> SleepHours => _sleepHours;
+        public TimeAssignmentDef GetTimeAssignment(int hour)
+        {
+            return hour < 0 || hour >= 24
+                ? throw new ArgumentOutOfRangeException(nameof(hour))
+                : DefDatabase<TimeAssignmentDef>.GetNamed(_hours[hour]);
+        }
 
-        public HashSet<Pawn> Workers { get; } = new HashSet<Pawn>();
-
-        public IEnumerable<int> WorkHours => _workHours;
+        public void SetTimeAssignment(int hour, [NotNull] TimeAssignmentDef assignment)
+        {
+            if (hour < 0 || hour >= 24) { return; }
+            _hours[hour] = assignment.defName ?? throw new ArgumentNullException(nameof(assignment));
+        }
     }
 }

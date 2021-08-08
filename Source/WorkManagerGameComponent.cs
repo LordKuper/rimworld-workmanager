@@ -14,7 +14,8 @@ namespace WorkManager
         private List<Pawn> _disabledPawnSchedules = new List<Pawn>();
         private List<PawnWorkType> _disabledPawnWorkTypes = new List<PawnWorkType>();
         private List<WorkTypeDef> _disabledWorkTypes = new List<WorkTypeDef>();
-        public bool Enabled = true;
+        public bool PriorityManagementEnabled = true;
+        public bool ScheduleManagementEnabled = true;
 
         [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Game API")]
         public WorkManagerGameComponent(Game game) { }
@@ -26,7 +27,8 @@ namespace WorkManager
             _disabledPawnSchedules?.RemoveAll(pawn => pawn?.Destroyed ?? true);
             _disabledWorkTypes?.RemoveAll(
                 workType => !DefDatabase<WorkTypeDef>.AllDefsListForReading.Contains(workType));
-            Scribe_Values.Look(ref Enabled, nameof(Enabled), true);
+            Scribe_Values.Look(ref PriorityManagementEnabled, nameof(PriorityManagementEnabled), true);
+            Scribe_Values.Look(ref ScheduleManagementEnabled, nameof(ScheduleManagementEnabled), true);
             Scribe_Collections.Look(ref _disabledWorkTypes, "DisabledWorkTypes", LookMode.Def);
             Scribe_Collections.Look(ref _disabledPawns, "DisabledPawns", LookMode.Reference);
             Scribe_Collections.Look(ref _disabledPawnWorkTypes, "DisabledPawnWorkTypes", LookMode.Deep);
@@ -94,7 +96,7 @@ namespace WorkManager
             {
                 if (!_disabledPawnWorkTypes.Any(pwt => pwt.Pawn == pawn && pwt.WorkType == workType))
                 {
-                    _disabledPawnWorkTypes.Add(new PawnWorkType {Pawn = pawn, WorkType = workType});
+                    _disabledPawnWorkTypes.Add(new PawnWorkType { Pawn = pawn, WorkType = workType });
                 }
             }
         }

@@ -64,6 +64,13 @@ namespace WorkManager
             return value;
         }
 
+        internal static int GetWorkTypePriority(Pawn pawn, WorkTypeDef workType)
+        {
+            return Settings.GetPriorityMethod == null
+                ? pawn.workSettings.GetPriority(workType)
+                : (int)Settings.GetPriorityMethod.Invoke(null, new object[] { pawn, workType, -1 });
+        }
+
         public bool IsActiveWork([NotNull] WorkTypeDef workType)
         {
             if (workType == null) { throw new ArgumentNullException(nameof(workType)); }
@@ -136,10 +143,7 @@ namespace WorkManager
             var workTypes = DefDatabase<WorkTypeDef>.AllDefsListForReading.Where(w => w.visible);
             foreach (var workType in workTypes)
             {
-                WorkPriorities.Add(workType,
-                    IsManagedWork(workType) ? 0 :
-                    Settings.GetPriorityMethod == null ? Pawn.workSettings.GetPriority(workType) :
-                    (int)Settings.GetPriorityMethod.Invoke(null, new object[] { Pawn, workType, -1 }));
+                WorkPriorities.Add(workType, IsManagedWork(workType) ? 0 : GetWorkTypePriority(Pawn, workType));
             }
             if (!IsCapable) { return; }
             if (hoursPassed >= 24)

@@ -16,7 +16,7 @@ namespace WorkManager.Patches
         private static void DrawWorkBoxForPostfix(float x, float y, Pawn p, WorkTypeDef wType)
         {
             var component = Current.Game.GetComponent<WorkManagerGameComponent>();
-            if (!component.Enabled || !Find.PlaySettings.useWorkPriorities) { return; }
+            if (!component.PriorityManagementEnabled || !Find.PlaySettings.useWorkPriorities) { return; }
             var rect = new Rect(x, y, 25f, 25f);
             var enabled = component.GetPawnWorkTypeEnabled(p, wType);
             if (!enabled)
@@ -37,7 +37,7 @@ namespace WorkManager.Patches
         {
             if (p == null || wType == null) { return; }
             var component = Current.Game.GetComponent<WorkManagerGameComponent>();
-            if (!component.Enabled || !Find.PlaySettings.useWorkPriorities) { return; }
+            if (!component.PriorityManagementEnabled || !Find.PlaySettings.useWorkPriorities) { return; }
             var rect = new Rect(x, y, 25f, 25f);
             var enabled = component.GetPawnWorkTypeEnabled(p, wType);
             if (Event.current.type == EventType.MouseDown && Mouse.IsOver(rect) && Event.current.button == 2)

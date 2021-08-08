@@ -21,7 +21,7 @@ namespace WorkManager.Patches
             const int iconSize = 16;
             var buttonRect = new Rect(rect.center.x - iconSize / 2 + 1, rect.yMax - iconSize - 4, iconSize, iconSize);
             var component = Current.Game.GetComponent<WorkManagerGameComponent>();
-            if (component.Enabled)
+            if (component.PriorityManagementEnabled)
             {
                 CustomWidgets.ButtonImageToggle(() => component.GetWorkTypeEnabled(__instance.def.workType),
                     newValue => component.SetWorkTypeEnabled(__instance.def.workType, newValue), buttonRect,

@@ -16,7 +16,7 @@ namespace WorkManager.Patches
             const int iconSize = 16;
             var buttonRect = new Rect(rect.center.x - iconSize / 2, rect.yMax - iconSize - 4, iconSize, iconSize);
             var component = Current.Game.GetComponent<WorkManagerGameComponent>();
-            if (component.Enabled)
+            if (component.PriorityManagementEnabled)
             {
                 CustomWidgets.ButtonImageToggle(() => component.GetWorkTypeEnabled(__instance.def.workType),
                     newValue => component.SetWorkTypeEnabled(__instance.def.workType, newValue), buttonRect,
@@ -35,9 +35,10 @@ namespace WorkManager.Patches
         public static void DoWindowContentsPostfix(Rect rect)
         {
             var component = Current.Game.GetComponent<WorkManagerGameComponent>();
-            CustomWidgets.ButtonImageToggle(ref component.Enabled, new Rect(rect.xMin, rect.yMin, 24, 24),
-                Resources.Strings.GlobalDisableTooltip, Resources.Textures.GlobalToggleButtonEnabled,
-                Resources.Strings.GlobalEnableTooltip, Resources.Textures.GlobalToggleButtonDisabled);
+            CustomWidgets.ButtonImageToggle(ref component.PriorityManagementEnabled,
+                new Rect(rect.xMin, rect.yMin, 24, 24), Resources.Strings.GlobalDisableTooltip,
+                Resources.Textures.PrioritiesToggleButtonEnabled, Resources.Strings.GlobalEnableTooltip,
+                Resources.Textures.PrioritiesToggleButtonDisabled);
         }
 
         [UsedImplicitly]
@@ -46,7 +47,7 @@ namespace WorkManager.Patches
         public static void DrawWorkTypeBoxForPostfix(Rect box, Pawn pawn, WorkTypeDef worktype)
         {
             var component = Current.Game.GetComponent<WorkManagerGameComponent>();
-            if (!component.Enabled || !Find.PlaySettings.useWorkPriorities) { return; }
+            if (!component.PriorityManagementEnabled || !Find.PlaySettings.useWorkPriorities) { return; }
             var enabled = component.GetPawnWorkTypeEnabled(pawn, worktype);
             if (!enabled)
             {
@@ -71,7 +72,7 @@ namespace WorkManager.Patches
         public static void HandleInteractionsDetailedPrefix(PawnColumnWorker __instance, Rect rect, Pawn pawn)
         {
             var component = Current.Game.GetComponent<WorkManagerGameComponent>();
-            if (!component.Enabled || !Find.PlaySettings.useWorkPriorities) { return; }
+            if (!component.PriorityManagementEnabled || !Find.PlaySettings.useWorkPriorities) { return; }
             var workType = __instance.def.workType;
             var enabled = component.GetPawnWorkTypeEnabled(pawn, workType);
             if (Event.current.type == EventType.MouseDown && Mouse.IsOver(rect) && Event.current.button == 2)
