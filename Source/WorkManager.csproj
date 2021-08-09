@@ -61,6 +61,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DisabledWorkType.cs" />
     <Compile Include="AssignEveryoneWorkType.cs" />
     <Compile Include="PawnColumnWorkers\AutoWorkSchedule.cs" />
     <Compile Include="RimworldTime.cs" />

@@ -60,16 +60,20 @@
   <WorkManager.Settings_WorkTypes_Title>Work Types</WorkManager.Settings_WorkTypes_Title>
   <WorkManager.Settings_WorkTypes_AssignEveryoneWorkTypes>Assign everyone work types</WorkManager.Settings_WorkTypes_AssignEveryoneWorkTypes>
   <WorkManager.Settings_WorkTypes_AssignEveryoneWorkTypesTooltip>Work types listed in this section will be assigned to every capable pawn</WorkManager.Settings_WorkTypes_AssignEveryoneWorkTypesTooltip>
-  <WorkManager.Settings_WorkTypes_AddAssignEveryoneWorkType>Add...</WorkManager.Settings_WorkTypes_AddAssignEveryoneWorkType>
-  <WorkManager.Settings_WorkTypes_DeleteAssignEveryoneWorkType>Delete...</WorkManager.Settings_WorkTypes_DeleteAssignEveryoneWorkType>
-  <WorkManager.Settings_WorkTypes_ResetAssignEveryoneWorkTypes>Reset to defaults</WorkManager.Settings_WorkTypes_ResetAssignEveryoneWorkTypes>
+  <WorkManager.Settings_WorkTypes_AddWorkType>Add...</WorkManager.Settings_WorkTypes_AddWorkType>
+  <WorkManager.Settings_WorkTypes_DeleteWorkType>Delete...</WorkManager.Settings_WorkTypes_DeleteWorkType>
+  <WorkManager.Settings_WorkTypes_ResetWorkTypes>Reset to defaults</WorkManager.Settings_WorkTypes_ResetWorkTypes>
   <WorkManager.Settings_WorkTypes_WorkTypeName>Work type's name</WorkManager.Settings_WorkTypes_WorkTypeName>
   <WorkManager.Settings_WorkTypes_WorkTypeNameTooltip>The name of a work type</WorkManager.Settings_WorkTypes_WorkTypeNameTooltip>
   <WorkManager.Settings_WorkTypes_WorkTypePriority>Priority</WorkManager.Settings_WorkTypes_WorkTypePriority>
   <WorkManager.Settings_WorkTypes_WorkTypePriorityTooltip>Priority with which work type will be assigned to a non-dedicated pawn</WorkManager.Settings_WorkTypes_WorkTypePriorityTooltip>
   <WorkManager.Settings_WorkTypes_AllowDedicated>Allow dedicated</WorkManager.Settings_WorkTypes_AllowDedicated>
   <WorkManager.Settings_WorkTypes_AllowDedicatedTooltip>Allow work type to be assigned to the most suitable pawn with top priority</WorkManager.Settings_WorkTypes_AllowDedicatedTooltip>
-  <WorkManager.Settings_WorkTypes_WorkTypeNotLoadedTooltip>This work type is absent from current game setup. It will not affect work assignment until the game is restarted with corresponding work type loaded.</WorkManager.Settings_WorkTypes_WorkTypeNotLoadedTooltip>
+  <WorkManager.Settings_WorkTypes_WorkTypeNotLoadedTooltip>This work type is absent from current game setup. It will not affect work assignment until the game is restarted with the corresponding work type loaded.</WorkManager.Settings_WorkTypes_WorkTypeNotLoadedTooltip>
+  <WorkManager.Settings_WorkTypes_DisabledWorkTypesForForeigners>Work types disabled for foreigners</WorkManager.Settings_WorkTypes_DisabledWorkTypesForForeigners>
+  <WorkManager.Settings_WorkTypes_DisabledWorkTypesForForeignersTooltip>Work types listed in this section will not be assigned to foreign members of your colony (e.g. temporary quest-related visitors)</WorkManager.Settings_WorkTypes_DisabledWorkTypesForForeignersTooltip>
+  <WorkManager.Settings_WorkTypes_DisabledWorkTypesForSlaves>Work types disabled for slaves</WorkManager.Settings_WorkTypes_DisabledWorkTypesForSlaves>
+  <WorkManager.Settings_WorkTypes_DisabledWorkTypesForSlavesTooltip>Work types listed in this section will not be assigned to slaves</WorkManager.Settings_WorkTypes_DisabledWorkTypesForSlavesTooltip>
   <WorkManager.Settings_Schedule_Title>Schedule</WorkManager.Settings_Schedule_Title>
   <WorkManager.Settings_Schedule_ManageWorkSchedule>Manage work schedule</WorkManager.Settings_Schedule_ManageWorkSchedule>
   <WorkManager.Settings_Schedule_ManageWorkScheduleTooltip>Automatic colonists' work shift management</WorkManager.Settings_Schedule_ManageWorkScheduleTooltip>

@@ -42,7 +42,8 @@ namespace WorkManager
         {
             return hour < 0 || hour >= 24
                 ? throw new ArgumentOutOfRangeException(nameof(hour))
-                : DefDatabase<TimeAssignmentDef>.GetNamed(_hours[hour]);
+                : DefDatabase<TimeAssignmentDef>.GetNamedSilentFail(_hours[hour]) ??
+                  DefDatabase<TimeAssignmentDef>.GetNamed("Anything");
         }
 
         public void SetTimeAssignment(int hour, [NotNull] TimeAssignmentDef assignment)

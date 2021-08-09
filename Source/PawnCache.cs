@@ -26,8 +26,10 @@ namespace WorkManager
 
         public RimworldTime IdleSince { get; set; }
         public bool IsCapable { get; private set; }
+        private bool IsForeigner { get; set; }
         public bool IsManaged { get; private set; }
         public bool IsRecovering { get; private set; }
+        private bool IsSlave { get; set; }
 
         public Pawn Pawn { get; }
         private static WorkManagerGameComponent WorkManager => Current.Game.GetComponent<WorkManagerGameComponent>();
@@ -91,7 +93,10 @@ namespace WorkManager
         {
             if (workType == null) { throw new ArgumentNullException(nameof(workType)); }
             if (DisabledWorkTypes.ContainsKey(workType)) { return DisabledWorkTypes[workType]; }
-            var value = Pawn.WorkTypeIsDisabled(workType);
+            var value = Pawn.WorkTypeIsDisabled(workType) ||
+                        IsForeigner &&
+                        Settings.DisabledWorkTypesForForeigners.Any(dwt => dwt.WorkTypeDef == workType) || IsSlave &&
+                        Settings.DisabledWorkTypesForSlaves.Any(dwt => dwt.WorkTypeDef == workType);
             DisabledWorkTypes.Add(workType, value);
             return value;
         }
@@ -138,6 +143,13 @@ namespace WorkManager
             IsRecovering = IsCapable && Settings.RecoveringPawnsUnfitForWork &&
                            HealthAIUtility.ShouldSeekMedicalRest(Pawn);
             IsManaged = WorkManager.GetPawnEnabled(Pawn);
+            IsForeigner = Pawn.Faction != Faction.OfPlayer || Pawn.HasExtraMiniFaction() || Pawn.HasExtraHomeFaction();
+            if (IsForeigner && Prefs.DevMode && Settings.VerboseLogging)
+            {
+                Log.Message(
+                    $"----- Work Manager: {Pawn.LabelShort} is Foreigner {(Pawn.Faction != Faction.OfPlayer ? "(Non-player)" : "")}{(Pawn.HasExtraMiniFaction() ? "(Extra Mini)" : "")}{(Pawn.HasExtraHomeFaction() ? "(Extra Home)" : "")} -----");
+            }
+            IsSlave = ModsConfig.IdeologyActive && Pawn.IsSlaveOfColony;
             WorkPriorities.Clear();
             _managedWorkTypes.Clear();
             var workTypes = DefDatabase<WorkTypeDef>.AllDefsListForReading.Where(w => w.visible);
@@ -151,7 +163,7 @@ namespace WorkManager
                 if (Prefs.DevMode && Settings.VerboseLogging)
                 {
                     Log.Message(
-                        $"----- Work Manager: Updating work type cache for {Pawn.LabelShort} (hours passed = {hoursPassed:N1})... -----");
+                        $"----- Work Manager: Updating work type cache for {(IsForeigner ? "[F]" : "")}{(IsSlave ? "[S]" : "")}{Pawn.LabelShort} (hours passed = {hoursPassed:N1})... -----");
                 }
                 DisabledWorkTypes.Clear();
                 BadWorkTypes.Clear();
@@ -161,7 +173,7 @@ namespace WorkManager
                 if (Prefs.DevMode && Settings.VerboseLogging)
                 {
                     Log.Message(
-                        $"----- Work Manager: Updating skill cache for {Pawn.LabelShort} (hours passed = {hoursPassed:N1})... -----");
+                        $"----- Work Manager: Updating skill cache for {(IsForeigner ? "[F]" : "")}{(IsSlave ? "[S]" : "")}{Pawn.LabelShort} (hours passed = {hoursPassed:N1})... -----");
                 }
                 if (Settings.UsePawnLearningRateThresholds)
                 {

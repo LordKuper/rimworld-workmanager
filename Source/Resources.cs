@@ -235,8 +235,8 @@ namespace WorkManager
 
                 internal static class WorkTypes
                 {
-                    internal static readonly string AddAssignEveryoneWorkType =
-                        "WorkManager.Settings_WorkTypes_AddAssignEveryoneWorkType".Translate();
+                    internal static readonly string AddWorkType =
+                        "WorkManager.Settings_WorkTypes_AddWorkType".Translate();
 
                     internal static readonly string AllowDedicated =
                         "WorkManager.Settings_WorkTypes_AllowDedicated".Translate();
@@ -250,11 +250,23 @@ namespace WorkManager
                     internal static readonly string AssignEveryoneWorkTypesTooltip =
                         "WorkManager.Settings_WorkTypes_AssignEveryoneWorkTypesTooltip".Translate();
 
-                    internal static readonly string DeleteAssignEveryoneWorkType =
-                        "WorkManager.Settings_WorkTypes_DeleteAssignEveryoneWorkType".Translate();
+                    internal static readonly string DeleteWorkType =
+                        "WorkManager.Settings_WorkTypes_DeleteWorkType".Translate();
 
-                    internal static readonly string ResetAssignEveryoneWorkTypes =
-                        "WorkManager.Settings_WorkTypes_ResetAssignEveryoneWorkTypes".Translate();
+                    internal static readonly string DisabledWorkTypesForForeigners =
+                        "WorkManager.Settings_WorkTypes_DisabledWorkTypesForForeigners".Translate();
+
+                    internal static readonly string DisabledWorkTypesForForeignersTooltip =
+                        "WorkManager.Settings_WorkTypes_DisabledWorkTypesForForeignersTooltip".Translate();
+
+                    internal static readonly string DisabledWorkTypesForSlaves =
+                        "WorkManager.Settings_WorkTypes_DisabledWorkTypesForSlaves".Translate();
+
+                    internal static readonly string DisabledWorkTypesForSlavesTooltip =
+                        "WorkManager.Settings_WorkTypes_DisabledWorkTypesForSlavesTooltip".Translate();
+
+                    internal static readonly string ResetWorkTypes =
+                        "WorkManager.Settings_WorkTypes_ResetWorkTypes".Translate();
 
                     internal static readonly string Title = "WorkManager.Settings_WorkTypes_Title".Translate();
 

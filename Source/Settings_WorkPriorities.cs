@@ -14,14 +14,14 @@ namespace WorkManager
         public static bool CountDownedColonists = true;
         public static bool CountDownedGuests = true;
         public static bool CountDownedPrisoners = true;
-        public static int DedicatedWorkerPriority;
-        public static int DoctoringPriority;
-        public static int HighestSkillPriority;
-        public static int IdlePriority;
-        public static int LeftoverPriority;
-        public static int MajorLearningRatePriority;
+        public static int DedicatedWorkerPriority = 1;
+        public static int DoctoringPriority = 1;
+        public static int HighestSkillPriority = 1;
+        public static int IdlePriority = 4;
+        public static int LeftoverPriority = 4;
+        public static int MajorLearningRatePriority = 2;
         public static float MajorLearningRateThreshold = 1.2f;
-        public static int MinorLearningRatePriority;
+        public static int MinorLearningRatePriority = 3;
         public static float MinorLearningRateThreshold = 0.8f;
         public static bool RecoveringPawnsUnfitForWork = true;
         public static bool SpecialRulesForDoctors = true;
@@ -180,6 +180,15 @@ namespace WorkManager
         private static void InitializeWorkPriorities()
         {
             if (UpdateFrequency == 0) { UpdateFrequency = 24; }
+            if (DedicatedWorkerPriority == 0) { DedicatedWorkerPriority = 1; }
+            if (HighestSkillPriority == 0) { HighestSkillPriority = 1; }
+            if (MajorLearningRateThreshold == 0) { MajorLearningRateThreshold = 1.2f; }
+            if (MajorLearningRatePriority == 0) { MajorLearningRatePriority = 2; }
+            if (MinorLearningRateThreshold == 0) { MinorLearningRateThreshold = 0.8f; }
+            if (MinorLearningRatePriority == 0) { MinorLearningRatePriority = 3; }
+            if (IdlePriority == 0) { IdlePriority = 4; }
+            if (LeftoverPriority == 0) { LeftoverPriority = 4; }
+            if (DoctoringPriority == 0) { DoctoringPriority = 1; }
         }
     }
 }
