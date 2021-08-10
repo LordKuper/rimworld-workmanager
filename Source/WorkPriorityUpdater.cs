@@ -97,26 +97,30 @@ namespace WorkManager
                 var relevantPawns = capablePawns.Where(pc =>
                     !pc.IsRecovering && !pc.IsDisabledWork(workType) && !pc.IsBadWork(workType)).ToList();
                 if (!relevantPawns.Any()) { continue; }
+                var dedicatedWorkers = relevantPawns.Where(pc =>
+                    pc.IsActiveWork(workType) && pc.WorkPriorities[workType] <= Settings.DedicatedWorkerPriority);
+                if (dedicatedWorkers.Count() >= targetWorkers) { continue; }
                 var pawnSkills = relevantPawns.ToDictionary(pc => pc, pc => pc.GetWorkSkillLevel(workType));
                 var maxSkill = pawnSkills.Max(pair => pair.Value);
                 var minSkill = pawnSkills.Min(pair => pair.Value);
                 var skillRange = maxSkill - minSkill;
                 var pawnDedicationsCounts = relevantPawns.ToDictionary(pc => pc,
-                    pc => workTypes.Count(wt => pc.WorkPriorities[wt] == Settings.DedicatedWorkerPriority));
+                    pc => workTypes.Count(wt =>
+                        pc.IsActiveWork(wt) && pc.WorkPriorities[wt] <= Settings.DedicatedWorkerPriority));
                 var maxDedications = pawnDedicationsCounts.Max(pair => pair.Value);
                 var minDedications = pawnDedicationsCounts.Min(pair => pair.Value);
                 var dedicationsCountRange = maxDedications - minDedications;
                 var pawnScores = new Dictionary<PawnCache, float>();
-                foreach (var pawnCache in relevantPawns)
+                foreach (var pawnCache in relevantPawns.Where(pc => pc.IsManagedWork(workType)))
                 {
                     var skill = pawnSkills[pawnCache];
-                    var normalizedSkill = skillRange == 0 ? 0 : skill / skillRange;
+                    var normalizedSkill = skillRange == 0f ? 0f : (float)skill / skillRange;
                     var normalizedLearnRate = pawnCache.IsLearningRateAboveThreshold(workType, true) ? 1f :
                         pawnCache.IsLearningRateAboveThreshold(workType, false) ? 0.5f : 0f;
                     var normalizedDedications = dedicationsCountRange == 0
-                        ? 0
-                        : pawnDedicationsCounts[pawnCache] / dedicationsCountRange;
-                    var score = normalizedSkill - 1.5f * normalizedDedications;
+                        ? 0f
+                        : (float)pawnDedicationsCounts[pawnCache] / dedicationsCountRange;
+                    var score = normalizedSkill - normalizedDedications;
                     score += skill < 20 ? 0.75f * normalizedLearnRate : 0.5f * normalizedLearnRate;
                     pawnScores.Add(pawnCache, score);
                 }
@@ -127,7 +131,9 @@ namespace WorkManager
                     Log.Message(
                         $"-- Work Manager: {string.Join(", ", pawnScores.OrderByDescending(pair => pair.Value).Select(pair => $"{pair.Key.Pawn.LabelShort}({pair.Value:N2})"))} --");
                 }
-                while (capablePawns.Count(pc => pc.WorkPriorities[workType] == Settings.DedicatedWorkerPriority) <
+                while (capablePawns.Count(pc =>
+                           pc.IsActiveWork(workType) &&
+                           pc.WorkPriorities[workType] <= Settings.DedicatedWorkerPriority) <
                        targetWorkers)
                 {
                     var dedicatedWorker = pawnScores.Any()
