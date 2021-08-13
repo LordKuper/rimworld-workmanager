@@ -121,7 +121,7 @@ namespace WorkManager
                         ? 0f
                         : (float)pawnDedicationsCounts[pawnCache] / dedicationsCountRange;
                     var score = normalizedSkill - normalizedDedications;
-                    score += skill < 20 ? 0.75f * normalizedLearnRate : 0.5f * normalizedLearnRate;
+                    score += 1.25f * normalizedLearnRate;
                     pawnScores.Add(pawnCache, score);
                 }
                 if (Prefs.DevMode && Settings.VerboseLogging)
@@ -163,24 +163,24 @@ namespace WorkManager
             if (workType == null) { return; }
             if (!WorkManager.GetWorkTypeEnabled(workType)) { return; }
             if (Prefs.DevMode && Settings.VerboseLogging) { Log.Message("-- Work Manager: Assigning doctors... --"); }
-            var doctors = _pawnCache.Values.Where(pc => pc.IsCapable && !pc.IsDisabledWork(workType)).ToList();
-            if (!doctors.Any()) { return; }
-            var doctorsCount = doctors.Count(pc => pc.IsActiveWork(workType));
-            var maxSkillValue = doctors.Max(pc => pc.GetWorkSkillLevel(workType));
+            var relevantPawns = _pawnCache.Values.Where(pc => pc.IsCapable && !pc.IsDisabledWork(workType)).ToList();
+            if (!relevantPawns.Any()) { return; }
+            var assignedDoctors = relevantPawns.Where(pc => pc.IsActiveWork(workType)).ToList();
+            var maxSkillValue = relevantPawns.Max(pc => pc.GetWorkSkillLevel(workType));
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
                 Log.Message($"Work Manager: Max doctoring skill value = '{maxSkillValue}'");
             }
             var assignEveryone = Settings.AssignEveryoneWorkTypes.FirstOrDefault(wt => wt.WorkTypeDef == workType);
-            var managedDoctors = doctors.Where(pc => pc.IsManaged && pc.IsManagedWork(workType))
+            var managedPawns = relevantPawns.Where(pc => pc.IsManaged && pc.IsManagedWork(workType))
                 .OrderBy(pc => pc.IsBadWork(workType)).ThenByDescending(pc => pc.GetWorkSkillLevel(workType)).ToList();
             if (assignEveryone == null || assignEveryone.AllowDedicated)
             {
-                foreach (var pawnCache in managedDoctors.Where(pc => !pc.IsRecovering))
+                foreach (var pawnCache in managedPawns.Where(pc => !pc.IsRecovering))
                 {
                     if (pawnCache.GetWorkSkillLevel(workType) >= maxSkillValue)
                     {
-                        if (doctorsCount == 0 || !pawnCache.IsBadWork(workType))
+                        if (assignedDoctors.Count == 0 || !pawnCache.IsBadWork(workType))
                         {
                             if (Prefs.DevMode && Settings.VerboseLogging)
                             {
@@ -188,11 +188,11 @@ namespace WorkManager
                                     $"Work Manager: Assigning '{pawnCache.Pawn.LabelShort}' as primary doctor (highest skill value)");
                             }
                             pawnCache.WorkPriorities[workType] = Settings.DoctoringPriority;
-                            doctorsCount++;
+                            assignedDoctors.Add(pawnCache);
                             continue;
                         }
                     }
-                    if (doctorsCount == 0)
+                    if (assignedDoctors.Count == 0)
                     {
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
@@ -200,14 +200,14 @@ namespace WorkManager
                                 $"Work Manager: Assigning '{pawnCache.Pawn.LabelShort}' as primary doctor (highest skill value)");
                         }
                         pawnCache.WorkPriorities[workType] = Settings.DoctoringPriority;
-                        doctorsCount++;
+                        assignedDoctors.Add(pawnCache);
                         break;
                     }
                 }
             }
-            if (doctorsCount == 0)
+            if (assignedDoctors.Count == 0)
             {
-                var pawnCache = managedDoctors.FirstOrDefault();
+                var pawnCache = managedPawns.FirstOrDefault();
                 if (pawnCache != null)
                 {
                     if (Prefs.DevMode && Settings.VerboseLogging)
@@ -218,16 +218,16 @@ namespace WorkManager
                     pawnCache.WorkPriorities[workType] = assignEveryone == null || assignEveryone.AllowDedicated
                         ? Settings.DoctoringPriority
                         : assignEveryone.Priority;
-                    doctorsCount++;
+                    assignedDoctors.Add(pawnCache);
                 }
             }
-            if (doctorsCount == 1)
+            if (assignedDoctors.Count == 1)
             {
-                var doctor = doctors.First(pc => pc.IsActiveWork(workType));
+                var doctor = assignedDoctors.First();
                 if (doctor.Pawn.health.HasHediffsNeedingTend() || doctor.Pawn.health.hediffSet.HasTendableInjury() ||
                     doctor.Pawn.health.hediffSet.HasTendableHediff())
                 {
-                    foreach (var pawnCache in doctors
+                    foreach (var pawnCache in relevantPawns
                         .Where(pc =>
                             pc.IsManaged && !pc.IsRecovering && pc.IsManagedWork(workType) &&
                             !pc.IsActiveWork(workType)).OrderByDescending(pc => pc.GetWorkSkillLevel(workType))
@@ -241,7 +241,7 @@ namespace WorkManager
                         pawnCache.WorkPriorities[workType] = assignEveryone == null || assignEveryone.AllowDedicated
                             ? Settings.DoctoringPriority
                             : assignEveryone.Priority;
-                        doctorsCount++;
+                        assignedDoctors.Add(pawnCache);
                         break;
                     }
                 }
@@ -275,13 +275,13 @@ namespace WorkManager
                     Log.Message(
                         $"Work Manager: Patient count = '{patients.Count}' ({string.Join(", ", patients.Select(pawn => pawn.LabelShort))})");
                 }
-                while (doctorsCount < patients.Count)
+                while (assignedDoctors.Count < patients.Count)
                 {
-                    var pawnCache = doctors
+                    var pawnCache = relevantPawns
                         .Where(pc =>
                             pc.IsManaged && !pc.IsRecovering && pc.IsManagedWork(workType) &&
-                            !pc.IsActiveWork(workType)).OrderByDescending(pc => pc.GetWorkSkillLevel(workType))
-                        .ThenBy(pc => pc.IsBadWork(workType)).FirstOrDefault();
+                            !pc.IsActiveWork(workType)).OrderBy(pc => pc.IsBadWork(workType))
+                        .ThenByDescending(pc => pc.GetWorkSkillLevel(workType)).FirstOrDefault();
                     if (pawnCache == null) { break; }
                     if (Prefs.DevMode && Settings.VerboseLogging)
                     {
@@ -289,7 +289,7 @@ namespace WorkManager
                             $"Work Manager: Assigning '{pawnCache.Pawn.LabelShort}' as backup doctor (multiple patients)");
                     }
                     pawnCache.WorkPriorities[workType] = Settings.DoctoringPriority;
-                    doctorsCount++;
+                    assignedDoctors.Add(pawnCache);
                 }
             }
             if (Prefs.DevMode && Settings.VerboseLogging) { Log.Message("---------------------"); }
