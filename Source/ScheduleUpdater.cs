@@ -47,7 +47,7 @@ namespace WorkManager
             var allPawns = map.mapPawns.FreeColonistsSpawned;
             var colonists = allPawns.Where(pawn => !pawn.story.traits.HasTrait(TraitDef.Named("NightOwl")));
             var nightOwls = allPawns.Where(pawn => pawn.story.traits.HasTrait(TraitDef.Named("NightOwl")));
-            foreach (var pawn in allPawns)
+            foreach (var pawn in allPawns.Where(pawn => WorkManager.GetPawnScheduleEnabled(pawn)))
             {
                 var lovers = pawn.relations.DirectRelations.Where(relation =>
                     new[] { PawnRelationDefOf.Fiance, PawnRelationDefOf.Lover, PawnRelationDefOf.Spouse }.Contains(
