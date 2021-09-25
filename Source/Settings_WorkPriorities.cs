@@ -17,6 +17,10 @@ namespace WorkManager
         public static int DedicatedWorkerPriority = 1;
         public static int DoctoringPriority = 1;
         public static int HighestSkillPriority = 1;
+        public static int HighSkillPriority = 1;
+        public static int HighSkillGapThresholdBelowHighest = 2;
+        public static int MediumSkillPriority = 2;
+        public static int MediumSkillThreshold = 8;
         public static int IdlePriority = 4;
         public static int LeftoverPriority = 4;
         public static int MajorLearningRatePriority = 2;
@@ -40,7 +44,7 @@ namespace WorkManager
                 if (AssignMultipleDoctors) { boolSettingsCount += 4; }
             }
             if (SpecialRulesForHunters) { boolSettingsCount++; }
-            var numericSettingsCount = 6;
+            var numericSettingsCount = 10;
             if (AssignAllWorkTypes) { numericSettingsCount++; }
             if (AssignWorkToIdlePawns) { numericSettingsCount++; }
             if (SpecialRulesForDoctors) { numericSettingsCount++; }
@@ -67,6 +71,16 @@ namespace WorkManager
             }
             listing.Outdent(16f);
             listing.ColumnWidth += 16f;
+
+            DoIntegerSlider(listing, ref HighSkillGapThresholdBelowHighest, 1, 20, Strings.HighSkillGapThresholdBelowHighest,
+                Strings.HighSkillGapThresholdBelowHighestTooltip);
+            DoIntegerSlider(listing, ref HighSkillPriority, 1, MaxPriority, Strings.HighSkillPriority,
+                Strings.HighSkillPriorityTooltip);
+            DoIntegerSlider(listing, ref MediumSkillThreshold, 1, 20, Strings.MediumSkillThreshold,
+                Strings.MediumSkillThresholdTooltip);
+            DoIntegerSlider(listing, ref MediumSkillPriority, 1, MaxPriority, Strings.MediumSkillPriority,
+                Strings.MediumSkillPriorityTooltip);
+
             listing.CheckboxLabeled(Strings.UsePawnLearningRateThresholds, ref UsePawnLearningRateThresholds,
                 Strings.UsePawnLearningRateThresholdsTooltip);
             if (UsePawnLearningRateThresholds)
@@ -175,6 +189,10 @@ namespace WorkManager
             Scribe_Values.Look(ref IdlePriority, nameof(IdlePriority), 4);
             Scribe_Values.Look(ref LeftoverPriority, nameof(LeftoverPriority), 4);
             Scribe_Values.Look(ref DoctoringPriority, nameof(DoctoringPriority), 1);
+            Scribe_Values.Look(ref HighSkillGapThresholdBelowHighest, nameof(HighSkillGapThresholdBelowHighest), 2);
+            Scribe_Values.Look(ref HighSkillPriority, nameof(HighSkillPriority), 1);
+            Scribe_Values.Look(ref MediumSkillThreshold, nameof(MediumSkillThreshold), 8);
+            Scribe_Values.Look(ref MediumSkillPriority, nameof(MediumSkillPriority), 2);
         }
 
         private static void InitializeWorkPriorities()
@@ -189,6 +207,10 @@ namespace WorkManager
             if (IdlePriority == 0) { IdlePriority = 4; }
             if (LeftoverPriority == 0) { LeftoverPriority = 4; }
             if (DoctoringPriority == 0) { DoctoringPriority = 1; }
+            if (HighSkillGapThresholdBelowHighest == 0) { HighSkillGapThresholdBelowHighest = 2; }
+            if (HighSkillPriority == 0) { HighSkillPriority = 1; }
+            if (MediumSkillThreshold == 0) { MediumSkillThreshold = 8; }
+            if (MediumSkillPriority == 0) { MediumSkillPriority = 2; }
         }
     }
 }

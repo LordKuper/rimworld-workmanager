@@ -551,6 +551,22 @@ namespace WorkManager
                                 $"Work Manager: Setting {pawnCache.Pawn.LabelShort}'s priority of '{workType.labelShort}' to {Settings.HighestSkillPriority} (skill = {pawnCache.GetWorkSkillLevel(workType)}, max = {maxSkillValue})");
                         }
                         pawnCache.WorkPriorities[workType] = Settings.HighestSkillPriority;
+                    } else if(pawnCache.GetWorkSkillLevel(workType) >= maxSkillValue - Settings.HighSkillGapThresholdBelowHighest)
+                    {
+                        if (Prefs.DevMode && Settings.VerboseLogging)
+                        {
+                            Log.Message(
+                                $"Work Manager: Setting {pawnCache.Pawn.LabelShort}'s priority of '{workType.labelShort}' to {Settings.HighSkillPriority} (skill = {pawnCache.GetWorkSkillLevel(workType)}, max = {maxSkillValue}, high threshold = {maxSkillValue - Settings.HighSkillGapThresholdBelowHighest})");
+                        }
+                        pawnCache.WorkPriorities[workType] = Settings.HighSkillPriority;
+                    } else if (pawnCache.GetWorkSkillLevel(workType) >= Settings.MediumSkillThreshold)
+                    {
+                        if (Prefs.DevMode && Settings.VerboseLogging)
+                        {
+                            Log.Message(
+                                $"Work Manager: Setting {pawnCache.Pawn.LabelShort}'s priority of '{workType.labelShort}' to {Settings.MediumSkillPriority} (skill = {pawnCache.GetWorkSkillLevel(workType)}, max = {maxSkillValue}, medium threshold = {Settings.MediumSkillThreshold})");
+                        }
+                        pawnCache.WorkPriorities[workType] = Settings.MediumSkillPriority;
                     }
                 }
             }

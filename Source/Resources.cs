@@ -105,6 +105,30 @@ namespace WorkManager
                     internal static readonly string HighestSkillPriorityTooltip =
                         "WorkManager.Settings_Priorities_HighestSkillPriorityTooltip".Translate();
 
+                    internal static readonly string HighSkillGapThresholdBelowHighest =
+                        "WorkManager.Settings_Priorities_HighSkillGapThresholdBelowHighest".Translate();
+
+                    internal static readonly string HighSkillGapThresholdBelowHighestTooltip =
+                        "WorkManager.Settings_Priorities_HighSkillGapThresholdBelowHighestTooltip".Translate();
+
+                    internal static readonly string HighSkillPriority =
+                        "WorkManager.Settings_Priorities_HighSkillPriority".Translate();
+
+                    internal static readonly string HighSkillPriorityTooltip =
+                        "WorkManager.Settings_Priorities_HighSkillPriorityTooltip".Translate();
+
+                    internal static readonly string MediumSkillThreshold =
+                        "WorkManager.Settings_Priorities_MediumSkillThreshold".Translate();
+
+                    internal static readonly string MediumSkillThresholdTooltip =
+                        "WorkManager.Settings_Priorities_MediumSkillThresholdTooltip".Translate();
+
+                    internal static readonly string MediumSkillPriority =
+                        "WorkManager.Settings_Priorities_MediumSkillPriority".Translate();
+
+                    internal static readonly string MediumSkillPriorityTooltip =
+                        "WorkManager.Settings_Priorities_MediumSkillPriorityTooltip".Translate();
+
                     internal static readonly string IdlePriority =
                         "WorkManager.Settings_Priorities_IdlePriority".Translate();
 
