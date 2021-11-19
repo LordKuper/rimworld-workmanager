@@ -129,6 +129,12 @@ namespace WorkManager
                     internal static readonly string MajorLearningRateThresholdTooltip =
                         "WorkManager.Settings_Priorities_MajorLearningRateThresholdTooltip".Translate();
 
+                    internal static readonly string MajorPassionPriority =
+                        "WorkManager.Settings_Priorities_MajorPassionPriority".Translate();
+
+                    internal static readonly string MajorPassionPriorityTooltip =
+                        "WorkManager.Settings_Priorities_MajorPassionPriorityTooltip".Translate();
+
                     internal static readonly string MinorLearningRatePriority =
                         "WorkManager.Settings_Priorities_MinorLearningRatePriority".Translate();
 
@@ -140,6 +146,12 @@ namespace WorkManager
 
                     internal static readonly string MinorLearningRateThresholdTooltip =
                         "WorkManager.Settings_Priorities_MinorLearningRateThresholdTooltip".Translate();
+
+                    internal static readonly string MinorPassionPriority =
+                        "WorkManager.Settings_Priorities_MinorPassionPriority".Translate();
+
+                    internal static readonly string MinorPassionPriorityTooltip =
+                        "WorkManager.Settings_Priorities_MinorPassionPriorityTooltip".Translate();
 
                     internal static readonly string RecoveringPawnsUnfitForWork =
                         "WorkManager.Settings_Priorities_RecoveringPawnsUnfitForWork".Translate();
@@ -172,6 +184,12 @@ namespace WorkManager
 
                     internal static readonly string UseDedicatedWorkersTooltip =
                         "WorkManager.Settings_Priorities_UseDedicatedWorkersTooltip".Translate();
+
+                    internal static readonly string UseLearningRates =
+                        "WorkManager.Settings_Priorities_UseLearningRates".Translate();
+
+                    internal static readonly string UseLearningRatesTooltip =
+                        "WorkManager.Settings_Priorities_UseLearningRatesTooltip".Translate();
 
                     internal static readonly string UsePawnLearningRateThresholds =
                         "WorkManager.Settings_Priorities_UsePawnLearningRateThresholds".Translate();

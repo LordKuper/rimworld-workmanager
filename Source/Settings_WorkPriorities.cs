@@ -21,13 +21,16 @@ namespace WorkManager
         public static int LeftoverPriority = 4;
         public static int MajorLearningRatePriority = 2;
         public static float MajorLearningRateThreshold = 1.2f;
+        public static int MajorPassionPriority = 2;
         public static int MinorLearningRatePriority = 3;
         public static float MinorLearningRateThreshold = 0.8f;
+        public static int MinorPassionPriority = 3;
         public static bool RecoveringPawnsUnfitForWork = true;
         public static bool SpecialRulesForDoctors = true;
         public static bool SpecialRulesForHunters = true;
         public static int UpdateFrequency = 24;
         public static bool UseDedicatedWorkers = true;
+        public static bool UseLearningRates;
         public static bool UsePawnLearningRateThresholds;
 
         private static void DoPrioritiesTab(Rect rect)
@@ -67,22 +70,37 @@ namespace WorkManager
             }
             listing.Outdent(16f);
             listing.ColumnWidth += 16f;
-            listing.CheckboxLabeled(Strings.UsePawnLearningRateThresholds, ref UsePawnLearningRateThresholds,
-                Strings.UsePawnLearningRateThresholdsTooltip);
-            if (UsePawnLearningRateThresholds)
+            listing.CheckboxLabeled(Strings.UseLearningRates, ref UseLearningRates, Strings.UseLearningRatesTooltip);
+            listing.Indent(16f);
+            listing.ColumnWidth -= 16f;
+            if (UseLearningRates)
             {
-                if (MajorLearningRateThreshold > 1f) { MajorLearningRateThreshold = 1f; }
-                if (MinorLearningRateThreshold > 1f) { MinorLearningRateThreshold = 1f; }
+                listing.CheckboxLabeled(Strings.UsePawnLearningRateThresholds, ref UsePawnLearningRateThresholds,
+                    Strings.UsePawnLearningRateThresholdsTooltip);
+                if (UsePawnLearningRateThresholds)
+                {
+                    if (MajorLearningRateThreshold > 1f) { MajorLearningRateThreshold = 1f; }
+                    if (MinorLearningRateThreshold > 1f) { MinorLearningRateThreshold = 1f; }
+                }
+                DoPercentSlider(listing, ref MajorLearningRateThreshold, MinorLearningRateThreshold,
+                    UsePawnLearningRateThresholds ? 1f : 2f, Strings.MajorLearningRateThreshold,
+                    Strings.MajorLearningRateThresholdTooltip);
+                DoIntegerSlider(listing, ref MajorLearningRatePriority, 1, MaxPriority,
+                    Strings.MajorLearningRatePriority, Strings.MajorLearningRatePriorityTooltip);
+                DoPercentSlider(listing, ref MinorLearningRateThreshold, 0.01f, MajorLearningRateThreshold,
+                    Strings.MinorLearningRateThreshold, Strings.MinorLearningRateThresholdTooltip);
+                DoIntegerSlider(listing, ref MinorLearningRatePriority, 1, MaxPriority,
+                    Strings.MinorLearningRatePriority, Strings.MinorLearningRatePriorityTooltip);
             }
-            DoPercentSlider(listing, ref MajorLearningRateThreshold, MinorLearningRateThreshold,
-                UsePawnLearningRateThresholds ? 1f : 2f, Strings.MajorLearningRateThreshold,
-                Strings.MajorLearningRateThresholdTooltip);
-            DoIntegerSlider(listing, ref MajorLearningRatePriority, 1, MaxPriority, Strings.MajorLearningRatePriority,
-                Strings.MajorLearningRatePriorityTooltip);
-            DoPercentSlider(listing, ref MinorLearningRateThreshold, 0.01f, MajorLearningRateThreshold,
-                Strings.MinorLearningRateThreshold, Strings.MinorLearningRateThresholdTooltip);
-            DoIntegerSlider(listing, ref MinorLearningRatePriority, 1, MaxPriority, Strings.MinorLearningRatePriority,
-                Strings.MinorLearningRatePriorityTooltip);
+            else
+            {
+                DoIntegerSlider(listing, ref MajorPassionPriority, 1, MaxPriority, Strings.MajorPassionPriority,
+                    Strings.MajorPassionPriorityTooltip);
+                DoIntegerSlider(listing, ref MinorPassionPriority, 1, MaxPriority, Strings.MinorPassionPriority,
+                    Strings.MinorPassionPriorityTooltip);
+            }
+            listing.Outdent(16f);
+            listing.ColumnWidth += 16f;
             listing.CheckboxLabeled(Strings.RecoveringPawnsUnfitForWork, ref RecoveringPawnsUnfitForWork,
                 Strings.RecoveringPawnsUnfitForWorkTooltip);
             listing.CheckboxLabeled(Strings.AssignAllWorkTypes, ref AssignAllWorkTypes,
@@ -153,6 +171,7 @@ namespace WorkManager
         private static void ExposeWorkPrioritiesData()
         {
             Scribe_Values.Look(ref UpdateFrequency, nameof(UpdateFrequency), 24);
+            Scribe_Values.Look(ref UseLearningRates, nameof(UseLearningRates));
             Scribe_Values.Look(ref UsePawnLearningRateThresholds, nameof(UsePawnLearningRateThresholds));
             Scribe_Values.Look(ref MajorLearningRateThreshold, nameof(MajorLearningRateThreshold), 1.2f);
             Scribe_Values.Look(ref MinorLearningRateThreshold, nameof(MinorLearningRateThreshold), 0.8f);
@@ -172,6 +191,8 @@ namespace WorkManager
             Scribe_Values.Look(ref HighestSkillPriority, nameof(HighestSkillPriority), 1);
             Scribe_Values.Look(ref MajorLearningRatePriority, nameof(MajorLearningRatePriority), 2);
             Scribe_Values.Look(ref MinorLearningRatePriority, nameof(MinorLearningRatePriority), 3);
+            Scribe_Values.Look(ref MajorPassionPriority, nameof(MajorPassionPriority), 2);
+            Scribe_Values.Look(ref MinorPassionPriority, nameof(MinorPassionPriority), 3);
             Scribe_Values.Look(ref IdlePriority, nameof(IdlePriority), 4);
             Scribe_Values.Look(ref LeftoverPriority, nameof(LeftoverPriority), 4);
             Scribe_Values.Look(ref DoctoringPriority, nameof(DoctoringPriority), 1);
@@ -182,6 +203,8 @@ namespace WorkManager
             if (UpdateFrequency == 0) { UpdateFrequency = 24; }
             if (DedicatedWorkerPriority == 0) { DedicatedWorkerPriority = 1; }
             if (HighestSkillPriority == 0) { HighestSkillPriority = 1; }
+            if (MajorPassionPriority == 0) { MajorPassionPriority = 2; }
+            if (MinorPassionPriority == 0) { MinorPassionPriority = 3; }
             if (MajorLearningRateThreshold == 0) { MajorLearningRateThreshold = 1.2f; }
             if (MajorLearningRatePriority == 0) { MajorLearningRatePriority = 2; }
             if (MinorLearningRateThreshold == 0) { MinorLearningRateThreshold = 0.8f; }

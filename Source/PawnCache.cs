@@ -35,6 +35,14 @@ namespace WorkManager
         private static WorkManagerGameComponent WorkManager => Current.Game.GetComponent<WorkManagerGameComponent>();
         public Dictionary<WorkTypeDef, int> WorkPriorities { get; } = new Dictionary<WorkTypeDef, int>();
 
+        public Passion GetPassion([NotNull] WorkTypeDef workType)
+        {
+            if (workType == null) { throw new ArgumentNullException(nameof(workType)); }
+            return !workType.relevantSkills.Any()
+                ? Passion.None
+                : workType.relevantSkills.Max(skill => Pawn.skills.GetSkill(skill)?.passion ?? Passion.None);
+        }
+
         private float GetSkillLearningRate([NotNull] SkillDef skill)
         {
             if (skill == null) { throw new ArgumentNullException(nameof(skill)); }

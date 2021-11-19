@@ -65,7 +65,6 @@ namespace WorkManager
 
         private void AssignDedicatedWorkers()
         {
-            if (!Settings.UseDedicatedWorkers) { return; }
             var capablePawns = _pawnCache.Values.Where(pc => pc.IsCapable).ToList();
             if (!capablePawns.Any()) { return; }
             if (Prefs.DevMode && Settings.VerboseLogging)
@@ -114,14 +113,23 @@ namespace WorkManager
                 foreach (var pawnCache in relevantPawns.Where(pc => pc.IsManagedWork(workType)))
                 {
                     var skill = pawnSkills[pawnCache];
+                    var passion = pawnCache.GetPassion(workType);
                     var normalizedSkill = skillRange == 0f ? 0f : (float)skill / skillRange;
-                    var normalizedLearnRate = pawnCache.IsLearningRateAboveThreshold(workType, true) ? 1f :
-                        pawnCache.IsLearningRateAboveThreshold(workType, false) ? 0.5f : 0f;
+                    var normalizedPassion = passion == Passion.Major ? 1f : passion == Passion.Minor ? 0.5f : 0f;
+                    var normalizedLearnRate = Settings.UseLearningRates
+                        ? pawnCache.IsLearningRateAboveThreshold(workType, true) ? 1f :
+                        pawnCache.IsLearningRateAboveThreshold(workType, false) ? 0.5f : 0f
+                        : 0f;
                     var normalizedDedications = dedicationsCountRange == 0
                         ? 0f
                         : (float)pawnDedicationsCounts[pawnCache] / dedicationsCountRange;
-                    var score = normalizedSkill - normalizedDedications;
-                    score += 1.25f * normalizedLearnRate;
+                    var score = normalizedSkill - 0.5f * normalizedDedications;
+                    if (Settings.UseLearningRates)
+                    {
+                        score += 0.2f * normalizedPassion;
+                        score += 1.5f * normalizedLearnRate;
+                    }
+                    else { score += 1.5f * normalizedPassion; }
                     pawnScores.Add(pawnCache, score);
                 }
                 if (Prefs.DevMode && Settings.VerboseLogging)
@@ -338,34 +346,34 @@ namespace WorkManager
                     if (pawnCache.GetWorkSkillLevel(workType) >= maxSkillValue ||
                         _pawnCache.Values.Count(pc => pc.IsCapable && pc.IsActiveWork(workType)) == 0)
                     {
-                        if (Prefs.DevMode && Settings.VerboseLogging)
-                        {
-                            Log.Message(
-                                $"Work Manager: Assigning '{pawnCache.Pawn.LabelShort}' as a hunter with priority 1 (highest skill value)");
-                        }
                         pawnCache.WorkPriorities[workType] = Settings.UseDedicatedWorkers
                             ? Settings.DedicatedWorkerPriority
                             : Settings.HighestSkillPriority;
                     }
                     else
                     {
-                        if (pawnCache.IsLearningRateAboveThreshold(workType, true))
+                        if (Settings.UseLearningRates)
                         {
-                            if (Prefs.DevMode && Settings.VerboseLogging)
+                            if (pawnCache.IsLearningRateAboveThreshold(workType, true))
                             {
-                                Log.Message(
-                                    $"Work Manager: Assigning '{pawnCache.Pawn.LabelShort}' as a hunter with priority 2 (major learning rate)");
+                                pawnCache.WorkPriorities[workType] = Settings.MajorLearningRatePriority;
                             }
-                            pawnCache.WorkPriorities[workType] = Settings.MajorLearningRatePriority;
+                            else if (pawnCache.IsLearningRateAboveThreshold(workType, false))
+                            {
+                                pawnCache.WorkPriorities[workType] = Settings.MinorLearningRatePriority;
+                            }
                         }
-                        else if (pawnCache.IsLearningRateAboveThreshold(workType, false))
+                        else
                         {
-                            if (Prefs.DevMode && Settings.VerboseLogging)
+                            switch (pawnCache.GetPassion(workType))
                             {
-                                Log.Message(
-                                    $"Work Manager: Assigning '{pawnCache.Pawn.LabelShort}' as a hunter with priority 3 (minor learning rate)");
+                                case Passion.Major:
+                                    pawnCache.WorkPriorities[workType] = Settings.MajorPassionPriority;
+                                    break;
+                                case Passion.Minor:
+                                    pawnCache.WorkPriorities[workType] = Settings.MinorPassionPriority;
+                                    break;
                             }
-                            pawnCache.WorkPriorities[workType] = Settings.MinorLearningRatePriority;
                         }
                     }
                 }
@@ -511,9 +519,45 @@ namespace WorkManager
             }
         }
 
+        private void AssignWorkersByPassion()
+        {
+            if (Prefs.DevMode && Settings.VerboseLogging)
+            {
+                Log.Message("-- Work Manager: Assigning workers by passion... --");
+            }
+            if (!_pawnCache.Values.Any(pc => pc.IsCapable)) { return; }
+            foreach (var pawnCache in _pawnCache.Values.Where(pc => pc.IsCapable && pc.IsManaged && !pc.IsRecovering))
+            {
+                var workTypes = _managedWorkTypes.Except(Settings.AssignEveryoneWorkTypes.Select(wt => wt.WorkTypeDef))
+                    .Where(workType => pawnCache.IsManagedWork(workType) && !pawnCache.IsDisabledWork(workType) &&
+                                       !pawnCache.IsBadWork(workType) && !pawnCache.IsActiveWork(workType)).ToList();
+                if (Settings.SpecialRulesForDoctors)
+                {
+                    workTypes.Remove(_allWorkTypes.FirstOrDefault(workTypeDef =>
+                        "Doctor".Equals(workTypeDef.defName, StringComparison.OrdinalIgnoreCase)));
+                }
+                if (Settings.SpecialRulesForHunters)
+                {
+                    workTypes.Remove(_allWorkTypes.FirstOrDefault(workTypeDef =>
+                        "Hunting".Equals(workTypeDef.defName, StringComparison.OrdinalIgnoreCase)));
+                }
+                foreach (var workType in workTypes)
+                {
+                    switch (pawnCache.GetPassion(workType))
+                    {
+                        case Passion.Major:
+                            pawnCache.WorkPriorities[workType] = Settings.MajorPassionPriority;
+                            break;
+                        case Passion.Minor:
+                            pawnCache.WorkPriorities[workType] = Settings.MinorPassionPriority;
+                            break;
+                    }
+                }
+            }
+        }
+
         private void AssignWorkersBySkill()
         {
-            if (Settings.UseDedicatedWorkers) { return; }
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
                 Log.Message("-- Work Manager: Assigning workers by skill... --");
@@ -578,7 +622,6 @@ namespace WorkManager
 
         private void AssignWorkToIdlePawns()
         {
-            if (!Settings.AssignWorkToIdlePawns) { return; }
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
                 Log.Message("-- Work Manager: Assigning work for idle pawns... --");
@@ -684,11 +727,12 @@ namespace WorkManager
             AssignCommonWork();
             AssignDoctors();
             AssignHunters();
-            AssignDedicatedWorkers();
-            AssignWorkersBySkill();
-            AssignWorkersByLearningRate();
+            if (Settings.UseDedicatedWorkers) { AssignDedicatedWorkers(); }
+            else { AssignWorkersBySkill(); }
+            if (Settings.UseLearningRates) { AssignWorkersByLearningRate(); }
+            else { AssignWorkersByPassion(); }
             AssignLeftoverWorkTypes();
-            AssignWorkToIdlePawns();
+            if (Settings.AssignWorkToIdlePawns) { AssignWorkToIdlePawns(); }
         }
     }
 }

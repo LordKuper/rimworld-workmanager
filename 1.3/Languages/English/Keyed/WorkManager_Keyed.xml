@@ -19,6 +19,12 @@
   <WorkManager.Settings_Priorities_DedicatedWorkerPriorityTooltip>Work priority for dedicated workers</WorkManager.Settings_Priorities_DedicatedWorkerPriorityTooltip>
   <WorkManager.Settings_Priorities_HighestSkillPriority>Highest-skilled workers priority</WorkManager.Settings_Priorities_HighestSkillPriority>
   <WorkManager.Settings_Priorities_HighestSkillPriorityTooltip>Work priority for highest-skilled workers</WorkManager.Settings_Priorities_HighestSkillPriorityTooltip>
+  <WorkManager.Settings_Priorities_UseLearningRates>Use skill learning rates instead of passions</WorkManager.Settings_Priorities_UseLearningRates>
+  <WorkManager.Settings_Priorities_UseLearningRatesTooltip>Use skill learning rates instead of passion levels for determining major and minor priorities</WorkManager.Settings_Priorities_UseLearningRatesTooltip>
+  <WorkManager.Settings_Priorities_MajorPassionPriority>Major passion work priority</WorkManager.Settings_Priorities_MajorPassionPriority>
+  <WorkManager.Settings_Priorities_MajorPassionPriorityTooltip>Priority for work types with major passion (burning)</WorkManager.Settings_Priorities_MajorPassionPriorityTooltip>
+  <WorkManager.Settings_Priorities_MinorPassionPriority>Minor passion work priority</WorkManager.Settings_Priorities_MinorPassionPriority>
+  <WorkManager.Settings_Priorities_MinorPassionPriorityTooltip>Priority for work types with minor passion (interested)</WorkManager.Settings_Priorities_MinorPassionPriorityTooltip>
   <WorkManager.Settings_Priorities_UsePawnLearningRateThresholds>Use individual skill learning rate thresholds</WorkManager.Settings_Priorities_UsePawnLearningRateThresholds>
   <WorkManager.Settings_Priorities_UsePawnLearningRateThresholdsTooltip>Use skill learning rate thresholds calculated for each pawn individually, considering their minimal and maximal skill learning rates</WorkManager.Settings_Priorities_UsePawnLearningRateThresholdsTooltip>
   <WorkManager.Settings_Priorities_MajorLearningRateThreshold>Major skill learning rate threshold</WorkManager.Settings_Priorities_MajorLearningRateThreshold>
