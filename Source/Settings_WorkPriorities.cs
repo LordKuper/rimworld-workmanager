@@ -26,6 +26,7 @@ namespace WorkManager
         public static float MinorLearningRateThreshold = 0.8f;
         public static int MinorPassionPriority = 3;
         public static bool RecoveringPawnsUnfitForWork = true;
+        public static bool UncontrollablePawnsUnfitForWork = true;
         public static bool SpecialRulesForDoctors = true;
         public static bool SpecialRulesForHunters = true;
         public static int UpdateFrequency = 24;
@@ -103,6 +104,8 @@ namespace WorkManager
             listing.ColumnWidth += 16f;
             listing.CheckboxLabeled(Strings.RecoveringPawnsUnfitForWork, ref RecoveringPawnsUnfitForWork,
                 Strings.RecoveringPawnsUnfitForWorkTooltip);
+            listing.CheckboxLabeled(Strings.UncontrollablePawnsUnfitForWork, ref UncontrollablePawnsUnfitForWork,
+                Strings.UncontrollablePawnsUnfitForWorkTooltip);
             listing.CheckboxLabeled(Strings.AssignAllWorkTypes, ref AssignAllWorkTypes,
                 Strings.AssignAllWorkTypesTooltip);
             if (AssignAllWorkTypes)

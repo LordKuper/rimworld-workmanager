@@ -159,6 +159,12 @@ namespace WorkManager
                     internal static readonly string RecoveringPawnsUnfitForWorkTooltip =
                         "WorkManager.Settings_Priorities_RecoveringPawnsUnfitForWorkTooltip".Translate();
 
+                    internal static readonly string UncontrollablePawnsUnfitForWork =
+                        "WorkManager.Settings_Priorities_UncontrollablePawnsUnfitForWork".Translate();
+
+                    internal static readonly string UncontrollablePawnsUnfitForWorkTooltip =
+                        "WorkManager.Settings_Priorities_UncontrollablePawnsUnfitForWorkTooltip".Translate();
+
                     internal static readonly string SpecialRulesForDoctors =
                         "WorkManager.Settings_Priorities_SpecialRulesForDoctors".Translate();
 

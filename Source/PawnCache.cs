@@ -147,7 +147,9 @@ namespace WorkManager
             _updateTime.Year = time.Year;
             _updateTime.Day = time.Day;
             _updateTime.Hour = time.Hour;
-            IsCapable = !Pawn.Dead && !Pawn.Downed && !Pawn.InMentalState && !Pawn.InContainerEnclosed;
+            IsCapable = Settings.UncontrollablePawnsUnfitForWork
+                ? !Pawn.Dead && !Pawn.Downed && !Pawn.InMentalState && !Pawn.InContainerEnclosed
+                : !Pawn.Dead;
             IsRecovering = IsCapable && Settings.RecoveringPawnsUnfitForWork &&
                            HealthAIUtility.ShouldSeekMedicalRest(Pawn);
             IsManaged = WorkManager.GetPawnEnabled(Pawn);
@@ -165,7 +167,15 @@ namespace WorkManager
             {
                 WorkPriorities.Add(workType, IsManagedWork(workType) ? 0 : GetWorkTypePriority(Pawn, workType));
             }
-            if (!IsCapable) { return; }
+            if (!IsCapable)
+            {
+                if (Prefs.DevMode && Settings.VerboseLogging)
+                {
+                    Log.Message(
+                       $"----- Work Manager: NOT Updating work type cache for {(!IsCapable ? "[!C]" : "")}{Pawn.LabelShort} (hours passed = {hoursPassed:N1})... -----");
+                }
+                return;
+            }
             if (hoursPassed >= 24)
             {
                 if (Prefs.DevMode && Settings.VerboseLogging)
