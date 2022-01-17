@@ -14,9 +14,7 @@ namespace WorkManager
         private readonly HashSet<WorkTypeDef> _allWorkTypes = new HashSet<WorkTypeDef>();
         private readonly HashSet<WorkTypeDef> _managedWorkTypes = new HashSet<WorkTypeDef>();
         private readonly Dictionary<Pawn, PawnCache> _pawnCache = new Dictionary<Pawn, PawnCache>();
-
         private readonly RimworldTime _workUpdateTime = new RimworldTime(-1, -1, -1);
-
         public WorkPriorityUpdater(Map map) : base(map) { }
 
         private static WorkManagerGameComponent WorkManager { get; } =
@@ -36,7 +34,7 @@ namespace WorkManager
                     else
                     {
                         Settings.SetPriorityMethod.Invoke(null,
-                            new object[] { pawnCache.Pawn, workType, priority, null });
+                            new object[] {pawnCache.Pawn, workType, priority, null});
                     }
                 }
             }
@@ -54,8 +52,8 @@ namespace WorkManager
             foreach (var workType in relevantWorkTypes)
             {
                 foreach (var pawnCache in _pawnCache.Values.Where(pc =>
-                    pc.IsManaged && pc.IsCapable && !pc.IsRecovering && pc.IsManagedWork(workType) &&
-                    !pc.IsDisabledWork(workType) && !pc.IsBadWork(workType)))
+                             pc.IsManaged && pc.IsCapable && !pc.IsRecovering && pc.IsManagedWork(workType) &&
+                             !pc.IsDisabledWork(workType) && !pc.IsBadWork(workType)))
                 {
                     pawnCache.WorkPriorities[workType] = Settings.AssignEveryoneWorkTypes
                         .First(wt => wt.WorkTypeDef == workType).Priority;
@@ -85,13 +83,13 @@ namespace WorkManager
                     "Hunting".Equals(workTypeDef.defName, StringComparison.OrdinalIgnoreCase)));
             }
             if (!workTypes.Any()) { return; }
-            var targetWorkers = (int)Math.Ceiling((float)capablePawns.Count / workTypes.Count);
+            var targetWorkers = (int) Math.Ceiling((float) capablePawns.Count / workTypes.Count);
             if (Prefs.DevMode && Settings.VerboseLogging)
             {
                 Log.Message($"-- Work Manager: Target dedicated workers by work type = {targetWorkers} --");
             }
             foreach (var workType in workTypes.OrderByDescending(wt => wt.relevantSkills.Count)
-                .ThenByDescending(wt => wt.naturalPriority))
+                         .ThenByDescending(wt => wt.naturalPriority))
             {
                 var relevantPawns = capablePawns.Where(pc =>
                     !pc.IsRecovering && !pc.IsDisabledWork(workType) && !pc.IsBadWork(workType)).ToList();
@@ -114,7 +112,7 @@ namespace WorkManager
                 {
                     var skill = pawnSkills[pawnCache];
                     var passion = pawnCache.GetPassion(workType);
-                    var normalizedSkill = skillRange == 0f ? 0f : (float)skill / skillRange;
+                    var normalizedSkill = skillRange == 0f ? 0f : (float) skill / skillRange;
                     var normalizedPassion = passion == Passion.Major ? 1f : passion == Passion.Minor ? 0.5f : 0f;
                     var normalizedLearnRate = Settings.UseLearningRates
                         ? pawnCache.IsLearningRateAboveThreshold(workType, true) ? 1f :
@@ -122,7 +120,7 @@ namespace WorkManager
                         : 0f;
                     var normalizedDedications = dedicationsCountRange == 0
                         ? 0f
-                        : (float)pawnDedicationsCounts[pawnCache] / dedicationsCountRange;
+                        : (float) pawnDedicationsCounts[pawnCache] / dedicationsCountRange;
                     var score = normalizedSkill - 0.5f * normalizedDedications;
                     if (Settings.UseLearningRates)
                     {
@@ -141,8 +139,7 @@ namespace WorkManager
                 }
                 while (capablePawns.Count(pc =>
                            pc.IsActiveWork(workType) &&
-                           pc.WorkPriorities[workType] <= Settings.DedicatedWorkerPriority) <
-                       targetWorkers)
+                           pc.WorkPriorities[workType] <= Settings.DedicatedWorkerPriority) < targetWorkers)
                 {
                     var dedicatedWorker = pawnScores.Any()
                         ? pawnScores.OrderByDescending(pair => pair.Value).First().Key
@@ -236,10 +233,10 @@ namespace WorkManager
                     doctor.Pawn.health.hediffSet.HasTendableHediff())
                 {
                     foreach (var pawnCache in relevantPawns
-                        .Where(pc =>
-                            pc.IsManaged && !pc.IsRecovering && pc.IsManagedWork(workType) &&
-                            !pc.IsActiveWork(workType)).OrderByDescending(pc => pc.GetWorkSkillLevel(workType))
-                        .ThenBy(pc => pc.IsBadWork(workType)))
+                                 .Where(pc =>
+                                     pc.IsManaged && !pc.IsRecovering && pc.IsManagedWork(workType) &&
+                                     !pc.IsActiveWork(workType)).OrderByDescending(pc => pc.GetWorkSkillLevel(workType))
+                                 .ThenBy(pc => pc.IsBadWork(workType)))
                     {
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
@@ -315,8 +312,8 @@ namespace WorkManager
             if (assignEveryone != null)
             {
                 foreach (var pawnCache in _pawnCache.Values.Where(pc =>
-                    pc.IsCapable && pc.IsManaged && pc.IsManagedWork(workType) && pc.IsActiveWork(workType) &&
-                    !pc.IsHunter()))
+                             pc.IsCapable && pc.IsManaged && pc.IsManagedWork(workType) && pc.IsActiveWork(workType) &&
+                             !pc.IsHunter()))
                 {
                     if (Prefs.DevMode && Settings.VerboseLogging)
                     {
@@ -339,9 +336,9 @@ namespace WorkManager
             if (assignEveryone == null || assignEveryone.AllowDedicated)
             {
                 foreach (var pawnCache in hunters
-                    .Where(pc =>
-                        pc.IsManaged && !pc.IsRecovering && pc.IsManagedWork(workType) && !pc.IsBadWork(workType))
-                    .OrderByDescending(pc => pc.GetWorkSkillLevel(workType)))
+                             .Where(pc =>
+                                 pc.IsManaged && !pc.IsRecovering && pc.IsManagedWork(workType) &&
+                                 !pc.IsBadWork(workType)).OrderByDescending(pc => pc.GetWorkSkillLevel(workType)))
                 {
                     if (pawnCache.GetWorkSkillLevel(workType) >= maxSkillValue ||
                         _pawnCache.Values.Count(pc => pc.IsCapable && pc.IsActiveWork(workType)) == 0)
@@ -425,13 +422,13 @@ namespace WorkManager
             if (!Settings.UseDedicatedWorkers)
             {
                 foreach (var workType in workTypes.Where(workType =>
-                    !_pawnCache.Values.Where(pc => pc.IsCapable).Any(pc => pc.IsActiveWork(workType))))
+                             !_pawnCache.Values.Where(pc => pc.IsCapable).Any(pc => pc.IsActiveWork(workType))))
                 {
                     foreach (var pawnCache in _pawnCache.Values
-                        .Where(pc =>
-                            pc.IsCapable && pc.IsManaged && !pc.IsRecovering && pc.IsManagedWork(workType) &&
-                            !pc.IsDisabledWork(workType) && !pc.IsBadWork(workType))
-                        .OrderBy(pc => workTypes.Count(pc.IsActiveWork)))
+                                 .Where(pc =>
+                                     pc.IsCapable && pc.IsManaged && !pc.IsRecovering && pc.IsManagedWork(workType) &&
+                                     !pc.IsDisabledWork(workType) && !pc.IsBadWork(workType))
+                                 .OrderBy(pc => workTypes.Count(pc.IsActiveWork)))
                     {
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
@@ -443,7 +440,7 @@ namespace WorkManager
                     }
                 }
                 foreach (var pawnCache in _pawnCache.Values.Where(pc =>
-                    pc.IsCapable && pc.IsManaged && !pc.IsRecovering && workTypes.Count(pc.IsActiveWork) == 0))
+                             pc.IsCapable && pc.IsManaged && !pc.IsRecovering && workTypes.Count(pc.IsActiveWork) == 0))
                 {
                     var workType = workTypes
                         .Where(wt =>
@@ -464,11 +461,11 @@ namespace WorkManager
             if (Settings.AssignAllWorkTypes)
             {
                 foreach (var pawnCache in _pawnCache.Values.Where(
-                    pc => pc.IsCapable && pc.IsManaged && !pc.IsRecovering))
+                             pc => pc.IsCapable && pc.IsManaged && !pc.IsRecovering))
                 {
                     foreach (var workType in workTypes.Where(wt =>
-                        pawnCache.IsManagedWork(wt) && !pawnCache.IsBadWork(wt) && !pawnCache.IsDisabledWork(wt) &&
-                        !pawnCache.IsActiveWork(wt)))
+                                 pawnCache.IsManagedWork(wt) && !pawnCache.IsBadWork(wt) &&
+                                 !pawnCache.IsDisabledWork(wt) && !pawnCache.IsActiveWork(wt)))
                     {
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
@@ -582,12 +579,12 @@ namespace WorkManager
                 if (!relevantPawns.Any()) { continue; }
                 var maxSkillValue = relevantPawns.Max(pc => pc.GetWorkSkillLevel(workType));
                 foreach (var pawnCache in relevantPawns
-                    .Where(pc =>
-                        pc.IsManaged && !pc.IsRecovering && pc.IsManagedWork(workType) && !pc.IsBadWork(workType))
-                    .OrderByDescending(pc => pc.GetWorkSkillLevel(workType)))
+                             .Where(pc =>
+                                 pc.IsManaged && !pc.IsRecovering && pc.IsManagedWork(workType) &&
+                                 !pc.IsBadWork(workType)).OrderByDescending(pc => pc.GetWorkSkillLevel(workType)))
                 {
                     if (pawnCache.GetWorkSkillLevel(workType) >= maxSkillValue || _pawnCache.Values
-                        .Where(pc => pc.IsCapable).Count(pc => pc.IsActiveWork(workType)) == 0)
+                            .Where(pc => pc.IsCapable).Count(pc => pc.IsActiveWork(workType)) == 0)
                     {
                         if (Prefs.DevMode && Settings.VerboseLogging)
                         {
@@ -608,12 +605,12 @@ namespace WorkManager
             {
                 Log.Message("-- Work Manager: Assigning work for recovering pawns --");
             }
-            var relevantWorkTypes = _allWorkTypes
-                .Where(wt => new[] { "Patient", "PatientBedRest" }.Contains(wt.defName)).Intersect(_managedWorkTypes);
+            var relevantWorkTypes = _allWorkTypes.Where(wt => new[] {"Patient", "PatientBedRest"}.Contains(wt.defName))
+                .Intersect(_managedWorkTypes);
             foreach (var workType in relevantWorkTypes)
             {
                 foreach (var pawnCache in _pawnCache.Values.Where(pc =>
-                    pc.IsManaged && pc.IsCapable && !pc.IsDisabledWork(workType) && !pc.IsBadWork(workType)))
+                             pc.IsManaged && pc.IsCapable && !pc.IsDisabledWork(workType) && !pc.IsBadWork(workType)))
                 {
                     pawnCache.WorkPriorities[workType] = 1;
                 }
@@ -654,8 +651,11 @@ namespace WorkManager
             foreach (var pawnCache in idlePawns)
             {
                 foreach (var workType in workTypes.Where(wt =>
-                    pawnCache.IsManagedWork(wt) && !pawnCache.IsDisabledWork(wt) && !pawnCache.IsBadWork(wt) &&
-                    !pawnCache.IsActiveWork(wt))) { pawnCache.WorkPriorities[workType] = Settings.IdlePriority; }
+                             pawnCache.IsManagedWork(wt) && !pawnCache.IsDisabledWork(wt) && !pawnCache.IsBadWork(wt) &&
+                             !pawnCache.IsActiveWork(wt)))
+                {
+                    pawnCache.WorkPriorities[workType] = Settings.IdlePriority;
+                }
                 if (pawnCache.IdleSince == null)
                 {
                     pawnCache.IdleSince =
@@ -681,7 +681,10 @@ namespace WorkManager
             {
                 Current.Game.playSettings.useWorkPriorities = true;
                 foreach (var pawn in PawnsFinder.AllMapsWorldAndTemporary_Alive.Where(pawn =>
-                    pawn.Faction == Faction.OfPlayer)) { pawn.workSettings?.Notify_UseWorkPrioritiesChanged(); }
+                             pawn.Faction == Faction.OfPlayer))
+                {
+                    pawn.workSettings?.Notify_UseWorkPrioritiesChanged();
+                }
             }
             if (Prefs.DevMode && Settings.VerboseLogging)
             {

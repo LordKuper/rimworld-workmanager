@@ -13,7 +13,6 @@ namespace WorkManager
         private readonly Dictionary<SkillDef, float> _skillLearningRates = new Dictionary<SkillDef, float>();
         private readonly RimworldTime _updateTime = new RimworldTime(-1, -1, -1);
         private readonly Dictionary<WorkTypeDef, float> _workSkillLearningRates = new Dictionary<WorkTypeDef, float>();
-
         private readonly Dictionary<WorkTypeDef, int> _workSkillLevels = new Dictionary<WorkTypeDef, int>();
 
         public PawnCache(Pawn pawn)
@@ -23,14 +22,12 @@ namespace WorkManager
 
         private Dictionary<WorkTypeDef, bool> BadWorkTypes { get; } = new Dictionary<WorkTypeDef, bool>();
         private Dictionary<WorkTypeDef, bool> DisabledWorkTypes { get; } = new Dictionary<WorkTypeDef, bool>();
-
         public RimworldTime IdleSince { get; set; }
         public bool IsCapable { get; private set; }
         private bool IsForeigner { get; set; }
         public bool IsManaged { get; private set; }
         public bool IsRecovering { get; private set; }
         private bool IsSlave { get; set; }
-
         public Pawn Pawn { get; }
         private static WorkManagerGameComponent WorkManager => Current.Game.GetComponent<WorkManagerGameComponent>();
         public Dictionary<WorkTypeDef, int> WorkPriorities { get; } = new Dictionary<WorkTypeDef, int>();
@@ -68,7 +65,7 @@ namespace WorkManager
             if (workType == null) { throw new ArgumentNullException(nameof(workType)); }
             if (_workSkillLevels.ContainsKey(workType)) { return _workSkillLevels[workType]; }
             var value = workType.relevantSkills.Any()
-                ? (int)Math.Floor(workType.relevantSkills.Select(skill => Pawn.skills.GetSkill(skill).Level).Average())
+                ? (int) Math.Floor(workType.relevantSkills.Select(skill => Pawn.skills.GetSkill(skill).Level).Average())
                 : 0;
             _workSkillLevels.Add(workType, value);
             return value;
@@ -78,7 +75,7 @@ namespace WorkManager
         {
             return Settings.GetPriorityMethod == null
                 ? pawn.workSettings.GetPriority(workType)
-                : (int)Settings.GetPriorityMethod.Invoke(null, new object[] { pawn, workType, -1 });
+                : (int) Settings.GetPriorityMethod.Invoke(null, new object[] {pawn, workType, -1});
         }
 
         public bool IsActiveWork([NotNull] WorkTypeDef workType)
@@ -92,7 +89,7 @@ namespace WorkManager
             if (workType == null) { throw new ArgumentNullException(nameof(workType)); }
             if (Settings.IsBadWorkMethod == null) { return false; }
             if (BadWorkTypes.ContainsKey(workType)) { return BadWorkTypes[workType]; }
-            var value = (bool)Settings.IsBadWorkMethod.Invoke(null, new object[] { Pawn, workType });
+            var value = (bool) Settings.IsBadWorkMethod.Invoke(null, new object[] {Pawn, workType});
             BadWorkTypes.Add(workType, value);
             return value;
         }
@@ -172,7 +169,7 @@ namespace WorkManager
                 if (Prefs.DevMode && Settings.VerboseLogging)
                 {
                     Log.Message(
-                       $"----- Work Manager: NOT Updating work type cache for {(!IsCapable ? "[!C]" : "")}{Pawn.LabelShort} (hours passed = {hoursPassed:N1})... -----");
+                        $"----- Work Manager: NOT Updating work type cache for {(!IsCapable ? "[!C]" : "")}{Pawn.LabelShort} (hours passed = {hoursPassed:N1})... -----");
                 }
                 return;
             }

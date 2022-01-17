@@ -10,9 +10,7 @@ namespace WorkManager
     public class ScheduleUpdater : MapComponent
     {
         private readonly RimworldTime _scheduleUpdateTime = new RimworldTime(-1, -1, -1);
-
         private readonly Dictionary<Pawn, WorkShift> _workers = new Dictionary<Pawn, WorkShift>();
-
         public ScheduleUpdater(Map map) : base(map) { }
 
         private static WorkManagerGameComponent WorkManager { get; } =
@@ -50,7 +48,7 @@ namespace WorkManager
             foreach (var pawn in allPawns.Where(pawn => WorkManager.GetPawnScheduleEnabled(pawn)))
             {
                 var lovers = pawn.relations.DirectRelations.Where(relation =>
-                    new[] { PawnRelationDefOf.Fiance, PawnRelationDefOf.Lover, PawnRelationDefOf.Spouse }.Contains(
+                    new[] {PawnRelationDefOf.Fiance, PawnRelationDefOf.Lover, PawnRelationDefOf.Spouse}.Contains(
                         relation.def)).Select(relation => relation.otherPawn).Distinct().ToList();
                 var workShifts = (pawn.story.traits.HasTrait(TraitDef.Named("NightOwl"))
                     ? Settings.NightOwlWorkShifts.Where(shift => shift.PawnThreshold <= nightOwls.Count())
@@ -66,8 +64,11 @@ namespace WorkManager
                         if (priority == 0) { continue; }
                         scores[shift] += 1f / priority;
                         foreach (var workerPriority in shiftWorkers
-                            .Select(worker => PawnCache.GetWorkTypePriority(worker, workType))
-                            .Where(workerPriority => workerPriority != 0)) { scores[shift] -= 1f / workerPriority; }
+                                     .Select(worker => PawnCache.GetWorkTypePriority(worker, workType))
+                                     .Where(workerPriority => workerPriority != 0))
+                        {
+                            scores[shift] -= 1f / workerPriority;
+                        }
                     }
                 }
                 var workShift = scores.OrderByDescending(shiftScore => shiftScore.Value).First().Key;

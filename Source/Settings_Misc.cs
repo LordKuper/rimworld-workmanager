@@ -5,7 +5,6 @@ using Strings = WorkManager.Resources.Strings.Settings.Misc;
 namespace WorkManager
 {
     public partial class Settings
-
     {
         public static bool VerboseLogging;
 

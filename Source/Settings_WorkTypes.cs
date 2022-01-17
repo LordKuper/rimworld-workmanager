@@ -63,9 +63,10 @@ namespace WorkManager
                 {
                     var options = new List<FloatMenuOption>();
                     foreach (var workTypeDef in DefDatabase<WorkTypeDef>.AllDefsListForReading.Where(w =>
-                            w.visible && !AssignEveryoneWorkTypes.Any(workType =>
-                                workType.WorkTypeDefName.Equals(w.defName, StringComparison.OrdinalIgnoreCase)))
-                        .OrderBy(workTypeDef => workTypeDef.labelShort))
+                                     w.visible && !AssignEveryoneWorkTypes.Any(workType =>
+                                         workType.WorkTypeDefName.Equals(w.defName,
+                                             StringComparison.OrdinalIgnoreCase)))
+                                 .OrderBy(workTypeDef => workTypeDef.labelShort))
                     {
                         options.Add(new FloatMenuOption(workTypeDef.labelShort,
                             () =>
@@ -139,7 +140,7 @@ namespace WorkManager
                     }
                     Widgets.Label(nameRect, workType.Label);
                     GUI.color = color;
-                    workType.Priority = (int)Widgets.HorizontalSlider(
+                    workType.Priority = (int) Widgets.HorizontalSlider(
                         new Rect(rect.x + _assignEveryoneWorkTypeNameColumnWidth, rect.y,
                             _assignEveryonePriorityColumnWidth, rect.height).ContractedBy(4f), workType.Priority, 1f,
                         MaxPriority, true, workType.Priority.ToString(), roundTo: 1);
@@ -175,9 +176,9 @@ namespace WorkManager
             {
                 var options = new List<FloatMenuOption>();
                 foreach (var workTypeDef in DefDatabase<WorkTypeDef>.AllDefsListForReading.Where(w =>
-                        w.visible && !disabledWorkTypes.Any(workType =>
-                            workType.WorkTypeDefName.Equals(w.defName, StringComparison.OrdinalIgnoreCase)))
-                    .OrderBy(workTypeDef => workTypeDef.labelShort))
+                                 w.visible && !disabledWorkTypes.Any(workType =>
+                                     workType.WorkTypeDefName.Equals(w.defName, StringComparison.OrdinalIgnoreCase)))
+                             .OrderBy(workTypeDef => workTypeDef.labelShort))
                 {
                     options.Add(new FloatMenuOption(workTypeDef.labelShort,
                         () => { disabledWorkTypes.Add(new DisabledWorkType(workTypeDef.defName)); }));
