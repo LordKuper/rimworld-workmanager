@@ -17,9 +17,7 @@ namespace WorkManager
         private static float _timeAssignmentColumnWidth;
         private static float _workShiftNumberColumnWidth;
         private static float _workShiftTableWidth;
-
         public static bool ManageWorkSchedule = true;
-
         public static int ScheduleUpdateFrequency = 2;
 
         private static IEnumerable<string> DefaultAfternoonWorkShift
@@ -111,7 +109,7 @@ namespace WorkManager
         }
 
         private static IEnumerable<WorkShift> DefaultNightOwlWorkShifts =>
-            new[] { new WorkShift(DefaultNightOwlWorkShift, 1) };
+            new[] {new WorkShift(DefaultNightOwlWorkShift, 1)};
 
         private static IEnumerable<string> DefaultNightWorkShift
         {
@@ -156,7 +154,7 @@ namespace WorkManager
             var buttonRect = new Rect(buttonRowRect.x, buttonRowRect.y, 150f, 35f);
             if (Widgets.ButtonText(buttonRect, Strings.AddWorkShift))
             {
-                ColonistWorkShifts.Add(new WorkShift { PawnThreshold = ColonistWorkShifts.Last().PawnThreshold });
+                ColonistWorkShifts.Add(new WorkShift {PawnThreshold = ColonistWorkShifts.Last().PawnThreshold});
             }
             buttonRect = new Rect(buttonRect.xMax + 10f, buttonRect.y, 150f, 35f);
             if (Widgets.ButtonText(buttonRect, Strings.DeleteWorkShift, active: ColonistWorkShifts.Count > 1))
@@ -211,7 +209,7 @@ namespace WorkManager
             var buttonRect = new Rect(buttonRowRect.x, buttonRowRect.y, 150f, 35f);
             if (Widgets.ButtonText(buttonRect, Strings.AddWorkShift))
             {
-                NightOwlWorkShifts.Add(new WorkShift { PawnThreshold = NightOwlWorkShifts.Last().PawnThreshold });
+                NightOwlWorkShifts.Add(new WorkShift {PawnThreshold = NightOwlWorkShifts.Last().PawnThreshold});
             }
             buttonRect = new Rect(buttonRect.xMax + 10f, buttonRect.y, 150f, 35f);
             if (Widgets.ButtonText(buttonRect, Strings.DeleteWorkShift, active: NightOwlWorkShifts.Count > 1))
@@ -281,8 +279,8 @@ namespace WorkManager
             TooltipHandler.TipRegion(optionRect, Strings.UpdateFrequencyTooltip);
             Widgets.DrawHighlightIfMouseover(optionRect);
             Widgets.Label(labelRect, Strings.UpdateFrequency);
-            ScheduleUpdateFrequency = (int)Widgets.HorizontalSlider(fieldRect.ContractedBy(4f), ScheduleUpdateFrequency,
-                1f, 24f, true, ScheduleUpdateFrequency.ToString(), roundTo: 1);
+            ScheduleUpdateFrequency = (int) Widgets.HorizontalSlider(fieldRect.ContractedBy(4f),
+                ScheduleUpdateFrequency, 1f, 24f, true, ScheduleUpdateFrequency.ToString(), roundTo: 1);
             listing.Gap(listing.verticalSpacing);
             listing.GapLine(listing.verticalSpacing);
             DoTimeAssignmentSelector(listing.GetRect(Text.LineHeight * 1.5f));
@@ -372,7 +370,7 @@ namespace WorkManager
             if (number == 0) { Widgets.Label(thresholdRect, workShift.PawnThreshold.ToString("N0")); }
             else
             {
-                workShift.PawnThreshold = (int)Widgets.HorizontalSlider(thresholdRect, workShift.PawnThreshold,
+                workShift.PawnThreshold = (int) Widgets.HorizontalSlider(thresholdRect, workShift.PawnThreshold,
                     minThreshold, maxThreshold, true, workShift.PawnThreshold.ToString(), roundTo: 1);
             }
             Text.Anchor = TextAnchor.UpperLeft;

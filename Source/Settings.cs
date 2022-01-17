@@ -11,14 +11,10 @@ namespace WorkManager
     {
         private static SettingsTabs _currentTab;
         private static Vector2 _scrollPosition;
-
         internal static MethodInfo GetPriorityMethod;
         public static bool Initialized;
-
         internal static MethodInfo IsBadWorkMethod;
-
         internal static int MaxPriority = 4;
-
         internal static MethodInfo SetPriorityMethod;
         private static readonly List<TabRecord> Tabs = new List<TabRecord>();
 
@@ -33,7 +29,7 @@ namespace WorkManager
             TooltipHandler.TipRegion(optionRect, tooltip);
             Widgets.DrawHighlightIfMouseover(optionRect);
             Widgets.Label(labelRect, label);
-            value = (int)Widgets.HorizontalSlider(fieldRect.ContractedBy(4f), value, minValue, maxValue, true,
+            value = (int) Widgets.HorizontalSlider(fieldRect.ContractedBy(4f), value, minValue, maxValue, true,
                 value.ToString(), roundTo: 1);
             listing.Gap(listing.verticalSpacing);
         }

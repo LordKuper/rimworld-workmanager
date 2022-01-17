@@ -9,7 +9,6 @@ namespace WorkManager
     public class WorkShift : IExposable
     {
         private List<string> _hours;
-
         public int PawnThreshold = 1;
 
         public WorkShift()

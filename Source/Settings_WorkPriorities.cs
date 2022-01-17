@@ -26,9 +26,9 @@ namespace WorkManager
         public static float MinorLearningRateThreshold = 0.8f;
         public static int MinorPassionPriority = 3;
         public static bool RecoveringPawnsUnfitForWork = true;
-        public static bool UncontrollablePawnsUnfitForWork = true;
         public static bool SpecialRulesForDoctors = true;
         public static bool SpecialRulesForHunters = true;
+        public static bool UncontrollablePawnsUnfitForWork = true;
         public static int UpdateFrequency = 24;
         public static bool UseDedicatedWorkers = true;
         public static bool UseLearningRates;
@@ -186,6 +186,7 @@ namespace WorkManager
             Scribe_Values.Look(ref CountDownedPrisoners, nameof(CountDownedPrisoners), true);
             Scribe_Values.Look(ref CountDownedAnimals, nameof(CountDownedAnimals), true);
             Scribe_Values.Look(ref RecoveringPawnsUnfitForWork, nameof(RecoveringPawnsUnfitForWork), true);
+            Scribe_Values.Look(ref UncontrollablePawnsUnfitForWork, nameof(UncontrollablePawnsUnfitForWork), true);
             Scribe_Values.Look(ref SpecialRulesForHunters, nameof(SpecialRulesForHunters), true);
             Scribe_Values.Look(ref AllowMeleeHunters, nameof(AllowMeleeHunters));
             Scribe_Values.Look(ref AssignAllWorkTypes, nameof(AssignAllWorkTypes));

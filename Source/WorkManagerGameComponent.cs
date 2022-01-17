@@ -96,7 +96,7 @@ namespace WorkManager
             {
                 if (!_disabledPawnWorkTypes.Any(pwt => pwt.Pawn == pawn && pwt.WorkType == workType))
                 {
-                    _disabledPawnWorkTypes.Add(new PawnWorkType { Pawn = pawn, WorkType = workType });
+                    _disabledPawnWorkTypes.Add(new PawnWorkType {Pawn = pawn, WorkType = workType});
                 }
             }
         }

@@ -22,19 +22,19 @@ namespace WorkManager
             var harmony = new Harmony("LordKuper.WorkManager");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
             if (LoadedModManager.RunningModsListForReading.Any(m =>
-                "fluffy.worktab".Equals(m.PackageId, StringComparison.OrdinalIgnoreCase)))
+                    "fluffy.worktab".Equals(m.PackageId, StringComparison.OrdinalIgnoreCase)))
             {
                 ApplyWorkTabPatch(harmony);
                 Settings.GetPriorityMethod = AccessTools.Method(AccessTools.TypeByName("WorkTab.Pawn_Extensions"),
-                    "GetPriority", new[] { typeof(Pawn), typeof(WorkTypeDef), typeof(int) });
+                    "GetPriority", new[] {typeof(Pawn), typeof(WorkTypeDef), typeof(int)});
                 Settings.SetPriorityMethod = AccessTools.Method(AccessTools.TypeByName("WorkTab.Pawn_Extensions"),
-                    "SetPriority", new[] { typeof(Pawn), typeof(WorkTypeDef), typeof(int), typeof(List<int>) });
+                    "SetPriority", new[] {typeof(Pawn), typeof(WorkTypeDef), typeof(int), typeof(List<int>)});
                 Settings.MaxPriority = Traverse.Create(AccessTools.TypeByName("WorkTab.Settings"))
                     .Field<int>("maxPriority").Value;
                 if (Prefs.DevMode) { Log.Message($"Work Manager: Max priority is {Settings.MaxPriority}."); }
             }
             if (LoadedModManager.RunningModsListForReading.Any(m =>
-                "notfood.MoreThanCapable".Equals(m.PackageId, StringComparison.OrdinalIgnoreCase)))
+                    "notfood.MoreThanCapable".Equals(m.PackageId, StringComparison.OrdinalIgnoreCase)))
             {
                 if (Prefs.DevMode) { Log.Message("Work Manager: MoreThanCapable detected."); }
                 Settings.IsBadWorkMethod =

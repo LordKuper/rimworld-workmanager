@@ -8,9 +8,7 @@ namespace WorkManager
         internal static class Strings
         {
             internal static readonly string GlobalDisableTooltip = "WorkManager.GlobalDisableTooltip".Translate();
-
             internal static readonly string GlobalEnableTooltip = "WorkManager.GlobalEnableTooltip".Translate();
-
             internal static readonly string PawnDisableTooltip = "WorkManager.PawnDisableTooltip".Translate();
             internal static readonly string PawnEnableTooltip = "WorkManager.PawnEnableTooltip".Translate();
 
@@ -159,12 +157,6 @@ namespace WorkManager
                     internal static readonly string RecoveringPawnsUnfitForWorkTooltip =
                         "WorkManager.Settings_Priorities_RecoveringPawnsUnfitForWorkTooltip".Translate();
 
-                    internal static readonly string UncontrollablePawnsUnfitForWork =
-                        "WorkManager.Settings_Priorities_UncontrollablePawnsUnfitForWork".Translate();
-
-                    internal static readonly string UncontrollablePawnsUnfitForWorkTooltip =
-                        "WorkManager.Settings_Priorities_UncontrollablePawnsUnfitForWorkTooltip".Translate();
-
                     internal static readonly string SpecialRulesForDoctors =
                         "WorkManager.Settings_Priorities_SpecialRulesForDoctors".Translate();
 
@@ -178,6 +170,12 @@ namespace WorkManager
                         "WorkManager.Settings_Priorities_SpecialRulesForHuntersTooltip".Translate();
 
                     internal static readonly string Title = "WorkManager.Settings_Priorities_Title".Translate();
+
+                    internal static readonly string UncontrollablePawnsUnfitForWork =
+                        "WorkManager.Settings_Priorities_UncontrollablePawnsUnfitForWork".Translate();
+
+                    internal static readonly string UncontrollablePawnsUnfitForWorkTooltip =
+                        "WorkManager.Settings_Priorities_UncontrollablePawnsUnfitForWorkTooltip".Translate();
 
                     internal static readonly string UpdateFrequency =
                         "WorkManager.Settings_Priorities_UpdateFrequency".Translate();
