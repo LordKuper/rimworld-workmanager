@@ -28,7 +28,7 @@ namespace WorkManager
             var hourFloat = GenLocalDate.HourFloat(map);
             var hoursPassed = (year - _scheduleUpdateTime.Year) * 60 * 24 + (day - _scheduleUpdateTime.Day) * 24 +
                 hourFloat - _scheduleUpdateTime.Hour;
-            if (hoursPassed < 24f / Settings.UpdateFrequency) { return; }
+            if (hoursPassed < 24f / Settings.ScheduleUpdateFrequency) { return; }
             _scheduleUpdateTime.Year = year;
             _scheduleUpdateTime.Day = day;
             _scheduleUpdateTime.Hour = hourFloat;
