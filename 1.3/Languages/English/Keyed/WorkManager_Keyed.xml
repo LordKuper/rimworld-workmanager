@@ -35,8 +35,8 @@
   <WorkManager.Settings_Priorities_MinorLearningRateThresholdTooltip>Pawns with skill learning rate above this threshold will be assigned to corresponding work types with priority value set below</WorkManager.Settings_Priorities_MinorLearningRateThresholdTooltip>
   <WorkManager.Settings_Priorities_MinorLearningRatePriority>Minor learning rate work priority</WorkManager.Settings_Priorities_MinorLearningRatePriority>
   <WorkManager.Settings_Priorities_MinorLearningRatePriorityTooltip>Priority for work types with learning rates between minor and major thresholds</WorkManager.Settings_Priorities_MinorLearningRatePriorityTooltip>
-  <WorkManager.Settings_Priorities_UncontrollablePawnsUnfitForWork>Uncontrolleable pawns lose all work</WorkManager.Settings_Priorities_UncontrollablePawnsUnfitForWork>
-  <WorkManager.Settings_Priorities_UncontrollablePawnsUnfitForWorkTooltip>Uncontrollable(downed, mental state, or stuck) pawns are not counted for priority management</WorkManager.Settings_Priorities_UncontrollablePawnsUnfitForWorkTooltip>
+  <WorkManager.Settings_Priorities_UncontrollablePawnsUnfitForWork>Uncontrollable pawns are unfit for work</WorkManager.Settings_Priorities_UncontrollablePawnsUnfitForWork>
+  <WorkManager.Settings_Priorities_UncontrollablePawnsUnfitForWorkTooltip>Do not assign work for uncontrollable (downed, mental or stuck) pawns</WorkManager.Settings_Priorities_UncontrollablePawnsUnfitForWorkTooltip>
   <WorkManager.Settings_Priorities_RecoveringPawnsUnfitForWork>Recovering pawns are unfit for work</WorkManager.Settings_Priorities_RecoveringPawnsUnfitForWork>
   <WorkManager.Settings_Priorities_RecoveringPawnsUnfitForWorkTooltip>Do not assign work for pawns needing medical rest</WorkManager.Settings_Priorities_RecoveringPawnsUnfitForWorkTooltip>
   <WorkManager.Settings_Priorities_AssignAllWorkTypes>Assign all work types</WorkManager.Settings_Priorities_AssignAllWorkTypes>
