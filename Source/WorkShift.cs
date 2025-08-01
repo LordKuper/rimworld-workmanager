@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 using RimWorld;
 using Verse;
 
-namespace WorkManager
+namespace LordKuper.WorkManager
 {
     public class WorkShift : IExposable
     {
@@ -14,7 +14,10 @@ namespace WorkManager
         public WorkShift()
         {
             _hours = new List<string>(24);
-            for (var i = 0; i < 24; i++) { _hours.Add("Anything"); }
+            for (var i = 0; i < 24; i++)
+            {
+                _hours.Add("Anything");
+            }
         }
 
         public WorkShift(IEnumerable<string> assignments, int pawnThreshold)
@@ -47,7 +50,10 @@ namespace WorkManager
 
         public void SetTimeAssignment(int hour, [NotNull] TimeAssignmentDef assignment)
         {
-            if (hour < 0 || hour >= 24) { return; }
+            if (hour < 0 || hour >= 24)
+            {
+                return;
+            }
             _hours[hour] = assignment.defName ?? throw new ArgumentNullException(nameof(assignment));
         }
     }

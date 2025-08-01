@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using Verse;
-using Strings = WorkManager.Resources.Strings.Settings.Priorities;
+using Strings = LordKuper.WorkManager.Resources.Strings.Settings.WorkPriorities;
 
-namespace WorkManager
+namespace LordKuper.WorkManager.Settings
 {
     public partial class Settings
     {
@@ -41,13 +41,28 @@ namespace WorkManager
             if (SpecialRulesForDoctors)
             {
                 boolSettingsCount++;
-                if (AssignMultipleDoctors) { boolSettingsCount += 4; }
+                if (AssignMultipleDoctors)
+                {
+                    boolSettingsCount += 4;
+                }
             }
-            if (SpecialRulesForHunters) { boolSettingsCount++; }
+            if (SpecialRulesForHunters)
+            {
+                boolSettingsCount++;
+            }
             var numericSettingsCount = 6;
-            if (AssignAllWorkTypes) { numericSettingsCount++; }
-            if (AssignWorkToIdlePawns) { numericSettingsCount++; }
-            if (SpecialRulesForDoctors) { numericSettingsCount++; }
+            if (AssignAllWorkTypes)
+            {
+                numericSettingsCount++;
+            }
+            if (AssignWorkToIdlePawns)
+            {
+                numericSettingsCount++;
+            }
+            if (SpecialRulesForDoctors)
+            {
+                numericSettingsCount++;
+            }
             var height = boolSettingsCount * (Text.LineHeight + listing.verticalSpacing) +
                          numericSettingsCount * (Text.LineHeight * 1.5f + listing.verticalSpacing);
             var viewRect = new Rect(rect.x, 0, rect.width - 16f, height);
@@ -80,8 +95,14 @@ namespace WorkManager
                     Strings.UsePawnLearningRateThresholdsTooltip);
                 if (UsePawnLearningRateThresholds)
                 {
-                    if (MajorLearningRateThreshold > 1f) { MajorLearningRateThreshold = 1f; }
-                    if (MinorLearningRateThreshold > 1f) { MinorLearningRateThreshold = 1f; }
+                    if (MajorLearningRateThreshold > 1f)
+                    {
+                        MajorLearningRateThreshold = 1f;
+                    }
+                    if (MinorLearningRateThreshold > 1f)
+                    {
+                        MinorLearningRateThreshold = 1f;
+                    }
                 }
                 DoPercentSlider(listing, ref MajorLearningRateThreshold, MinorLearningRateThreshold,
                     UsePawnLearningRateThresholds ? 1f : 2f, Strings.MajorLearningRateThreshold,
@@ -204,18 +225,54 @@ namespace WorkManager
 
         private static void InitializeWorkPriorities()
         {
-            if (UpdateFrequency == 0) { UpdateFrequency = 24; }
-            if (DedicatedWorkerPriority == 0) { DedicatedWorkerPriority = 1; }
-            if (HighestSkillPriority == 0) { HighestSkillPriority = 1; }
-            if (MajorPassionPriority == 0) { MajorPassionPriority = 2; }
-            if (MinorPassionPriority == 0) { MinorPassionPriority = 3; }
-            if (MajorLearningRateThreshold == 0) { MajorLearningRateThreshold = 1.2f; }
-            if (MajorLearningRatePriority == 0) { MajorLearningRatePriority = 2; }
-            if (MinorLearningRateThreshold == 0) { MinorLearningRateThreshold = 0.8f; }
-            if (MinorLearningRatePriority == 0) { MinorLearningRatePriority = 3; }
-            if (IdlePriority == 0) { IdlePriority = 4; }
-            if (LeftoverPriority == 0) { LeftoverPriority = 4; }
-            if (DoctoringPriority == 0) { DoctoringPriority = 1; }
+            if (UpdateFrequency == 0)
+            {
+                UpdateFrequency = 24;
+            }
+            if (DedicatedWorkerPriority == 0)
+            {
+                DedicatedWorkerPriority = 1;
+            }
+            if (HighestSkillPriority == 0)
+            {
+                HighestSkillPriority = 1;
+            }
+            if (MajorPassionPriority == 0)
+            {
+                MajorPassionPriority = 2;
+            }
+            if (MinorPassionPriority == 0)
+            {
+                MinorPassionPriority = 3;
+            }
+            if (MajorLearningRateThreshold == 0)
+            {
+                MajorLearningRateThreshold = 1.2f;
+            }
+            if (MajorLearningRatePriority == 0)
+            {
+                MajorLearningRatePriority = 2;
+            }
+            if (MinorLearningRateThreshold == 0)
+            {
+                MinorLearningRateThreshold = 0.8f;
+            }
+            if (MinorLearningRatePriority == 0)
+            {
+                MinorLearningRatePriority = 3;
+            }
+            if (IdlePriority == 0)
+            {
+                IdlePriority = 4;
+            }
+            if (LeftoverPriority == 0)
+            {
+                LeftoverPriority = 4;
+            }
+            if (DoctoringPriority == 0)
+            {
+                DoctoringPriority = 1;
+            }
         }
     }
 }

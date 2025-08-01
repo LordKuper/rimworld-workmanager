@@ -5,9 +5,9 @@ using RimWorld;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
-using Strings = WorkManager.Resources.Strings.Settings.Schedule;
+using Strings = LordKuper.WorkManager.Resources.Strings.Settings.Schedule;
 
-namespace WorkManager
+namespace LordKuper.WorkManager.Settings
 {
     public partial class Settings
     {
@@ -32,10 +32,10 @@ namespace WorkManager
                         case int hour when hour >= 8 && hour < 16:
                             shift[i] = "Sleep";
                             break;
-                        case int hour when hour < 2 || hour >= 16 && hour < 22:
+                        case int hour when hour < 2 || (hour >= 16 && hour < 22):
                             shift[i] = "Work";
                             break;
-                        case int hour when hour >= 6 && hour < 8 || hour >= 22:
+                        case int hour when (hour >= 6 && hour < 8) || hour >= 22:
                             shift[i] = "Joy";
                             break;
                         default:
@@ -69,7 +69,7 @@ namespace WorkManager
                         case int hour when hour >= 8 && hour < 16:
                             shift[i] = "Work";
                             break;
-                        case int hour when hour >= 6 && hour < 8 || hour >= 20 && hour < 22:
+                        case int hour when (hour >= 6 && hour < 8) || (hour >= 20 && hour < 22):
                             shift[i] = "Joy";
                             break;
                         default:
@@ -96,7 +96,7 @@ namespace WorkManager
                         case int hour when hour < 5 || hour >= 21:
                             shift[i] = "Work";
                             break;
-                        case int hour when hour >= 5 && hour < 7 || hour >= 19 && hour < 21:
+                        case int hour when (hour >= 5 && hour < 7) || (hour >= 19 && hour < 21):
                             shift[i] = "Joy";
                             break;
                         default:
@@ -109,7 +109,7 @@ namespace WorkManager
         }
 
         private static IEnumerable<WorkShift> DefaultNightOwlWorkShifts =>
-            new[] {new WorkShift(DefaultNightOwlWorkShift, 1)};
+            new[] { new WorkShift(DefaultNightOwlWorkShift, 1) };
 
         private static IEnumerable<string> DefaultNightWorkShift
         {
@@ -154,7 +154,7 @@ namespace WorkManager
             var buttonRect = new Rect(buttonRowRect.x, buttonRowRect.y, 150f, 35f);
             if (Widgets.ButtonText(buttonRect, Strings.AddWorkShift))
             {
-                ColonistWorkShifts.Add(new WorkShift {PawnThreshold = ColonistWorkShifts.Last().PawnThreshold});
+                ColonistWorkShifts.Add(new WorkShift { PawnThreshold = ColonistWorkShifts.Last().PawnThreshold });
             }
             buttonRect = new Rect(buttonRect.xMax + 10f, buttonRect.y, 150f, 35f);
             if (Widgets.ButtonText(buttonRect, Strings.DeleteWorkShift, active: ColonistWorkShifts.Count > 1))
@@ -209,7 +209,7 @@ namespace WorkManager
             var buttonRect = new Rect(buttonRowRect.x, buttonRowRect.y, 150f, 35f);
             if (Widgets.ButtonText(buttonRect, Strings.AddWorkShift))
             {
-                NightOwlWorkShifts.Add(new WorkShift {PawnThreshold = NightOwlWorkShifts.Last().PawnThreshold});
+                NightOwlWorkShifts.Add(new WorkShift { PawnThreshold = NightOwlWorkShifts.Last().PawnThreshold });
             }
             buttonRect = new Rect(buttonRect.xMax + 10f, buttonRect.y, 150f, 35f);
             if (Widgets.ButtonText(buttonRect, Strings.DeleteWorkShift, active: NightOwlWorkShifts.Count > 1))
@@ -279,8 +279,8 @@ namespace WorkManager
             TooltipHandler.TipRegion(optionRect, Strings.UpdateFrequencyTooltip);
             Widgets.DrawHighlightIfMouseover(optionRect);
             Widgets.Label(labelRect, Strings.UpdateFrequency);
-            ScheduleUpdateFrequency = (int) Widgets.HorizontalSlider(fieldRect.ContractedBy(4f),
-                ScheduleUpdateFrequency, 1f, 24f, true, ScheduleUpdateFrequency.ToString(), roundTo: 1);
+            ScheduleUpdateFrequency = (int)Widgets.HorizontalSlider(fieldRect.ContractedBy(4f), ScheduleUpdateFrequency,
+                1f, 24f, true, ScheduleUpdateFrequency.ToString(), roundTo: 1);
             listing.Gap(listing.verticalSpacing);
             listing.GapLine(listing.verticalSpacing);
             DoTimeAssignmentSelector(listing.GetRect(Text.LineHeight * 1.5f));
@@ -309,14 +309,23 @@ namespace WorkManager
                     SoundDefOf.Tick_High.PlayOneShotOnCamera();
                 }
                 GUI.color = Color.white;
-                if (Mouse.IsOver(buttonRect)) { Widgets.DrawHighlight(buttonRect); }
+                if (Mouse.IsOver(buttonRect))
+                {
+                    Widgets.DrawHighlight(buttonRect);
+                }
                 Text.Font = GameFont.Small;
                 Text.Anchor = TextAnchor.MiddleCenter;
                 GUI.color = Color.white;
                 Widgets.Label(buttonRect, def.LabelCap);
                 Text.Anchor = TextAnchor.UpperLeft;
-                if (TimeAssignmentSelector.selectedAssignment == def) { Widgets.DrawBox(buttonRect, 2); }
-                else { UIHighlighter.HighlightOpportunity(buttonRect, def.cachedHighlightNotSelectedTag); }
+                if (TimeAssignmentSelector.selectedAssignment == def)
+                {
+                    Widgets.DrawBox(buttonRect, 2);
+                }
+                else
+                {
+                    UIHighlighter.HighlightOpportunity(buttonRect, def.cachedHighlightNotSelectedTag);
+                }
                 selectorRect.x += buttonWidth;
             }
         }
@@ -367,10 +376,13 @@ namespace WorkManager
             GUI.color = Color.white;
             var thresholdRect = new Rect(timeAssignmentRect.xMax, rect.y, _pawnThresholdColumnWidth, rect.height)
                 .ContractedBy(4f);
-            if (number == 0) { Widgets.Label(thresholdRect, workShift.PawnThreshold.ToString("N0")); }
+            if (number == 0)
+            {
+                Widgets.Label(thresholdRect, workShift.PawnThreshold.ToString("N0"));
+            }
             else
             {
-                workShift.PawnThreshold = (int) Widgets.HorizontalSlider(thresholdRect, workShift.PawnThreshold,
+                workShift.PawnThreshold = (int)Widgets.HorizontalSlider(thresholdRect, workShift.PawnThreshold,
                     minThreshold, maxThreshold, true, workShift.PawnThreshold.ToString(), roundTo: 1);
             }
             Text.Anchor = TextAnchor.UpperLeft;
@@ -386,9 +398,18 @@ namespace WorkManager
 
         private static void InitializeSchedules()
         {
-            if (ScheduleUpdateFrequency == 0) { ScheduleUpdateFrequency = 2; }
-            if (ColonistWorkShifts == null) { ColonistWorkShifts = new List<WorkShift>(DefaultColonistWorkShifts); }
-            if (NightOwlWorkShifts == null) { NightOwlWorkShifts = new List<WorkShift>(DefaultNightOwlWorkShifts); }
+            if (ScheduleUpdateFrequency == 0)
+            {
+                ScheduleUpdateFrequency = 2;
+            }
+            if (ColonistWorkShifts == null)
+            {
+                ColonistWorkShifts = new List<WorkShift>(DefaultColonistWorkShifts);
+            }
+            if (NightOwlWorkShifts == null)
+            {
+                NightOwlWorkShifts = new List<WorkShift>(DefaultNightOwlWorkShifts);
+            }
         }
     }
 }

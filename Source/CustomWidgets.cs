@@ -2,7 +2,7 @@
 using UnityEngine;
 using Verse;
 
-namespace WorkManager
+namespace LordKuper.WorkManager
 {
     internal static class CustomWidgets
     {
@@ -11,7 +11,10 @@ namespace WorkManager
         {
             TooltipHandler.TipRegion(rect, property ? enabledTooltip : disabledTooltip);
             if (Widgets.ButtonImage(rect, property ? enabledTexture : disabledTexture, Color.white,
-                    GenUI.MouseoverColor)) { property = !property; }
+                    GenUI.MouseoverColor))
+            {
+                property = !property;
+            }
         }
 
         internal static void ButtonImageToggle(Func<bool> getter, Action<bool> setter, Rect rect, string enabledTooltip,
@@ -19,7 +22,10 @@ namespace WorkManager
         {
             TooltipHandler.TipRegion(rect, getter() ? enabledTooltip : disabledTooltip);
             if (Widgets.ButtonImage(rect, getter() ? enabledTexture : disabledTexture, Color.white,
-                    GenUI.MouseoverColor)) { setter(!getter()); }
+                    GenUI.MouseoverColor))
+            {
+                setter(!getter());
+            }
         }
     }
 }

@@ -2,7 +2,7 @@
 using JetBrains.Annotations;
 using RimWorld;
 
-namespace WorkManager.DefOfs
+namespace LordKuper.WorkManager.DefOfs
 {
     [DefOf]
     [UsedImplicitly]

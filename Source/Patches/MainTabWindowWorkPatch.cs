@@ -4,7 +4,7 @@ using RimWorld;
 using UnityEngine;
 using Verse;
 
-namespace WorkManager.Patches
+namespace LordKuper.WorkManager.Patches
 {
     [HarmonyPatch(typeof(MainTabWindow_Work), nameof(MainTabWindow_Work.DoWindowContents))]
     [UsedImplicitly]

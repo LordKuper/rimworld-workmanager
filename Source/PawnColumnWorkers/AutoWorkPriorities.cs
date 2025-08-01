@@ -3,14 +3,17 @@ using RimWorld;
 using UnityEngine;
 using Verse;
 
-namespace WorkManager.PawnColumnWorkers
+namespace LordKuper.WorkManager.PawnColumnWorkers
 {
     [UsedImplicitly]
     public class AutoWorkPriorities : PawnColumnWorker
     {
         public override void DoCell(Rect rect, Pawn pawn, PawnTable table)
         {
-            if (pawn.Dead || pawn.workSettings == null || !pawn.workSettings.EverWork) { return; }
+            if (pawn.Dead || pawn.workSettings == null || !pawn.workSettings.EverWork)
+            {
+                return;
+            }
             var component = Current.Game.GetComponent<WorkManagerGameComponent>();
             if (component.PriorityManagementEnabled)
             {

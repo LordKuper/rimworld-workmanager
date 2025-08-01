@@ -1,21 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using UnityEngine;
 using Verse;
-using Strings = WorkManager.Resources.Strings.Settings;
+using Strings = LordKuper.WorkManager.Resources.Strings.Settings;
 
-namespace WorkManager
+namespace LordKuper.WorkManager.Settings
 {
     public partial class Settings : ModSettings
     {
         private static SettingsTabs _currentTab;
         private static Vector2 _scrollPosition;
-        internal static MethodInfo GetPriorityMethod;
         public static bool Initialized;
-        internal static MethodInfo IsBadWorkMethod;
         internal static int MaxPriority = 4;
-        internal static MethodInfo SetPriorityMethod;
         private static readonly List<TabRecord> Tabs = new List<TabRecord>();
 
         private static void DoIntegerSlider(Listing listing, ref int value, int minValue, int maxValue, string label,
@@ -29,7 +25,7 @@ namespace WorkManager
             TooltipHandler.TipRegion(optionRect, tooltip);
             Widgets.DrawHighlightIfMouseover(optionRect);
             Widgets.Label(labelRect, label);
-            value = (int) Widgets.HorizontalSlider(fieldRect.ContractedBy(4f), value, minValue, maxValue, true,
+            value = (int)Widgets.HorizontalSlider(fieldRect.ContractedBy(4f), value, minValue, maxValue, true,
                 value.ToString(), roundTo: 1);
             listing.Gap(listing.verticalSpacing);
         }
@@ -52,7 +48,10 @@ namespace WorkManager
 
         public static void DoWindowContents(Rect rect)
         {
-            if (!Initialized) { Initialize(); }
+            if (!Initialized)
+            {
+                Initialize();
+            }
             var tabDrawerRect = rect;
             tabDrawerRect.yMin += 32f;
             TabDrawer.DrawTabs(tabDrawerRect, Tabs, 500f);
@@ -69,9 +68,6 @@ namespace WorkManager
                 case SettingsTabs.Schedule:
                     DoScheduleTab(activeTabRect);
                     break;
-                case SettingsTabs.Misc:
-                    DoMiscTab(activeTabRect);
-                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -81,14 +77,16 @@ namespace WorkManager
         {
             base.ExposeData();
             ExposeWorkPrioritiesData();
-            ExposeMiscData();
             ExposeWorkTypesData();
             ExposeSchedulesData();
         }
 
         public static void Initialize()
         {
-            if (Initialized) { return; }
+            if (Initialized)
+            {
+                return;
+            }
             InitializeTabs();
             InitializeWorkPriorities();
             InitializeWorkTypes();
@@ -98,7 +96,7 @@ namespace WorkManager
 
         private static void InitializeTabs()
         {
-            Tabs.Add(new TabRecord(Strings.Priorities.Title, () =>
+            Tabs.Add(new TabRecord(Strings.WorkPriorities.Title, () =>
             {
                 _currentTab = SettingsTabs.Priorities;
                 _scrollPosition.Set(0, 0);
@@ -113,11 +111,6 @@ namespace WorkManager
                 _currentTab = SettingsTabs.Schedule;
                 _scrollPosition.Set(0, 0);
             }, () => _currentTab == SettingsTabs.Schedule));
-            Tabs.Add(new TabRecord(Strings.Misc.Title, () =>
-            {
-                _currentTab = SettingsTabs.Misc;
-                _scrollPosition.Set(0, 0);
-            }, () => _currentTab == SettingsTabs.Misc));
         }
     }
 }

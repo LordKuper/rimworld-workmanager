@@ -1,13 +1,33 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using HarmonyLib;
 using JetBrains.Annotations;
 using RimWorld;
 using UnityEngine;
 using Verse;
 
-namespace WorkManager.Patches
+namespace LordKuper.WorkManager.Patches
 {
     public static class WorkTabPatch
     {
+        internal static void Apply(Harmony harmony)
+        {
+            harmony.Patch(
+                AccessTools.Method(AccessTools.TypeByName("WorkTab.MainTabWindow_WorkTab"), "DoWindowContents"),
+                postfix: new HarmonyMethod(typeof(WorkTabPatch), nameof(DoWindowContentsPostfix)));
+            harmony.Patch(
+                AccessTools.Method(AccessTools.TypeByName("WorkTab.PawnColumnWorker_WorkType"), "GetMinHeaderHeight"),
+                postfix: new HarmonyMethod(typeof(WorkTabPatch), nameof(GetMinHeaderHeightPostfix)));
+            harmony.Patch(AccessTools.Method(AccessTools.TypeByName("WorkTab.PawnColumnWorker_WorkType"), "DoHeader"),
+                new HarmonyMethod(typeof(WorkTabPatch), nameof(DoHeaderPrefix)));
+            harmony.Patch(
+                AccessTools.Method(AccessTools.TypeByName("WorkTab.PawnColumnWorker_WorkType"),
+                    "HandleInteractionsDetailed"),
+                new HarmonyMethod(typeof(WorkTabPatch), nameof(HandleInteractionsDetailedPrefix)));
+            harmony.Patch(
+                AccessTools.Method(AccessTools.TypeByName("WorkTab.PawnColumnWorker_WorkType"), "DrawWorkTypeBoxFor"),
+                postfix: new HarmonyMethod(typeof(WorkTabPatch), nameof(DrawWorkTypeBoxForPostfix)));
+        }
+
         [UsedImplicitly]
         [SuppressMessage("ReSharper", "InconsistentNaming")]
         [SuppressMessage("ReSharper", "PossibleLossOfFraction")]
@@ -47,7 +67,10 @@ namespace WorkManager.Patches
         public static void DrawWorkTypeBoxForPostfix(Rect box, Pawn pawn, WorkTypeDef worktype)
         {
             var component = Current.Game.GetComponent<WorkManagerGameComponent>();
-            if (!component.PriorityManagementEnabled || !Find.PlaySettings.useWorkPriorities) { return; }
+            if (!component.PriorityManagementEnabled || !Find.PlaySettings.useWorkPriorities)
+            {
+                return;
+            }
             var enabled = component.GetPawnWorkTypeEnabled(pawn, worktype);
             if (!enabled)
             {
@@ -72,7 +95,10 @@ namespace WorkManager.Patches
         public static void HandleInteractionsDetailedPrefix(PawnColumnWorker __instance, Rect rect, Pawn pawn)
         {
             var component = Current.Game.GetComponent<WorkManagerGameComponent>();
-            if (!component.PriorityManagementEnabled || !Find.PlaySettings.useWorkPriorities) { return; }
+            if (!component.PriorityManagementEnabled || !Find.PlaySettings.useWorkPriorities)
+            {
+                return;
+            }
             var workType = __instance.def.workType;
             var enabled = component.GetPawnWorkTypeEnabled(pawn, workType);
             if (Event.current.type == EventType.MouseDown && Mouse.IsOver(rect) && Event.current.button == 2)

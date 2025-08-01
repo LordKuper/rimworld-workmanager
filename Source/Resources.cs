@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Verse;
 
-namespace WorkManager
+namespace LordKuper.WorkManager
 {
     internal static class Resources
     {
@@ -9,6 +9,7 @@ namespace WorkManager
         {
             internal static readonly string GlobalDisableTooltip = "WorkManager.GlobalDisableTooltip".Translate();
             internal static readonly string GlobalEnableTooltip = "WorkManager.GlobalEnableTooltip".Translate();
+            internal static readonly string ModTitle = "WorkManager".Translate();
             internal static readonly string PawnDisableTooltip = "WorkManager.PawnDisableTooltip".Translate();
             internal static readonly string PawnEnableTooltip = "WorkManager.PawnEnableTooltip".Translate();
 
@@ -18,24 +19,65 @@ namespace WorkManager
             internal static readonly string PawnScheduleEnableTooltip =
                 "WorkManager.PawnScheduleEnableTooltip".Translate();
 
-            internal static readonly string WorkManager = "WorkManager".Translate();
             internal static readonly string WorkTypeDisableTooltip = "WorkManager.WorkTypeDisableTooltip".Translate();
             internal static readonly string WorkTypeEnableTooltip = "WorkManager.WorkTypeEnableTooltip".Translate();
 
             internal static class Settings
             {
-                internal static class Misc
+                internal static class Schedule
                 {
-                    internal static readonly string Title = "WorkManager.Settings_Misc_Title".Translate();
+                    internal static readonly string AddWorkShift =
+                        "WorkManager.Settings_Schedule_AddWorkShift".Translate();
 
-                    internal static readonly string VerboseLogging =
-                        "WorkManager.Settings_Misc_VerboseLogging".Translate();
+                    internal static readonly string ColonistWorkShifts =
+                        "WorkManager.Settings_Schedule_ColonistWorkShifts".Translate();
 
-                    internal static readonly string VerboseLoggingTooltip =
-                        "WorkManager.Settings_Misc_VerboseLoggingTooltip".Translate();
+                    internal static readonly string ColonistWorkShiftsTooltip =
+                        "WorkManager.Settings_Schedule_ColonistWorkShiftsTooltip".Translate();
+
+                    internal static readonly string DeleteWorkShift =
+                        "WorkManager.Settings_Schedule_DeleteWorkShift".Translate();
+
+                    internal static readonly string ManageWorkSchedule =
+                        "WorkManager.Settings_Schedule_ManageWorkSchedule".Translate();
+
+                    internal static readonly string ManageWorkScheduleTooltip =
+                        "WorkManager.Settings_Schedule_ManageWorkScheduleTooltip".Translate();
+
+                    internal static readonly string NightOwlWorkShifts =
+                        "WorkManager.Settings_Schedule_NightOwlWorkShifts".Translate();
+
+                    internal static readonly string NightOwlWorkShiftsTooltip =
+                        "WorkManager.Settings_Schedule_NightOwlWorkShiftsTooltip".Translate();
+
+                    internal static readonly string ResetWorkShifts =
+                        "WorkManager.Settings_Schedule_ResetWorkShifts".Translate();
+
+                    internal static readonly string Title = "WorkManager.Settings_Schedule_Title".Translate();
+
+                    internal static readonly string UpdateFrequency =
+                        "WorkManager.Settings_Schedule_UpdateFrequency".Translate();
+
+                    internal static readonly string UpdateFrequencyTooltip =
+                        "WorkManager.Settings_Schedule_UpdateFrequencyTooltip".Translate();
+
+                    internal static readonly string WorkShiftColumnHeader =
+                        "WorkManager.Settings_Schedule_WorkShiftColumnHeader".Translate();
+
+                    internal static readonly string WorkShiftColumnHeaderTooltip =
+                        "WorkManager.Settings_Schedule_WorkShiftColumnHeaderTooltip".Translate();
+
+                    internal static readonly string WorkShiftNumberColumnHeader =
+                        "WorkManager.Settings_Schedule_WorkShiftNumberColumnHeader".Translate();
+
+                    internal static readonly string WorkShiftThresholdColumnHeader =
+                        "WorkManager.Settings_Schedule_WorkShiftThresholdColumnHeader".Translate();
+
+                    internal static readonly string WorkShiftThresholdColumnHeaderTooltip =
+                        "WorkManager.Settings_Schedule_WorkShiftThresholdColumnHeaderTooltip".Translate();
                 }
 
-                internal static class Priorities
+                internal static class WorkPriorities
                 {
                     internal static readonly string AllowMeleeHunters =
                         "WorkManager.Settings_Priorities_AllowMeleeHunters".Translate();
@@ -202,59 +244,6 @@ namespace WorkManager
                         "WorkManager.Settings_Priorities_UsePawnLearningRateThresholdsTooltip".Translate();
                 }
 
-                internal static class Schedule
-                {
-                    internal static readonly string AddWorkShift =
-                        "WorkManager.Settings_Schedule_AddWorkShift".Translate();
-
-                    internal static readonly string ColonistWorkShifts =
-                        "WorkManager.Settings_Schedule_ColonistWorkShifts".Translate();
-
-                    internal static readonly string ColonistWorkShiftsTooltip =
-                        "WorkManager.Settings_Schedule_ColonistWorkShiftsTooltip".Translate();
-
-                    internal static readonly string DeleteWorkShift =
-                        "WorkManager.Settings_Schedule_DeleteWorkShift".Translate();
-
-                    internal static readonly string ManageWorkSchedule =
-                        "WorkManager.Settings_Schedule_ManageWorkSchedule".Translate();
-
-                    internal static readonly string ManageWorkScheduleTooltip =
-                        "WorkManager.Settings_Schedule_ManageWorkScheduleTooltip".Translate();
-
-                    internal static readonly string NightOwlWorkShifts =
-                        "WorkManager.Settings_Schedule_NightOwlWorkShifts".Translate();
-
-                    internal static readonly string NightOwlWorkShiftsTooltip =
-                        "WorkManager.Settings_Schedule_NightOwlWorkShiftsTooltip".Translate();
-
-                    internal static readonly string ResetWorkShifts =
-                        "WorkManager.Settings_Schedule_ResetWorkShifts".Translate();
-
-                    internal static readonly string Title = "WorkManager.Settings_Schedule_Title".Translate();
-
-                    internal static readonly string UpdateFrequency =
-                        "WorkManager.Settings_Schedule_UpdateFrequency".Translate();
-
-                    internal static readonly string UpdateFrequencyTooltip =
-                        "WorkManager.Settings_Schedule_UpdateFrequencyTooltip".Translate();
-
-                    internal static readonly string WorkShiftColumnHeader =
-                        "WorkManager.Settings_Schedule_WorkShiftColumnHeader".Translate();
-
-                    internal static readonly string WorkShiftColumnHeaderTooltip =
-                        "WorkManager.Settings_Schedule_WorkShiftColumnHeaderTooltip".Translate();
-
-                    internal static readonly string WorkShiftNumberColumnHeader =
-                        "WorkManager.Settings_Schedule_WorkShiftNumberColumnHeader".Translate();
-
-                    internal static readonly string WorkShiftThresholdColumnHeader =
-                        "WorkManager.Settings_Schedule_WorkShiftThresholdColumnHeader".Translate();
-
-                    internal static readonly string WorkShiftThresholdColumnHeaderTooltip =
-                        "WorkManager.Settings_Schedule_WorkShiftThresholdColumnHeaderTooltip".Translate();
-                }
-
                 internal static class WorkTypes
                 {
                     internal static readonly string AddWorkType =
@@ -271,6 +260,9 @@ namespace WorkManager
 
                     internal static readonly string AssignEveryoneWorkTypesTooltip =
                         "WorkManager.Settings_WorkTypes_AssignEveryoneWorkTypesTooltip".Translate();
+
+                    internal static readonly string DefaultWorkTypeName =
+                        "WorkManager.Settings_WorkTypes_DefaultWorkTypeName".Translate();
 
                     internal static readonly string DeleteWorkType =
                         "WorkManager.Settings_WorkTypes_DeleteWorkType".Translate();
@@ -289,6 +281,9 @@ namespace WorkManager
 
                     internal static readonly string ResetWorkTypes =
                         "WorkManager.Settings_WorkTypes_ResetWorkTypes".Translate();
+
+                    internal static readonly string SelectWorkType =
+                        "WorkManager.Settings_WorkTypes_SelectWorkType".Translate();
 
                     internal static readonly string Title = "WorkManager.Settings_WorkTypes_Title".Translate();
 

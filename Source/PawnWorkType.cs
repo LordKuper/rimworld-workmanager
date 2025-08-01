@@ -1,6 +1,6 @@
 ﻿using Verse;
 
-namespace WorkManager
+namespace LordKuper.WorkManager
 {
     public class PawnWorkType : IExposable
     {

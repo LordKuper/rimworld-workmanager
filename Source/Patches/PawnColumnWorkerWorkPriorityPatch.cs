@@ -5,7 +5,7 @@ using RimWorld;
 using UnityEngine;
 using Verse;
 
-namespace WorkManager.Patches
+namespace LordKuper.WorkManager.Patches
 {
     [HarmonyPatch(typeof(PawnColumnWorker_WorkPriority))]
     [UsedImplicitly]

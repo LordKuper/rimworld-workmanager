@@ -1,10 +1,10 @@
 ﻿using System;
 using HarmonyLib;
 using JetBrains.Annotations;
+using LordKuper.WorkManager.DefOfs;
 using RimWorld;
-using WorkManager.DefOfs;
 
-namespace WorkManager.Patches
+namespace LordKuper.WorkManager.Patches
 {
     [HarmonyPatch(typeof(DefGenerator), nameof(DefGenerator.GenerateImpliedDefs_PreResolve))]
     [HarmonyBefore("fluffy.worktab")]

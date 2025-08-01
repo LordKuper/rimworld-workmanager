@@ -1,19 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
+using LordKuper.Common;
+using LordKuper.WorkManager.Compatibility;
+using LordKuper.WorkManager.Helpers;
 using RimWorld;
 using Verse;
+using Enumerable = System.Linq.Enumerable;
 
-namespace WorkManager
+namespace LordKuper.WorkManager
 {
     internal class PawnCache
     {
         private readonly Dictionary<WorkTypeDef, bool> _managedWorkTypes = new Dictionary<WorkTypeDef, bool>();
         private readonly Dictionary<SkillDef, float> _skillLearningRates = new Dictionary<SkillDef, float>();
-        private readonly RimworldTime _updateTime = new RimworldTime(-1, -1, -1);
         private readonly Dictionary<WorkTypeDef, float> _workSkillLearningRates = new Dictionary<WorkTypeDef, float>();
         private readonly Dictionary<WorkTypeDef, int> _workSkillLevels = new Dictionary<WorkTypeDef, int>();
+        private RimWorldTime _updateTime = new RimWorldTime(0);
 
         public PawnCache(Pawn pawn)
         {
@@ -22,7 +25,7 @@ namespace WorkManager
 
         private Dictionary<WorkTypeDef, bool> BadWorkTypes { get; } = new Dictionary<WorkTypeDef, bool>();
         private Dictionary<WorkTypeDef, bool> DisabledWorkTypes { get; } = new Dictionary<WorkTypeDef, bool>();
-        public RimworldTime IdleSince { get; set; }
+        public RimWorldTime? IdleSince { get; set; }
         public bool IsCapable { get; private set; }
         private bool IsForeigner { get; set; }
         public bool IsManaged { get; private set; }
@@ -34,16 +37,26 @@ namespace WorkManager
 
         public Passion GetPassion([NotNull] WorkTypeDef workType)
         {
-            if (workType == null) { throw new ArgumentNullException(nameof(workType)); }
+            if (workType == null)
+            {
+                throw new ArgumentNullException(nameof(workType));
+            }
             return !workType.relevantSkills.Any()
                 ? Passion.None
-                : workType.relevantSkills.Max(skill => Pawn.skills.GetSkill(skill)?.passion ?? Passion.None);
+                : Enumerable.Max(workType.relevantSkills,
+                    skill => Pawn.skills.GetSkill(skill)?.passion ?? Passion.None);
         }
 
         private float GetSkillLearningRate([NotNull] SkillDef skill)
         {
-            if (skill == null) { throw new ArgumentNullException(nameof(skill)); }
-            if (_skillLearningRates.ContainsKey(skill)) { return _skillLearningRates[skill]; }
+            if (skill == null)
+            {
+                throw new ArgumentNullException(nameof(skill));
+            }
+            if (_skillLearningRates.TryGetValue(skill, out var rate))
+            {
+                return rate;
+            }
             var value = Pawn.skills.GetSkill(skill).LearnRateFactor();
             _skillLearningRates.Add(skill, value);
             return value;
@@ -51,10 +64,16 @@ namespace WorkManager
 
         private float GetWorkSkillLearningRate([NotNull] WorkTypeDef workType)
         {
-            if (workType == null) { throw new ArgumentNullException(nameof(workType)); }
-            if (_workSkillLearningRates.ContainsKey(workType)) { return _workSkillLearningRates[workType]; }
+            if (workType == null)
+            {
+                throw new ArgumentNullException(nameof(workType));
+            }
+            if (_workSkillLearningRates.TryGetValue(workType, out var rate))
+            {
+                return rate;
+            }
             var value = workType.relevantSkills.Any()
-                ? workType.relevantSkills.Select(GetSkillLearningRate).Average()
+                ? Enumerable.Average(Enumerable.Select(workType.relevantSkills, GetSkillLearningRate))
                 : 0;
             _workSkillLearningRates.Add(workType, value);
             return value;
@@ -62,46 +81,65 @@ namespace WorkManager
 
         public int GetWorkSkillLevel([NotNull] WorkTypeDef workType)
         {
-            if (workType == null) { throw new ArgumentNullException(nameof(workType)); }
-            if (_workSkillLevels.ContainsKey(workType)) { return _workSkillLevels[workType]; }
+            if (workType == null)
+            {
+                throw new ArgumentNullException(nameof(workType));
+            }
+            if (_workSkillLevels.TryGetValue(workType, out var level))
+            {
+                return level;
+            }
             var value = workType.relevantSkills.Any()
-                ? (int) Math.Floor(workType.relevantSkills.Select(skill => Pawn.skills.GetSkill(skill).Level).Average())
+                ? (int)Math.Floor(Enumerable.Average(Enumerable.Select(workType.relevantSkills,
+                    skill => Pawn.skills.GetSkill(skill).Level)))
                 : 0;
             _workSkillLevels.Add(workType, value);
             return value;
         }
 
-        internal static int GetWorkTypePriority(Pawn pawn, WorkTypeDef workType)
-        {
-            return Settings.GetPriorityMethod == null
-                ? pawn.workSettings.GetPriority(workType)
-                : (int) Settings.GetPriorityMethod.Invoke(null, new object[] {pawn, workType, -1});
-        }
-
         public bool IsActiveWork([NotNull] WorkTypeDef workType)
         {
-            if (workType == null) { throw new ArgumentNullException(nameof(workType)); }
+            if (workType == null)
+            {
+                throw new ArgumentNullException(nameof(workType));
+            }
             return WorkPriorities[workType] > 0;
         }
 
         public bool IsBadWork([NotNull] WorkTypeDef workType)
         {
-            if (workType == null) { throw new ArgumentNullException(nameof(workType)); }
-            if (Settings.IsBadWorkMethod == null) { return false; }
-            if (BadWorkTypes.ContainsKey(workType)) { return BadWorkTypes[workType]; }
-            var value = (bool) Settings.IsBadWorkMethod.Invoke(null, new object[] {Pawn, workType});
+            if (workType == null)
+            {
+                throw new ArgumentNullException(nameof(workType));
+            }
+            if (!Compatibility.Compatibility.MoreThanCapableActive)
+            {
+                return false;
+            }
+            if (BadWorkTypes.TryGetValue(workType, out var work))
+            {
+                return work;
+            }
+            var value = MoreThanCapable.IsBadWork(Pawn, workType);
             BadWorkTypes.Add(workType, value);
             return value;
         }
 
         public bool IsDisabledWork([NotNull] WorkTypeDef workType)
         {
-            if (workType == null) { throw new ArgumentNullException(nameof(workType)); }
-            if (DisabledWorkTypes.ContainsKey(workType)) { return DisabledWorkTypes[workType]; }
+            if (workType == null)
+            {
+                throw new ArgumentNullException(nameof(workType));
+            }
+            if (DisabledWorkTypes.TryGetValue(workType, out var work))
+            {
+                return work;
+            }
             var value = Pawn.WorkTypeIsDisabled(workType) ||
-                        IsForeigner &&
-                        Settings.DisabledWorkTypesForForeigners.Any(dwt => dwt.WorkTypeDef == workType) || IsSlave &&
-                        Settings.DisabledWorkTypesForSlaves.Any(dwt => dwt.WorkTypeDef == workType);
+                        (IsForeigner &&
+                         Settings.Settings.DisabledWorkTypesForForeigners.Any(dwt => dwt.WorkTypeDef == workType)) ||
+                        (IsSlave && Settings.Settings.DisabledWorkTypesForSlaves.Any(dwt =>
+                            dwt.WorkTypeDef == workType));
             DisabledWorkTypes.Add(workType, value);
             return value;
         }
@@ -109,88 +147,103 @@ namespace WorkManager
         public bool IsHunter()
         {
             return !IsDisabledWork(WorkTypeDefOf.Hunting) && !IsBadWork(WorkTypeDefOf.Hunting) &&
-                   (Settings.AllowMeleeHunters || !Pawn.story.traits.HasTrait(TraitDefOf.Brawler)) &&
-                   (Settings.AllowMeleeHunters ||
-                    Pawn.equipment.Primary != null && !Pawn.equipment.Primary.def.IsMeleeWeapon);
+                   (Settings.Settings.AllowMeleeHunters || !Pawn.story.traits.HasTrait(TraitDefOf.Brawler)) &&
+                   (Settings.Settings.AllowMeleeHunters ||
+                    (Pawn.equipment.Primary != null && !Pawn.equipment.Primary.def.IsMeleeWeapon));
         }
 
         public bool IsLearningRateAboveThreshold([NotNull] WorkTypeDef workType, bool majorThreshold)
         {
-            if (workType == null) { throw new ArgumentNullException(nameof(workType)); }
-            var threshold = majorThreshold ? Settings.MajorLearningRateThreshold : Settings.MinorLearningRateThreshold;
+            if (workType == null)
+            {
+                throw new ArgumentNullException(nameof(workType));
+            }
+            var threshold = majorThreshold
+                ? Settings.Settings.MajorLearningRateThreshold
+                : Settings.Settings.MinorLearningRateThreshold;
             var learnRate = GetWorkSkillLearningRate(workType);
-            if (!Settings.UsePawnLearningRateThresholds) { return learnRate >= threshold; }
-            var minLearningRate = _skillLearningRates.Values.Min();
-            var maxLearningRate = _skillLearningRates.Values.Max();
+            if (!Settings.Settings.UsePawnLearningRateThresholds)
+            {
+                return learnRate >= threshold;
+            }
+            var minLearningRate = Enumerable.Min(_skillLearningRates.Values);
+            var maxLearningRate = Enumerable.Max(_skillLearningRates.Values);
             var learningRateRange = maxLearningRate - minLearningRate;
-            if (learningRateRange < 0.01) { return false; }
+            if (learningRateRange < 0.01)
+            {
+                return false;
+            }
             return learnRate >= minLearningRate + learningRateRange * threshold;
         }
 
         public bool IsManagedWork([NotNull] WorkTypeDef workType)
         {
-            if (workType == null) { throw new ArgumentNullException(nameof(workType)); }
-            if (_managedWorkTypes.ContainsKey(workType)) { return _managedWorkTypes[workType]; }
+            if (workType == null)
+            {
+                throw new ArgumentNullException(nameof(workType));
+            }
+            if (_managedWorkTypes.TryGetValue(workType, out var work))
+            {
+                return work;
+            }
             var value = IsManaged && WorkManager.GetWorkTypeEnabled(workType) &&
                         WorkManager.GetPawnWorkTypeEnabled(Pawn, workType);
             _managedWorkTypes.Add(workType, value);
             return value;
         }
 
-        public void Update(RimworldTime time)
+        public void Update(RimWorldTime time)
         {
             var hoursPassed = (time.Year - _updateTime.Year) * 60 * 24 + (time.Day - _updateTime.Day) * 24 + time.Hour -
                               _updateTime.Hour;
-            _updateTime.Year = time.Year;
-            _updateTime.Day = time.Day;
-            _updateTime.Hour = time.Hour;
-            IsCapable = Settings.UncontrollablePawnsUnfitForWork
+            _updateTime = time;
+            IsCapable = Settings.Settings.UncontrollablePawnsUnfitForWork
                 ? !Pawn.Dead && !Pawn.Downed && !Pawn.InMentalState && !Pawn.InContainerEnclosed
                 : !Pawn.Dead;
-            IsRecovering = IsCapable && Settings.RecoveringPawnsUnfitForWork &&
+            IsRecovering = IsCapable && Settings.Settings.RecoveringPawnsUnfitForWork &&
                            HealthAIUtility.ShouldSeekMedicalRest(Pawn);
             IsManaged = WorkManager.GetPawnEnabled(Pawn);
             IsForeigner = Pawn.Faction != Faction.OfPlayer || Pawn.HasExtraMiniFaction() || Pawn.HasExtraHomeFaction();
-            if (IsForeigner && Prefs.DevMode && Settings.VerboseLogging)
+#if DEBUG
+            if (IsForeigner)
             {
-                Log.Message(
-                    $"----- Work Manager: {Pawn.LabelShort} is Foreigner {(Pawn.Faction != Faction.OfPlayer ? "(Non-player)" : "")}{(Pawn.HasExtraMiniFaction() ? "(Extra Mini)" : "")}{(Pawn.HasExtraHomeFaction() ? "(Extra Home)" : "")} -----");
+                Logger.LogMessage(
+                    $"{Pawn.LabelShort} is Foreigner {(Pawn.Faction != Faction.OfPlayer ? "(Non-player)" : "")}{(Pawn.HasExtraMiniFaction() ? "(Extra Mini)" : "")}{(Pawn.HasExtraHomeFaction() ? "(Extra Home)" : "")}");
             }
+#endif
             IsSlave = ModsConfig.IdeologyActive && Pawn.IsSlaveOfColony;
             WorkPriorities.Clear();
             _managedWorkTypes.Clear();
-            var workTypes = DefDatabase<WorkTypeDef>.AllDefsListForReading.Where(w => w.visible);
+            var workTypes = Enumerable.Where(DefDatabase<WorkTypeDef>.AllDefsListForReading, w => w.visible);
             foreach (var workType in workTypes)
             {
-                WorkPriorities.Add(workType, IsManagedWork(workType) ? 0 : GetWorkTypePriority(Pawn, workType));
+                WorkPriorities.Add(workType,
+                    IsManagedWork(workType) ? 0 : WorkTypePriorityHelper.GetPriority(Pawn, workType));
             }
             if (!IsCapable)
             {
-                if (Prefs.DevMode && Settings.VerboseLogging)
-                {
-                    Log.Message(
-                        $"----- Work Manager: NOT Updating work type cache for {(!IsCapable ? "[!C]" : "")}{Pawn.LabelShort} (hours passed = {hoursPassed:N1})... -----");
-                }
+#if DEBUG
+                Logger.LogMessage(
+                    $"NOT Updating work type cache for {(!IsCapable ? "[!C]" : "")}{Pawn.LabelShort} (hours passed = {hoursPassed:N1}).");
+#endif
                 return;
             }
             if (hoursPassed >= 24)
             {
-                if (Prefs.DevMode && Settings.VerboseLogging)
-                {
-                    Log.Message(
-                        $"----- Work Manager: Updating work type cache for {(IsForeigner ? "[F]" : "")}{(IsSlave ? "[S]" : "")}{Pawn.LabelShort} (hours passed = {hoursPassed:N1})... -----");
-                }
+#if DEBUG
+                Logger.LogMessage(
+                    $"Updating work type cache for {(IsForeigner ? "[F]" : "")}{(IsSlave ? "[S]" : "")}{Pawn.LabelShort} (hours passed = {hoursPassed:N1})...");
+#endif
                 DisabledWorkTypes.Clear();
                 BadWorkTypes.Clear();
             }
             if (hoursPassed >= 6)
             {
-                if (Prefs.DevMode && Settings.VerboseLogging)
-                {
-                    Log.Message(
-                        $"----- Work Manager: Updating skill cache for {(IsForeigner ? "[F]" : "")}{(IsSlave ? "[S]" : "")}{Pawn.LabelShort} (hours passed = {hoursPassed:N1})... -----");
-                }
-                if (Settings.UsePawnLearningRateThresholds)
+#if DEBUG
+                Logger.LogMessage(
+                    $"Updating skill cache for {(IsForeigner ? "[F]" : "")}{(IsSlave ? "[S]" : "")}{Pawn.LabelShort} (hours passed = {hoursPassed:N1})...");
+#endif
+                if (Settings.Settings.UsePawnLearningRateThresholds)
                 {
                     _skillLearningRates.Clear();
                     foreach (var skill in DefDatabase<SkillDef>.AllDefsListForReading)

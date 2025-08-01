@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<Defs>
+	<PawnColumnDef>
+		<defName>AutoWorkPriorities</defName>
+		<workerClass>LordKuper.WorkManager.PawnColumnWorkers.AutoWorkPriorities</workerClass>
+	</PawnColumnDef>
+	<PawnColumnDef>
+		<defName>AutoWorkSchedule</defName>
+		<workerClass>LordKuper.WorkManager.PawnColumnWorkers.AutoWorkSchedule</workerClass>
+	</PawnColumnDef>
+</Defs>
