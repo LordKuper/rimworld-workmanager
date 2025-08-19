@@ -1,116 +1,128 @@
 ﻿using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
+using LordKuper.Common.UI;
 using UnityEngine;
 using Verse;
 using Strings = LordKuper.WorkManager.Resources.Strings.Settings;
 
-namespace LordKuper.WorkManager.Settings
+namespace LordKuper.WorkManager;
+
+/// <summary>
+///     Represents the mod settings for the Work Manager.
+/// </summary>
+[UsedImplicitly]
+public partial class Settings : ModSettings
 {
-    public partial class Settings : ModSettings
+    /// <summary>
+    ///     The list of tab records for the settings window.
+    /// </summary>
+    private readonly List<TabRecord> _tabs = [];
+
+    /// <summary>
+    ///     The currently active tab in the settings window.
+    /// </summary>
+    private SettingsTabs _currentTab;
+
+    /// <summary>
+    ///     Indicates whether the settings have been initialized.
+    /// </summary>
+    private bool _isInitialized;
+
+    /// <summary>
+    ///     The scroll position for the settings window.
+    /// </summary>
+    private Vector2 _scrollPosition;
+
+    /// <summary>
+    ///     Draws the contents of the specified tab in the settings window.
+    /// </summary>
+    /// <param name="rect">The rectangle area to draw the tab contents.</param>
+    /// <param name="tab">The tab to display.</param>
+    private void DoTab(Rect rect, SettingsTabs tab)
     {
-        private static SettingsTabs _currentTab;
-        private static Vector2 _scrollPosition;
-        public static bool Initialized;
-        internal static int MaxPriority = 4;
-        private static readonly List<TabRecord> Tabs = new List<TabRecord>();
-
-        private static void DoIntegerSlider(Listing listing, ref int value, int minValue, int maxValue, string label,
-            string tooltip)
+        switch (tab)
         {
-            var optionRect = listing.GetRect(Text.LineHeight * 1.5f);
-            var fieldRect = optionRect;
-            var labelRect = optionRect;
-            fieldRect.xMin = optionRect.xMax - optionRect.width * (1 / 2f);
-            labelRect.xMax = fieldRect.xMin;
-            TooltipHandler.TipRegion(optionRect, tooltip);
-            Widgets.DrawHighlightIfMouseover(optionRect);
-            Widgets.Label(labelRect, label);
-            value = (int)Widgets.HorizontalSlider(fieldRect.ContractedBy(4f), value, minValue, maxValue, true,
-                value.ToString(), roundTo: 1);
-            listing.Gap(listing.verticalSpacing);
+            case SettingsTabs.WorkPriorities:
+                DoWorkPrioritiesTab(rect);
+                break;
+            case SettingsTabs.WorkTypes:
+                DoWorkTypesTab(rect);
+                break;
+            case SettingsTabs.Schedule:
+                DoScheduleTab(rect);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(tab));
         }
+    }
 
-        private static void DoPercentSlider(Listing listing, ref float value, float minValue, float maxValue,
-            string label, string tooltip)
-        {
-            var optionRect = listing.GetRect(Text.LineHeight * 1.5f);
-            var fieldRect = optionRect;
-            var labelRect = optionRect;
-            fieldRect.xMin = optionRect.xMax - optionRect.width * (1 / 2f);
-            labelRect.xMax = fieldRect.xMin;
-            TooltipHandler.TipRegion(optionRect, tooltip);
-            Widgets.DrawHighlightIfMouseover(optionRect);
-            Widgets.Label(labelRect, label);
-            value = Widgets.HorizontalSlider(fieldRect.ContractedBy(4f), value, minValue, maxValue, true,
-                value.ToStringPercent());
-            listing.Gap(listing.verticalSpacing);
-        }
+    /// <summary>
+    ///     Draws the window contents for the settings, including tabs and their contents.
+    /// </summary>
+    /// <param name="rect">The rectangle area to draw the window contents.</param>
+    internal void DoWindowContents(Rect rect)
+    {
+        Initialize();
+        var activeTabRect = Tabs.DoTabs(rect, _tabs);
+        DoTab(activeTabRect, _currentTab);
+    }
 
-        public static void DoWindowContents(Rect rect)
-        {
-            if (!Initialized)
-            {
-                Initialize();
-            }
-            var tabDrawerRect = rect;
-            tabDrawerRect.yMin += 32f;
-            TabDrawer.DrawTabs(tabDrawerRect, Tabs, 500f);
-            var activeTabRect = tabDrawerRect.ContractedBy(10);
-            activeTabRect.xMax += 6f;
-            switch (_currentTab)
-            {
-                case SettingsTabs.Priorities:
-                    DoPrioritiesTab(activeTabRect);
-                    break;
-                case SettingsTabs.WorkTypes:
-                    DoWorkTypesTab(activeTabRect);
-                    break;
-                case SettingsTabs.Schedule:
-                    DoScheduleTab(activeTabRect);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
+    /// <summary>
+    ///     Exposes the mod settings data for saving and loading.
+    /// </summary>
+    public override void ExposeData()
+    {
+        base.ExposeData();
+        ExposeWorkPrioritiesData();
+        ExposeWorkTypesData();
+        ExposeSchedulesData();
+    }
 
-        public override void ExposeData()
-        {
-            base.ExposeData();
-            ExposeWorkPrioritiesData();
-            ExposeWorkTypesData();
-            ExposeSchedulesData();
-        }
+    /// <summary>
+    ///     Initializes the settings if not already initialized.
+    /// </summary>
+    internal void Initialize()
+    {
+        if (_isInitialized) return;
+        _isInitialized = true;
+        InitializeTabs();
+        InitializeSchedules();
+        Validate();
+    }
 
-        public static void Initialize()
+    /// <summary>
+    ///     Initializes the tab records for the settings window.
+    /// </summary>
+    private void InitializeTabs()
+    {
+        _tabs.Add(new TabRecord(Strings.WorkPriorities.Title, () =>
         {
-            if (Initialized)
-            {
-                return;
-            }
-            InitializeTabs();
-            InitializeWorkPriorities();
-            InitializeWorkTypes();
-            InitializeSchedules();
-            Initialized = true;
-        }
+            _currentTab = SettingsTabs.WorkPriorities;
+            _scrollPosition.Set(0, 0);
+        }, () => _currentTab == SettingsTabs.WorkPriorities));
+        _tabs.Add(new TabRecord(Strings.WorkTypes.Title, () =>
+        {
+            _currentTab = SettingsTabs.WorkTypes;
+            _scrollPosition.Set(0, 0);
+        }, () => _currentTab == SettingsTabs.WorkTypes));
+        _tabs.Add(new TabRecord(Strings.Schedule.Title, () =>
+        {
+            _currentTab = SettingsTabs.Schedule;
+            _scrollPosition.Set(0, 0);
+        }, () => _currentTab == SettingsTabs.Schedule));
+    }
 
-        private static void InitializeTabs()
-        {
-            Tabs.Add(new TabRecord(Strings.WorkPriorities.Title, () =>
-            {
-                _currentTab = SettingsTabs.Priorities;
-                _scrollPosition.Set(0, 0);
-            }, () => _currentTab == SettingsTabs.Priorities));
-            Tabs.Add(new TabRecord(Strings.WorkTypes.Title, () =>
-            {
-                _currentTab = SettingsTabs.WorkTypes;
-                _scrollPosition.Set(0, 0);
-            }, () => _currentTab == SettingsTabs.WorkTypes));
-            Tabs.Add(new TabRecord(Strings.Schedule.Title, () =>
-            {
-                _currentTab = SettingsTabs.Schedule;
-                _scrollPosition.Set(0, 0);
-            }, () => _currentTab == SettingsTabs.Schedule));
-        }
+    /// <summary>
+    ///     Validates the current state of the object to ensure it meets required conditions.
+    /// </summary>
+    /// <remarks>
+    ///     This method performs internal validation checks. It is
+    ///     intended to ensure the object is in a consistent and valid state before further processing.
+    /// </remarks>
+    private void Validate()
+    {
+        ValidateWorkPriorities();
+        ValidateWorkTypes();
     }
 }

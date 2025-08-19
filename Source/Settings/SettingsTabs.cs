@@ -1,9 +1,22 @@
-﻿namespace LordKuper.WorkManager.Settings
+﻿namespace LordKuper.WorkManager;
+
+/// <summary>
+///     Represents the available tabs in the settings section of the application.
+/// </summary>
+internal enum SettingsTabs
 {
-    public enum SettingsTabs
-    {
-        Priorities,
-        WorkTypes,
-        Schedule
-    }
+    /// <summary>
+    ///     Tab for configuring work priorities.
+    /// </summary>
+    WorkPriorities,
+
+    /// <summary>
+    ///     Tab for managing work types.
+    /// </summary>
+    WorkTypes,
+
+    /// <summary>
+    ///     Tab for setting up the schedule.
+    /// </summary>
+    Schedule
 }

@@ -1,189 +1,138 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using JetBrains.Annotations;
 using Verse;
 
-namespace LordKuper.WorkManager
+namespace LordKuper.WorkManager;
+
+[UsedImplicitly]
+[method: SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Game API")]
+public class WorkManagerGameComponent(Game game) : GameComponent
 {
-    [UsedImplicitly]
-    public class WorkManagerGameComponent : GameComponent
+    private List<Pawn> _disabledPawns = [];
+    private List<Pawn> _disabledPawnSchedules = [];
+    private Dictionary<Pawn, WorkTypeDef> _disabledPawnWorkTypes = [];
+    private List<WorkTypeDef> _disabledWorkTypes = [];
+    public bool PriorityManagementEnabled = true;
+    public bool ScheduleManagementEnabled = true;
+    public IReadOnlyList<Pawn> DisabledPawns => _disabledPawns;
+    public IReadOnlyList<Pawn> DisabledPawnSchedules => _disabledPawnSchedules;
+    public IReadOnlyDictionary<Pawn, WorkTypeDef> DisabledPawnWorkTypes => _disabledPawnWorkTypes;
+    public IReadOnlyList<WorkTypeDef> DisabledWorkTypes => _disabledWorkTypes;
+
+    public override void ExposeData()
     {
-        private List<Pawn> _disabledPawns = new List<Pawn>();
-        private List<Pawn> _disabledPawnSchedules = new List<Pawn>();
-        private List<PawnWorkType> _disabledPawnWorkTypes = new List<PawnWorkType>();
-        private List<WorkTypeDef> _disabledWorkTypes = new List<WorkTypeDef>();
-        public bool PriorityManagementEnabled = true;
-        public bool ScheduleManagementEnabled = true;
+        base.ExposeData();
+        _ = _disabledPawns?.RemoveAll(pawn => pawn?.Destroyed ?? true);
+        _ = _disabledPawnSchedules?.RemoveAll(pawn => pawn?.Destroyed ?? true);
+        _ = _disabledWorkTypes?.RemoveAll(workType =>
+            !DefDatabase<WorkTypeDef>.AllDefsListForReading.Contains(workType));
+        Scribe_Values.Look(ref PriorityManagementEnabled, nameof(PriorityManagementEnabled), true);
+        Scribe_Values.Look(ref ScheduleManagementEnabled, nameof(ScheduleManagementEnabled), true);
+        Scribe_Collections.Look(ref _disabledWorkTypes, nameof(DisabledWorkTypes), LookMode.Def);
+        Scribe_Collections.Look(ref _disabledPawns, nameof(DisabledPawns), LookMode.Reference);
+        Scribe_Collections.Look(ref _disabledPawnWorkTypes, nameof(DisabledPawnWorkTypes), LookMode.Deep);
+        Scribe_Collections.Look(ref _disabledPawnSchedules, nameof(DisabledPawnSchedules), LookMode.Reference);
+    }
 
-        [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Game API")]
-        public WorkManagerGameComponent(Game game) { }
+    internal bool GetPawnEnabled([NotNull] Pawn pawn)
+    {
+        if (pawn == null) throw new ArgumentNullException(nameof(pawn));
+        _disabledPawns ??= [];
+        return !_disabledPawns.Contains(pawn);
+    }
 
-        public override void ExposeData()
+    internal bool GetPawnScheduleEnabled([NotNull] Pawn pawn)
+    {
+        if (pawn == null) throw new ArgumentNullException(nameof(pawn));
+        _disabledPawnSchedules ??= [];
+        return !_disabledPawnSchedules.Contains(pawn);
+    }
+
+    internal bool GetPawnWorkTypeEnabled([NotNull] Pawn pawn, [NotNull] WorkTypeDef workType)
+    {
+        if (pawn == null) throw new ArgumentNullException(nameof(pawn));
+        if (workType == null) throw new ArgumentNullException(nameof(workType));
+        _disabledPawnWorkTypes ??= [];
+        return !_disabledPawnWorkTypes.Any(pwt => pwt.Key == pawn && pwt.Value == workType);
+    }
+
+    internal bool GetWorkTypeEnabled([NotNull] WorkTypeDef workType)
+    {
+        if (workType == null) throw new ArgumentNullException(nameof(workType));
+        _disabledWorkTypes ??= [];
+        return !_disabledWorkTypes.Contains(workType);
+    }
+
+    public override void LoadedGame()
+    {
+        base.LoadedGame();
+        WorkManagerMod.Settings.Initialize();
+    }
+
+    internal void SetPawnEnabled([NotNull] Pawn pawn, bool enabled)
+    {
+        if (pawn == null) throw new ArgumentNullException(nameof(pawn));
+        _disabledPawns ??= [];
+        if (enabled)
         {
-            base.ExposeData();
-            _disabledPawns?.RemoveAll(pawn => pawn?.Destroyed ?? true);
-            _disabledPawnSchedules?.RemoveAll(pawn => pawn?.Destroyed ?? true);
-            _disabledWorkTypes?.RemoveAll(workType =>
-                !DefDatabase<WorkTypeDef>.AllDefsListForReading.Contains(workType));
-            Scribe_Values.Look(ref PriorityManagementEnabled, nameof(PriorityManagementEnabled), true);
-            Scribe_Values.Look(ref ScheduleManagementEnabled, nameof(ScheduleManagementEnabled), true);
-            Scribe_Collections.Look(ref _disabledWorkTypes, "DisabledWorkTypes", LookMode.Def);
-            Scribe_Collections.Look(ref _disabledPawns, "DisabledPawns", LookMode.Reference);
-            Scribe_Collections.Look(ref _disabledPawnWorkTypes, "DisabledPawnWorkTypes", LookMode.Deep);
-            Scribe_Collections.Look(ref _disabledPawnSchedules, "DisabledPawnSchedules", LookMode.Reference);
+            _ = _disabledPawns.RemoveAll(p => p == pawn);
         }
-
-        public bool GetPawnEnabled([NotNull] Pawn pawn)
+        else
         {
-            if (pawn == null)
-            {
-                throw new ArgumentNullException(nameof(pawn));
-            }
-            if (_disabledPawns == null)
-            {
-                _disabledPawns = new List<Pawn>();
-            }
-            return !_disabledPawns.Contains(pawn);
+            if (!_disabledPawns.Contains(pawn)) _disabledPawns.Add(pawn);
         }
+    }
 
-        public bool GetPawnScheduleEnabled([NotNull] Pawn pawn)
+    internal void SetPawnScheduleEnabled([NotNull] Pawn pawn, bool enabled)
+    {
+        if (pawn == null) throw new ArgumentNullException(nameof(pawn));
+        _disabledPawnSchedules ??= [];
+        if (enabled)
         {
-            if (pawn == null)
-            {
-                throw new ArgumentNullException(nameof(pawn));
-            }
-            if (_disabledPawnSchedules == null)
-            {
-                _disabledPawnSchedules = new List<Pawn>();
-            }
-            return !_disabledPawnSchedules.Contains(pawn);
+            _ = _disabledPawnSchedules.RemoveAll(p => p == pawn);
         }
+        else
+        {
+            if (!_disabledPawnSchedules.Contains(pawn)) _disabledPawnSchedules.Add(pawn);
+        }
+    }
 
-        public bool GetPawnWorkTypeEnabled([NotNull] Pawn pawn, [NotNull] WorkTypeDef workType)
+    internal void SetPawnWorkTypeEnabled([NotNull] Pawn pawn, [NotNull] WorkTypeDef workType, bool enabled)
+    {
+        if (pawn == null) throw new ArgumentNullException(nameof(pawn));
+        if (workType == null) throw new ArgumentNullException(nameof(workType));
+        _disabledPawnWorkTypes ??= [];
+        if (enabled)
         {
-            if (pawn == null)
-            {
-                throw new ArgumentNullException(nameof(pawn));
-            }
-            if (workType == null)
-            {
-                throw new ArgumentNullException(nameof(workType));
-            }
-            if (_disabledPawnWorkTypes == null)
-            {
-                _disabledPawnWorkTypes = new List<PawnWorkType>();
-            }
-            return !_disabledPawnWorkTypes.Any(pwt => pwt.Pawn == pawn && pwt.WorkType == workType);
+            _ = _disabledPawnWorkTypes.RemoveAll(pwt => pwt.Key == pawn && pwt.Value == workType);
         }
+        else
+        {
+            if (!_disabledPawnWorkTypes.Any(pwt => pwt.Key == pawn && pwt.Value == workType))
+                _disabledPawnWorkTypes.Add(pawn, workType);
+        }
+    }
 
-        public bool GetWorkTypeEnabled([NotNull] WorkTypeDef workType)
+    internal void SetWorkTypeEnabled([NotNull] WorkTypeDef workType, bool enabled)
+    {
+        if (workType == null) throw new ArgumentNullException(nameof(workType));
+        _disabledWorkTypes ??= [];
+        if (enabled)
         {
-            if (workType == null)
-            {
-                throw new ArgumentNullException(nameof(workType));
-            }
-            if (_disabledWorkTypes == null)
-            {
-                _disabledWorkTypes = new List<WorkTypeDef>();
-            }
-            return !_disabledWorkTypes.Contains(workType);
+            _ = _disabledWorkTypes.RemoveAll(wt => wt == workType);
         }
+        else
+        {
+            if (!_disabledWorkTypes.Contains(workType)) _disabledWorkTypes.Add(workType);
+        }
+    }
 
-        public void SetPawnEnabled([NotNull] Pawn pawn, bool enabled)
-        {
-            if (pawn == null)
-            {
-                throw new ArgumentNullException(nameof(pawn));
-            }
-            if (_disabledPawns == null)
-            {
-                _disabledPawns = new List<Pawn>();
-            }
-            if (enabled)
-            {
-                _disabledPawns.RemoveAll(p => p == pawn);
-            }
-            else
-            {
-                if (!_disabledPawns.Contains(pawn))
-                {
-                    _disabledPawns.Add(pawn);
-                }
-            }
-        }
-
-        public void SetPawnScheduleEnabled([NotNull] Pawn pawn, bool enabled)
-        {
-            if (pawn == null)
-            {
-                throw new ArgumentNullException(nameof(pawn));
-            }
-            if (_disabledPawnSchedules == null)
-            {
-                _disabledPawnSchedules = new List<Pawn>();
-            }
-            if (enabled)
-            {
-                _disabledPawnSchedules.RemoveAll(p => p == pawn);
-            }
-            else
-            {
-                if (!_disabledPawnSchedules.Contains(pawn))
-                {
-                    _disabledPawnSchedules.Add(pawn);
-                }
-            }
-        }
-
-        public void SetPawnWorkTypeEnabled([NotNull] Pawn pawn, [NotNull] WorkTypeDef workType, bool enabled)
-        {
-            if (pawn == null)
-            {
-                throw new ArgumentNullException(nameof(pawn));
-            }
-            if (workType == null)
-            {
-                throw new ArgumentNullException(nameof(workType));
-            }
-            if (_disabledPawnWorkTypes == null)
-            {
-                _disabledPawnWorkTypes = new List<PawnWorkType>();
-            }
-            if (enabled)
-            {
-                _disabledPawnWorkTypes.RemoveAll(pwt => pwt.Pawn == pawn && pwt.WorkType == workType);
-            }
-            else
-            {
-                if (!_disabledPawnWorkTypes.Any(pwt => pwt.Pawn == pawn && pwt.WorkType == workType))
-                {
-                    _disabledPawnWorkTypes.Add(new PawnWorkType { Pawn = pawn, WorkType = workType });
-                }
-            }
-        }
-
-        public void SetWorkTypeEnabled([NotNull] WorkTypeDef workType, bool enabled)
-        {
-            if (workType == null)
-            {
-                throw new ArgumentNullException(nameof(workType));
-            }
-            if (_disabledWorkTypes == null)
-            {
-                _disabledWorkTypes = new List<WorkTypeDef>();
-            }
-            if (enabled)
-            {
-                _disabledWorkTypes.RemoveAll(wt => wt == workType);
-            }
-            else
-            {
-                if (!_disabledWorkTypes.Contains(workType))
-                {
-                    _disabledWorkTypes.Add(workType);
-                }
-            }
-        }
+    public override void StartedNewGame()
+    {
+        base.StartedNewGame();
+        WorkManagerMod.Settings.Initialize();
     }
 }

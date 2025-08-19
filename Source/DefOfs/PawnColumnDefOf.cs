@@ -2,14 +2,23 @@
 using JetBrains.Annotations;
 using RimWorld;
 
-namespace LordKuper.WorkManager.DefOfs
+namespace LordKuper.WorkManager.DefOfs;
+
+/// <summary>
+///     Contains references to custom <see cref="PawnColumnDef" /> definitions used by the Work Manager mod.
+/// </summary>
+[DefOf]
+[UsedImplicitly]
+[SuppressMessage("ReSharper", "UnassignedField.Global")]
+public static class PawnColumnDefOf
 {
-    [DefOf]
-    [UsedImplicitly]
-    [SuppressMessage("ReSharper", "UnassignedField.Global")]
-    public static class PawnColumnDefOf
-    {
-        public static PawnColumnDef AutoWorkPriorities;
-        public static PawnColumnDef AutoWorkSchedule;
-    }
+    /// <summary>
+    ///     The pawn column definition for displaying and editing automatic work priorities.
+    /// </summary>
+    public static PawnColumnDef AutoWorkPriorities;
+
+    /// <summary>
+    ///     The pawn column definition for displaying and editing automatic work schedules.
+    /// </summary>
+    public static PawnColumnDef AutoWorkSchedule;
 }

@@ -22,7 +22,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>..\CodeAnalysis.ruleset</CodeAnalysisRuleSet>
+    <LangVersion>default</LangVersion>
+    <UseWinFormsOutOfProcDesigner>True</UseWinFormsOutOfProcDesigner>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,7 +32,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>..\CodeAnalysis.ruleset</CodeAnalysisRuleSet>
+    <LangVersion>default</LangVersion>
+    <UseWinFormsOutOfProcDesigner>True</UseWinFormsOutOfProcDesigner>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony, Version=2.3.6.0, Culture=neutral, processorArchitecture=MSIL">
@@ -47,6 +49,8 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.InteropServices.RuntimeInformation" />
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\Games\Steam\steamapps\common\RimWorld\RimWorldWin64_Data\Managed\UnityEngine.dll</HintPath>
@@ -68,9 +72,9 @@
   <ItemGroup>
     <Compile Include="Helpers\UIHelper.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="Settings\DedicatedWorkerSettings.cs" />
     <Compile Include="Settings\DisabledWorkType.cs" />
     <Compile Include="Settings\AssignEveryoneWorkType.cs" />
-    <Compile Include="Compatibility\Compatibility.cs" />
     <Compile Include="Compatibility\MoreThanCapable.cs" />
     <Compile Include="Compatibility\WorkTab.cs" />
     <Compile Include="Helpers\WorkTypePriorityHelper.cs" />
@@ -82,31 +86,32 @@
     <Compile Include="Patches\WidgetsWorkPatch.cs" />
     <Compile Include="Patches\PawnColumnWorkerWorkPriorityPatch.cs" />
     <Compile Include="Patches\WorkTabPatch.cs" />
-    <Compile Include="PawnCache.cs" />
+    <Compile Include="Cache\PawnCache.cs" />
     <Compile Include="PawnColumnWorkers\AutoWorkPriorities.cs" />
-    <Compile Include="PawnWorkType.cs" />
     <Compile Include="Resources.cs" />
     <Compile Include="Settings\PawnCountSettings.cs" />
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="CustomWidgets.cs" />
     <Compile Include="Settings\SettingsTabs.cs" />
     <Compile Include="Settings\Settings_Schedules.cs" />
+    <Compile Include="Settings\Settings_Priorities.cs" />
     <Compile Include="Settings\Settings_WorkPriorities.cs" />
+    <Compile Include="Settings\Settings_Works.cs" />
     <Compile Include="Settings\Settings_WorkTypes.cs" />
-    <Compile Include="Compatibility\Vse.cs" />
     <Compile Include="Settings\SkillLimit.cs" />
+    <Compile Include="Settings\DedicatedWorkerMode.cs" />
     <Compile Include="WorkManagerMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WorkManagerGameComponent.cs" />
     <Compile Include="ScheduleUpdater.cs" />
+    <Compile Include="Settings\WorkTypeAssignmentRule.cs" />
     <Compile Include="WorkPriorityUpdater.cs" />
     <Compile Include="WorkShift.cs" />
-    <Compile Include="Settings\WorkTypePawnSettings.cs" />
     <Compile Include="Settings\WorkTypeSettings.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".editorconfig" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

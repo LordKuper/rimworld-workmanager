@@ -1,71 +1,58 @@
 ﻿using JetBrains.Annotations;
 using Verse;
 
-namespace LordKuper.WorkManager.Settings
+namespace LordKuper.WorkManager;
+
+public class DisabledWorkType : IExposable
 {
-    public class DisabledWorkType : IExposable
+    private bool _isInitialized;
+    private WorkTypeDef _workTypeDef;
+    public string WorkTypeDefName;
+
+    [UsedImplicitly]
+    public DisabledWorkType() { }
+
+    public DisabledWorkType(string workTypeDefName)
     {
-        private bool _isInitialized;
-        private WorkTypeDef _workTypeDef;
-        public string WorkTypeDefName;
+        WorkTypeDefName = workTypeDefName;
+    }
 
-        [UsedImplicitly]
-        public DisabledWorkType() { }
-
-        public DisabledWorkType(string workTypeDefName)
+    public bool IsWorkTypeLoaded
+    {
+        get
         {
-            WorkTypeDefName = workTypeDefName;
+            if (!_isInitialized) Initialize();
+            return WorkTypeDef != null;
         }
+    }
 
-        public bool IsWorkTypeLoaded
+    public string Label
+    {
+        get
         {
-            get
-            {
-                if (!_isInitialized)
-                {
-                    Initialize();
-                }
-                return WorkTypeDef != null;
-            }
+            if (!_isInitialized) Initialize();
+            return WorkTypeDef?.labelShort ?? WorkTypeDefName;
         }
+    }
 
-        public string Label
+    public WorkTypeDef WorkTypeDef
+    {
+        get
         {
-            get
-            {
-                if (!_isInitialized)
-                {
-                    Initialize();
-                }
-                return WorkTypeDef?.labelShort ?? WorkTypeDefName;
-            }
+            if (!_isInitialized) Initialize();
+            return _workTypeDef;
         }
+    }
 
-        public WorkTypeDef WorkTypeDef
-        {
-            get
-            {
-                if (!_isInitialized)
-                {
-                    Initialize();
-                }
-                return _workTypeDef;
-            }
-        }
+    public void ExposeData()
+    {
+        Scribe_Values.Look(ref WorkTypeDefName, nameof(WorkTypeDefName));
+    }
 
-        public void ExposeData()
-        {
-            Scribe_Values.Look(ref WorkTypeDefName, nameof(WorkTypeDefName));
-        }
-
-        private void Initialize()
-        {
-            if (_isInitialized)
-            {
-                return;
-            }
-            _workTypeDef = DefDatabase<WorkTypeDef>.GetNamedSilentFail(WorkTypeDefName);
-            _isInitialized = true;
-        }
+    private void Initialize()
+    {
+        if (_isInitialized) return;
+        _workTypeDef = DefDatabase<WorkTypeDef>.GetNamedSilentFail(WorkTypeDefName);
+        _isInitialized = true;
     }
 }

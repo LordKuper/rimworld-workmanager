@@ -18,12 +18,16 @@
 			<displayName>Harmony</displayName>
 			<steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl>
 		</li>
-		<li>
-			<packageId>LordKuper.Common</packageId>
-			<displayName>LordKuper.Common</displayName>
-			<steamWorkshopUrl>steam://url/CommunityFilePage/3531352422</steamWorkshopUrl>
-		</li>
 	</modDependencies>
+	<modDependenciesByVersion>
+		<v1.6>
+			<li>
+				<packageId>LordKuper.Common</packageId>
+				<displayName>LordKuper.Common</displayName>
+				<steamWorkshopUrl>steam://url/CommunityFilePage/3531352422</steamWorkshopUrl>
+			</li>
+		</v1.6>
+	</modDependenciesByVersion>
 	<loadAfter>
 		<li>brrainz.harmony</li>
 		<li>LordKuper.Common</li>
