@@ -11,7 +11,7 @@ public class WorkShift : IExposable
     private List<string> _hours;
     public int PawnThreshold = 1;
 
-    public WorkShift()
+    internal WorkShift()
     {
         _hours = new List<string>(24);
         for (var i = 0; i < 24; i++)
@@ -20,9 +20,9 @@ public class WorkShift : IExposable
         }
     }
 
-    public WorkShift([NotNull] IEnumerable<string> assignments, int pawnThreshold)
+    internal WorkShift([NotNull] IEnumerable<string> assignments, int pawnThreshold)
     {
-        _hours = new List<string>(assignments);
+        _hours = [.. assignments];
         if (_hours.Count != 24)
             throw new ArgumentException("Invalid schedule for creating work shift", nameof(assignments));
         if (pawnThreshold < 1)
@@ -36,7 +36,7 @@ public class WorkShift : IExposable
         Scribe_Values.Look(ref PawnThreshold, nameof(PawnThreshold), 1);
     }
 
-    public TimeAssignmentDef GetTimeAssignment(int hour)
+    internal TimeAssignmentDef GetTimeAssignment(int hour)
     {
         return hour is < 0 or >= 24
             ? throw new ArgumentOutOfRangeException(nameof(hour))
@@ -44,7 +44,7 @@ public class WorkShift : IExposable
               DefDatabase<TimeAssignmentDef>.GetNamed("Anything");
     }
 
-    public void SetTimeAssignment(int hour, [NotNull] TimeAssignmentDef assignment)
+    internal void SetTimeAssignment(int hour, [NotNull] TimeAssignmentDef assignment)
     {
         if (hour is < 0 or >= 24) return;
         _hours[hour] = assignment.defName ?? throw new ArgumentNullException(nameof(assignment));

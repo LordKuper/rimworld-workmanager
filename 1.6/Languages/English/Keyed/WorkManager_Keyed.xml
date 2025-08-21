@@ -15,6 +15,8 @@
 	<LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerPassionScoreFactorTooltip>Passion level factor for the colonist's overall score when determining dedicated workers.</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerPassionScoreFactorTooltip>
 	<LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerLearningRateScoreFactor>Skill learning rate factor</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerLearningRateScoreFactor>
 	<LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerLearningRateScoreFactorTooltip>Skill learning rate factor for the colonist's overall score when determining dedicated workers.\nSkill learning rate decreases after receiving a certain amount of experience points for that skill. It will impact work priority depending on the value of this setting.</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerLearningRateScoreFactorTooltip>
+	<LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerWorkCountScoreFactor>Number of assigned work types factor</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerWorkCountScoreFactor>
+	<LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerWorkCountScoreFactorTooltip>Number of assigned work types factor for the colonist's overall score when determining dedicated workers.</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerWorkCountScoreFactorTooltip>
 	<LordKuper.WorkManager.Settings.WorkPriorities.HighestSkillPriority>Highest skill worker priority</LordKuper.WorkManager.Settings.WorkPriorities.HighestSkillPriority>
 	<LordKuper.WorkManager.Settings.WorkPriorities.HighestSkillPriorityTooltip>Work priority to be used for pawns with the highest skill value.</LordKuper.WorkManager.Settings.WorkPriorities.HighestSkillPriorityTooltip>
 	<LordKuper.WorkManager.Settings.WorkPriorities.AssignAllWorkTypes>Assign all work types</LordKuper.WorkManager.Settings.WorkPriorities.AssignAllWorkTypes>
@@ -64,9 +66,11 @@
 	<LordKuper.WorkManager.Settings.WorkTypes.AssignEveryoneOffTooltip>The job will be assigned according to other settings (dedicated workers, work passions, etc.).</LordKuper.WorkManager.Settings.WorkTypes.AssignEveryoneOffTooltip>
 	<LordKuper.WorkManager.Settings.WorkTypes.AssignEveryonePriorityLabel>Assign everyone priority</LordKuper.WorkManager.Settings.WorkTypes.AssignEveryonePriorityLabel>
 	<LordKuper.WorkManager.Settings.WorkTypes.AssignEveryonePriorityTooltip>The priority value with which work will be assigned to all eligible workers.</LordKuper.WorkManager.Settings.WorkTypes.AssignEveryonePriorityTooltip>
-	<LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedLabel>Ensure worker assigned</LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedLabel>
+	<LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedLabel>Ensure workers assigned</LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedLabel>
 	<LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedOnTooltip>At least one worker will be assigned even if no pawn satisfies the allowed workers filter.</LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedOnTooltip>
 	<LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedOffTooltip>A worker will only be assigned if there is a pawn that satisfies the allowed workers filter.</LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedOffTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.MinWorkerNumberLabel>Minimum number of workers</LordKuper.WorkManager.Settings.WorkTypes.MinWorkerNumberLabel>
+	<LordKuper.WorkManager.Settings.WorkTypes.MinWorkerNumberTooltip>At least the specified number of workers will be assigned.</LordKuper.WorkManager.Settings.WorkTypes.MinWorkerNumberTooltip>
 	<LordKuper.WorkManager.Settings.WorkTypes.DedicatedWorkerSettingsLabel>Dedicated workers settings</LordKuper.WorkManager.Settings.WorkTypes.DedicatedWorkerSettingsLabel>
 	<LordKuper.WorkManager.Settings.WorkTypes.DedicatedWorkerSettingsTooltip>Settings that determine the criteria for assigning dedicated workers.</LordKuper.WorkManager.Settings.WorkTypes.DedicatedWorkerSettingsTooltip>
 	<LordKuper.WorkManager.Settings.WorkTypes.AllowDedicatedWorkerLabel>Allow dedicated workers</LordKuper.WorkManager.Settings.WorkTypes.AllowDedicatedWorkerLabel>
@@ -100,67 +104,6 @@
 	<WorkManager.WorkTypeDisableTooltip>Disable automatic priority assignment for work type</WorkManager.WorkTypeDisableTooltip>
 	<WorkManager.PawnScheduleEnableTooltip>Enable automatic schedule management for pawn</WorkManager.PawnScheduleEnableTooltip>
 	<WorkManager.PawnScheduleDisableTooltip>Disable automatic schedule management for pawn</WorkManager.PawnScheduleDisableTooltip>
-	<WorkManager.Settings_Priorities_UseLearningRates>Use skill learning rates instead of passions</WorkManager.Settings_Priorities_UseLearningRates>
-	<WorkManager.Settings_Priorities_UseLearningRatesTooltip>Use skill learning rates instead of passion levels for determining major and minor priorities</WorkManager.Settings_Priorities_UseLearningRatesTooltip>
-	<WorkManager.Settings_Priorities_MajorPassionPriority>Major passion work priority</WorkManager.Settings_Priorities_MajorPassionPriority>
-	<WorkManager.Settings_Priorities_MajorPassionPriorityTooltip>Priority for work types with major passion (burning)</WorkManager.Settings_Priorities_MajorPassionPriorityTooltip>
-	<WorkManager.Settings_Priorities_MinorPassionPriority>Minor passion work priority</WorkManager.Settings_Priorities_MinorPassionPriority>
-	<WorkManager.Settings_Priorities_MinorPassionPriorityTooltip>Priority for work types with minor passion (interested)</WorkManager.Settings_Priorities_MinorPassionPriorityTooltip>
-	<WorkManager.Settings_Priorities_UsePawnLearningRateThresholds>Use individual skill learning rate thresholds</WorkManager.Settings_Priorities_UsePawnLearningRateThresholds>
-	<WorkManager.Settings_Priorities_UsePawnLearningRateThresholdsTooltip>Use skill learning rate thresholds calculated for each pawn individually, considering their minimal and maximal skill learning rates</WorkManager.Settings_Priorities_UsePawnLearningRateThresholdsTooltip>
-	<WorkManager.Settings_Priorities_MajorLearningRateThreshold>Major skill learning rate threshold</WorkManager.Settings_Priorities_MajorLearningRateThreshold>
-	<WorkManager.Settings_Priorities_MajorLearningRateThresholdTooltip>Pawns with skill learning rate above this threshold will be assigned to corresponding work types with priority value set below</WorkManager.Settings_Priorities_MajorLearningRateThresholdTooltip>
-	<WorkManager.Settings_Priorities_MajorLearningRatePriority>Major learning rate work priority</WorkManager.Settings_Priorities_MajorLearningRatePriority>
-	<WorkManager.Settings_Priorities_MajorLearningRatePriorityTooltip>Priority for work types with learning rates above major threshold</WorkManager.Settings_Priorities_MajorLearningRatePriorityTooltip>
-	<WorkManager.Settings_Priorities_MinorLearningRateThreshold>Minor skill learning rate threshold</WorkManager.Settings_Priorities_MinorLearningRateThreshold>
-	<WorkManager.Settings_Priorities_MinorLearningRateThresholdTooltip>Pawns with skill learning rate above this threshold will be assigned to corresponding work types with priority value set below</WorkManager.Settings_Priorities_MinorLearningRateThresholdTooltip>
-	<WorkManager.Settings_Priorities_MinorLearningRatePriority>Minor learning rate work priority</WorkManager.Settings_Priorities_MinorLearningRatePriority>
-	<WorkManager.Settings_Priorities_MinorLearningRatePriorityTooltip>Priority for work types with learning rates between minor and major thresholds</WorkManager.Settings_Priorities_MinorLearningRatePriorityTooltip>
-	<WorkManager.Settings_Priorities_UncontrollablePawnsUnfitForWork>Uncontrollable pawns are unfit for work</WorkManager.Settings_Priorities_UncontrollablePawnsUnfitForWork>
-	<WorkManager.Settings_Priorities_UncontrollablePawnsUnfitForWorkTooltip>Do not assign work for uncontrollable (downed, mental or stuck) pawns</WorkManager.Settings_Priorities_UncontrollablePawnsUnfitForWorkTooltip>
-	<WorkManager.Settings_Priorities_RecoveringPawnsUnfitForWork>Recovering pawns are unfit for work</WorkManager.Settings_Priorities_RecoveringPawnsUnfitForWork>
-	<WorkManager.Settings_Priorities_RecoveringPawnsUnfitForWorkTooltip>Do not assign work for pawns needing medical rest</WorkManager.Settings_Priorities_RecoveringPawnsUnfitForWorkTooltip>
-	<WorkManager.Settings_Priorities_AssignWorkToIdlePawns>Assign work to idle pawns</WorkManager.Settings_Priorities_AssignWorkToIdlePawns>
-	<WorkManager.Settings_Priorities_AssignWorkToIdlePawnsTooltip>Assign idle pawns all work types (except special ones) with lowest priority for 12 hours</WorkManager.Settings_Priorities_AssignWorkToIdlePawnsTooltip>
-	<WorkManager.Settings_Priorities_IdlePriority>Idle work priority</WorkManager.Settings_Priorities_IdlePriority>
-	<WorkManager.Settings_Priorities_IdlePriorityTooltip>Work priority for idle pawns</WorkManager.Settings_Priorities_IdlePriorityTooltip>
-	<WorkManager.Settings_Priorities_SpecialRulesForDoctors>Special rules for doctors</WorkManager.Settings_Priorities_SpecialRulesForDoctors>
-	<WorkManager.Settings_Priorities_SpecialRulesForDoctorsTooltip>Use special rules for doctoring assignment. These include assigning doctoring to highest-skilled pawn(s) only; assigning secondary doctor when primary doctor needs tending; assigning multiple doctors if multiple units need rescuing.</WorkManager.Settings_Priorities_SpecialRulesForDoctorsTooltip>
-	<WorkManager.Settings_Priorities_DoctoringPriority>Doctoring work type priority</WorkManager.Settings_Priorities_DoctoringPriority>
-	<WorkManager.Settings_Priorities_DoctoringPriorityTooltip>Work priority for doctoring</WorkManager.Settings_Priorities_DoctoringPriorityTooltip>
-	<WorkManager.Settings_Priorities_AssignMultipleDoctors>Assign multiple doctors</WorkManager.Settings_Priorities_AssignMultipleDoctors>
-	<WorkManager.Settings_Priorities_AssignMultipleDoctorsTooltip>Assign multiple doctors when there are multiple downed pawns</WorkManager.Settings_Priorities_AssignMultipleDoctorsTooltip>
-	<WorkManager.Settings_Priorities_CountDownedColonists>Count downed colonists</WorkManager.Settings_Priorities_CountDownedColonists>
-	<WorkManager.Settings_Priorities_CountDownedColonistsTooltip>Each downed colonist will require additional doctor to be assigned</WorkManager.Settings_Priorities_CountDownedColonistsTooltip>
-	<WorkManager.Settings_Priorities_CountDownedGuests>Count downed guests</WorkManager.Settings_Priorities_CountDownedGuests>
-	<WorkManager.Settings_Priorities_CountDownedGuestsTooltip>Each downed guest will require additional doctor to be assigned</WorkManager.Settings_Priorities_CountDownedGuestsTooltip>
-	<WorkManager.Settings_Priorities_CountDownedPrisoners>Count downed prisoners</WorkManager.Settings_Priorities_CountDownedPrisoners>
-	<WorkManager.Settings_Priorities_CountDownedPrisonersTooltip>Each downed prisoner will require additional doctor to be assigned</WorkManager.Settings_Priorities_CountDownedPrisonersTooltip>
-	<WorkManager.Settings_Priorities_CountDownedAnimals>Count downed animals</WorkManager.Settings_Priorities_CountDownedAnimals>
-	<WorkManager.Settings_Priorities_CountDownedAnimalsTooltip>Each downed colony animal will require additional doctor to be assigned</WorkManager.Settings_Priorities_CountDownedAnimalsTooltip>
-	<WorkManager.Settings_Priorities_SpecialRulesForHunters>Special rules for hunters</WorkManager.Settings_Priorities_SpecialRulesForHunters>
-	<WorkManager.Settings_Priorities_SpecialRulesForHuntersTooltip>Use special rules to determine which pawns are considered hunters</WorkManager.Settings_Priorities_SpecialRulesForHuntersTooltip>
-	<WorkManager.Settings_Priorities_AllowMeleeHunters>Allow melee hunters</WorkManager.Settings_Priorities_AllowMeleeHunters>
-	<WorkManager.Settings_Priorities_AllowMeleeHuntersTooltip>Allow barehanded pawns and pawns with melee weapons equipped to be assigned to hunting</WorkManager.Settings_Priorities_AllowMeleeHuntersTooltip>
-	<WorkManager.Settings_WorkTypes_Title>Work Types</WorkManager.Settings_WorkTypes_Title>
-	<WorkManager.Settings_WorkTypes_AssignEveryoneWorkTypes>Assign everyone work types</WorkManager.Settings_WorkTypes_AssignEveryoneWorkTypes>
-	<WorkManager.Settings_WorkTypes_AssignEveryoneWorkTypesTooltip>Work types listed in this section will be assigned to every capable pawn</WorkManager.Settings_WorkTypes_AssignEveryoneWorkTypesTooltip>
-	<WorkManager.Settings_WorkTypes_SelectWorkType>Select work type</WorkManager.Settings_WorkTypes_SelectWorkType>
-	<WorkManager.Settings_WorkTypes_AddWorkType>Add...</WorkManager.Settings_WorkTypes_AddWorkType>
-	<WorkManager.Settings_WorkTypes_DeleteWorkType>Delete...</WorkManager.Settings_WorkTypes_DeleteWorkType>
-	<WorkManager.Settings_WorkTypes_ResetWorkTypes>Reset to defaults</WorkManager.Settings_WorkTypes_ResetWorkTypes>
-	<WorkManager.Settings_WorkTypes_DefaultWorkTypeName>default</WorkManager.Settings_WorkTypes_DefaultWorkTypeName>
-	<WorkManager.Settings_WorkTypes_WorkTypeName>Work type's name</WorkManager.Settings_WorkTypes_WorkTypeName>
-	<WorkManager.Settings_WorkTypes_WorkTypeNameTooltip>The name of a work type</WorkManager.Settings_WorkTypes_WorkTypeNameTooltip>
-	<WorkManager.Settings_WorkTypes_WorkTypePriority>Priority</WorkManager.Settings_WorkTypes_WorkTypePriority>
-	<WorkManager.Settings_WorkTypes_WorkTypePriorityTooltip>Priority with which work type will be assigned to a non-dedicated pawn</WorkManager.Settings_WorkTypes_WorkTypePriorityTooltip>
-	<WorkManager.Settings_WorkTypes_AllowDedicated>Allow dedicated</WorkManager.Settings_WorkTypes_AllowDedicated>
-	<WorkManager.Settings_WorkTypes_AllowDedicatedTooltip>Allow work type to be assigned to the most suitable pawn with top priority</WorkManager.Settings_WorkTypes_AllowDedicatedTooltip>
-	<WorkManager.Settings_WorkTypes_WorkTypeNotLoadedTooltip>This work type is absent from current game setup. It will not affect work assignment until the game is restarted with the corresponding work type loaded.</WorkManager.Settings_WorkTypes_WorkTypeNotLoadedTooltip>
-	<WorkManager.Settings_WorkTypes_DisabledWorkTypesForForeigners>Work types disabled for foreigners</WorkManager.Settings_WorkTypes_DisabledWorkTypesForForeigners>
-	<WorkManager.Settings_WorkTypes_DisabledWorkTypesForForeignersTooltip>Work types listed in this section will not be assigned to foreign members of your colony (e.g. temporary quest-related visitors)</WorkManager.Settings_WorkTypes_DisabledWorkTypesForForeignersTooltip>
-	<WorkManager.Settings_WorkTypes_DisabledWorkTypesForSlaves>Work types disabled for slaves</WorkManager.Settings_WorkTypes_DisabledWorkTypesForSlaves>
-	<WorkManager.Settings_WorkTypes_DisabledWorkTypesForSlavesTooltip>Work types listed in this section will not be assigned to slaves</WorkManager.Settings_WorkTypes_DisabledWorkTypesForSlavesTooltip>
 	<WorkManager.Settings_Schedule_Title>Schedule</WorkManager.Settings_Schedule_Title>
 	<WorkManager.Settings_Schedule_ManageWorkSchedule>Manage work schedule</WorkManager.Settings_Schedule_ManageWorkSchedule>
 	<WorkManager.Settings_Schedule_ManageWorkScheduleTooltip>Automatic colonists' work shift management</WorkManager.Settings_Schedule_ManageWorkScheduleTooltip>

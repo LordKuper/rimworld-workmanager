@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
 using LordKuper.Common.Cache;
@@ -28,7 +29,7 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
     /// </summary>
     private static readonly PawnHealthState[] AllowedWorkersForbiddenPawnHealthStates =
     [
-        PawnHealthState.Downed, PawnHealthState.Dead
+        PawnHealthState.Dead
     ];
 
     /// <summary>
@@ -63,6 +64,11 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
     ///     Indicates whether at least one worker should always be assigned to this work type.
     /// </summary>
     public bool? EnsureWorkerAssigned;
+
+    /// <summary>
+    ///     Gets or sets the minimum number of workers to be assigned.
+    /// </summary>
+    public int MinWorkerNumber;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="WorkTypeAssignmentRule" /> class.
@@ -108,7 +114,8 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
             },
             AssignEveryone = null,
             AssignEveryonePriority = 1,
-            EnsureWorkerAssigned = true
+            EnsureWorkerAssigned = true,
+            MinWorkerNumber = 1
         },
         new("Firefighter")
         {
@@ -116,12 +123,13 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
             {
                 TriStateMode = true,
                 ForbiddenPawnTypes = [..AllowedWorkersForbiddenPawnTypes],
-                ForbiddenPawnHealthStates = [..AllowedWorkersForbiddenPawnHealthStates]
+                ForbiddenPawnHealthStates = [..AllowedWorkersForbiddenPawnHealthStates], FilterPawnHealthStates = true,
+                AllowedPawnHealthStates = [PawnHealthState.Healthy, PawnHealthState.Resting]
             },
             DedicatedWorkerSettings = new DedicatedWorkerSettings { TriStateMode = true, AllowDedicated = false },
             AssignEveryone = true,
-            AssignEveryonePriority = 1,
-            EnsureWorkerAssigned = false
+            AssignEveryonePriority = 1, EnsureWorkerAssigned = false,
+            MinWorkerNumber = 0
         },
         new("Patient")
         {
@@ -129,12 +137,17 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
             {
                 TriStateMode = true,
                 ForbiddenPawnTypes = [..AllowedWorkersForbiddenPawnTypes],
-                ForbiddenPawnHealthStates = [..AllowedWorkersForbiddenPawnHealthStates]
+                ForbiddenPawnHealthStates = [..AllowedWorkersForbiddenPawnHealthStates], FilterPawnHealthStates = true,
+                AllowedPawnHealthStates =
+                [
+                    PawnHealthState.Healthy, PawnHealthState.Resting, PawnHealthState.NeedsTending,
+                    PawnHealthState.Downed, PawnHealthState.Mental
+                ]
             },
             DedicatedWorkerSettings = new DedicatedWorkerSettings { TriStateMode = true, AllowDedicated = false },
             AssignEveryone = true,
-            AssignEveryonePriority = 1,
-            EnsureWorkerAssigned = false
+            AssignEveryonePriority = 1, EnsureWorkerAssigned = false,
+            MinWorkerNumber = 0
         },
         new("PatientBedRest")
         {
@@ -142,12 +155,17 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
             {
                 TriStateMode = true,
                 ForbiddenPawnTypes = [..AllowedWorkersForbiddenPawnTypes],
-                ForbiddenPawnHealthStates = [..AllowedWorkersForbiddenPawnHealthStates]
+                ForbiddenPawnHealthStates = [..AllowedWorkersForbiddenPawnHealthStates], FilterPawnHealthStates = true,
+                AllowedPawnHealthStates =
+                [
+                    PawnHealthState.Healthy, PawnHealthState.Resting, PawnHealthState.NeedsTending,
+                    PawnHealthState.Downed, PawnHealthState.Mental
+                ]
             },
             DedicatedWorkerSettings = new DedicatedWorkerSettings { TriStateMode = true, AllowDedicated = false },
             AssignEveryone = true,
-            AssignEveryonePriority = 1,
-            EnsureWorkerAssigned = false
+            AssignEveryonePriority = 1, EnsureWorkerAssigned = false,
+            MinWorkerNumber = 0
         },
         new("BasicWorker")
         {
@@ -159,8 +177,8 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
             },
             DedicatedWorkerSettings = new DedicatedWorkerSettings { TriStateMode = true, AllowDedicated = false },
             AssignEveryone = true,
-            AssignEveryonePriority = 1,
-            EnsureWorkerAssigned = false
+            AssignEveryonePriority = 1, EnsureWorkerAssigned = false,
+            MinWorkerNumber = 0
         },
         new("Hauling")
         {
@@ -172,8 +190,8 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
             },
             DedicatedWorkerSettings = new DedicatedWorkerSettings { TriStateMode = true, AllowDedicated = true },
             AssignEveryone = true,
-            AssignEveryonePriority = 4,
-            EnsureWorkerAssigned = false
+            AssignEveryonePriority = 4, EnsureWorkerAssigned = true,
+            MinWorkerNumber = 1
         },
         new("Cleaning")
         {
@@ -183,10 +201,10 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
                 ForbiddenPawnTypes = [..AllowedWorkersForbiddenPawnTypes],
                 ForbiddenPawnHealthStates = [..AllowedWorkersForbiddenPawnHealthStates]
             },
-            DedicatedWorkerSettings = new DedicatedWorkerSettings { TriStateMode = true, AllowDedicated = false },
+            DedicatedWorkerSettings = new DedicatedWorkerSettings { TriStateMode = true, AllowDedicated = true },
             AssignEveryone = true,
-            AssignEveryonePriority = 4,
-            EnsureWorkerAssigned = false
+            AssignEveryonePriority = 4, EnsureWorkerAssigned = true,
+            MinWorkerNumber = 1
         },
         new("Doctor")
         {
@@ -194,7 +212,8 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
             {
                 TriStateMode = true,
                 ForbiddenPawnTypes = [..AllowedWorkersForbiddenPawnTypes],
-                ForbiddenPawnHealthStates = [..AllowedWorkersForbiddenPawnHealthStates]
+                ForbiddenPawnHealthStates = [..AllowedWorkersForbiddenPawnHealthStates], FilterPawnHealthStates = true,
+                AllowedPawnHealthStates = [PawnHealthState.Healthy, PawnHealthState.Resting]
             },
             DedicatedWorkerSettings = new DedicatedWorkerSettings
             {
@@ -214,8 +233,24 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
                     AllowedPawnHealthStates = [PawnHealthState.NeedsTending]
                 }
             },
-            AssignEveryone = false,
-            EnsureWorkerAssigned = true
+            AssignEveryone = false, EnsureWorkerAssigned = true,
+            MinWorkerNumber = 2
+        },
+        new("Hunting")
+        {
+            AllowedWorkers = new PawnFilter
+            {
+                TriStateMode = true,
+                ForbiddenPawnTypes = [..AllowedWorkersForbiddenPawnTypes],
+                ForbiddenPawnHealthStates = [..AllowedWorkersForbiddenPawnHealthStates],
+                FilterPawnPrimaryWeaponTypes = true, AllowedPawnPrimaryWeaponTypes = [PawnPrimaryWeaponType.Ranged]
+            },
+            DedicatedWorkerSettings = new DedicatedWorkerSettings
+            {
+                TriStateMode = true
+            },
+            AssignEveryone = false, EnsureWorkerAssigned = false,
+            MinWorkerNumber = 0
         }
     ];
 
@@ -235,11 +270,18 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
             if (EnsureWorkerAssigned.HasValue)
             {
                 anyValue = true;
-                stringBuilder.AppendIndented(
-                    $"{Strings.EnsureWorkerAssignedLabel}: ".Colorize(ColoredText.ExpectationsColor), 2);
-                stringBuilder.AppendLine(EnsureWorkerAssigned.Value
-                    ? Strings.WorkTypeRuleEnabledSettingTooltip
-                    : Strings.WorkTypeRuleDisabledSettingTooltip);
+                if (EnsureWorkerAssigned == true)
+                {
+                    stringBuilder.AppendIndented(
+                        $"{Strings.MinWorkerNumberLabel}: ".Colorize(ColoredText.ExpectationsColor), 2);
+                    stringBuilder.AppendLine(MinWorkerNumber.ToString("N0"));
+                }
+                else
+                {
+                    stringBuilder.AppendIndented(
+                        $"{Strings.AllowDedicatedWorkerLabel}: ".Colorize(ColoredText.ExpectationsColor), 2);
+                    stringBuilder.AppendLine(Strings.WorkTypeRuleDisabledSettingTooltip);
+                }
             }
             if (AssignEveryone.HasValue)
             {
@@ -330,8 +372,47 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
         Scribe_Deep.Look(ref AllowedWorkers, nameof(AllowedWorkers));
         Scribe_Values.Look(ref AssignEveryone, nameof(AssignEveryone));
         Scribe_Values.Look(ref AssignEveryonePriority, nameof(AssignEveryonePriority), AssignEveryonePriorityDefault);
-        Scribe_Values.Look(ref EnsureWorkerAssigned, nameof(EnsureWorkerAssigned));
+        Scribe_Values.Look(ref MinWorkerNumber, nameof(MinWorkerNumber));
         Scribe_Deep.Look(ref DedicatedWorkerSettings, nameof(DedicatedWorkerSettings));
+    }
+
+    /// <summary>
+    ///     Combines two <see cref="WorkTypeAssignmentRule" /> instances into a single rule by applying fallback logic.
+    /// </summary>
+    /// <param name="main">The primary <see cref="WorkTypeAssignmentRule" /> to use. Cannot be <see langword="null" />.</param>
+    /// <param name="fallback">
+    ///     The fallback <see cref="WorkTypeAssignmentRule" /> to use when values in <paramref name="main" /> are not set.
+    ///     Cannot be <see langword="null" />.
+    /// </param>
+    /// <returns>
+    ///     A new <see cref="WorkTypeAssignmentRule" /> instance that merges the values from <paramref name="main" /> and
+    ///     <paramref name="fallback" />. Values from <paramref name="main" /> take precedence unless they are
+    ///     <see
+    ///         langword="null" />
+    ///     or unset, in which case values from <paramref name="fallback" /> are used.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    ///     Thrown if <paramref name="main" /> or <paramref name="fallback" /> is
+    ///     <see langword="null" />.
+    /// </exception>
+    [NotNull]
+    public static WorkTypeAssignmentRule Combine([NotNull] WorkTypeAssignmentRule main,
+        [NotNull] WorkTypeAssignmentRule fallback)
+    {
+        if (main == null) throw new ArgumentNullException(nameof(main));
+        if (fallback == null) throw new ArgumentNullException(nameof(fallback));
+        return new WorkTypeAssignmentRule(main.DefName)
+        {
+            EnsureWorkerAssigned = main.EnsureWorkerAssigned ?? fallback.EnsureWorkerAssigned,
+            MinWorkerNumber = main.EnsureWorkerAssigned.HasValue ? main.MinWorkerNumber : fallback.MinWorkerNumber,
+            AssignEveryone = main.AssignEveryone ?? fallback.AssignEveryone,
+            AssignEveryonePriority = main.AssignEveryone.HasValue
+                ? main.AssignEveryonePriority
+                : fallback.AssignEveryonePriority,
+            DedicatedWorkerSettings =
+                DedicatedWorkerSettings.Combine(main.DedicatedWorkerSettings, fallback.DedicatedWorkerSettings),
+            AllowedWorkers = PawnFilter.Combine(main.AllowedWorkers, fallback.AllowedWorkers)
+        };
     }
 
     /// <summary>
@@ -358,15 +439,66 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
     }
 
     /// <summary>
+    ///     Calculates the target number of workers based on the current dedicated worker mode and relevant parameters.
+    /// </summary>
+    /// <param name="map">The map context used to filter pawns when calculating the worker count in certain modes.</param>
+    /// <param name="capablePawnCount">The number of pawns capable of performing work, used in ratio-based calculations.</param>
+    /// <param name="dedicatedWorkTypesCount">The number of dedicated work types, used in work type-based calculations.</param>
+    /// <returns>
+    ///     The calculated target number of workers based on the selected <see cref="DedicatedWorkerMode" /> and the provided
+    ///     parameters.
+    /// </returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    ///     Thrown if the <see cref="DedicatedWorkerMode" /> is set to an unsupported
+    ///     value.
+    /// </exception>
+    public int GetTargetWorkersCount(Map map, int capablePawnCount, int dedicatedWorkTypesCount)
+    {
+        switch (DedicatedWorkerSettings.Mode)
+        {
+            case DedicatedWorkerMode.Constant:
+                return DedicatedWorkerSettings.ConstantWorkerCount;
+            case DedicatedWorkerMode.WorkTypeCount:
+                return Mathf.CeilToInt(DedicatedWorkerSettings.WorkTypeCountFactor * dedicatedWorkTypesCount);
+            case DedicatedWorkerMode.CapablePawnRatio:
+                return Mathf.CeilToInt(DedicatedWorkerSettings.CapablePawnRatioFactor *
+                                       ((float)capablePawnCount / dedicatedWorkTypesCount));
+            case DedicatedWorkerMode.PawnCount:
+                var filteredPawns = DedicatedWorkerSettings.PawnCountFilter.GetFilteredPawns([map], null);
+#if DEBUG
+                Logger.LogMessage(
+                    $"Pawns eligible for target worker count: {string.Join(", ", filteredPawns.Select(p => p.LabelShort))}");
+#endif
+                return Mathf.CeilToInt(DedicatedWorkerSettings.PawnCountFactor * filteredPawns.Count);
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    /// <summary>
+    ///     Determines whether the specified pawn is allowed to perform work based on the defined criteria.
+    /// </summary>
+    /// <param name="pawn">The pawn to evaluate. Cannot be <see langword="null" />.</param>
+    /// <returns>
+    ///     <see langword="true" /> if the pawn satisfies the allowed worker criteria; otherwise, <see langword="false" />
+    ///     .
+    /// </returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="pawn" /> is <see langword="null" />.</exception>
+    public bool IsAllowedWorker([NotNull] Pawn pawn)
+    {
+        if (pawn == null) throw new ArgumentNullException(nameof(pawn));
+        return AllowedWorkers.SatisfiesFilter(pawn, Def);
+    }
+
+    /// <summary>
     ///     Validates and normalizes the rule's settings, ensuring all values are within allowed ranges.
     /// </summary>
     private void Validate()
     {
         DedicatedWorkerSettings ??= new DedicatedWorkerSettings();
         AllowedWorkers ??= new PawnFilter();
-        AllowedWorkers.ForbiddenPawnTypes = new HashSet<PawnType>(AllowedWorkersForbiddenPawnTypes);
-        AllowedWorkers.ForbiddenPawnHealthStates =
-            new HashSet<PawnHealthState>(AllowedWorkersForbiddenPawnHealthStates);
+        AllowedWorkers.ForbiddenPawnTypes = [.. AllowedWorkersForbiddenPawnTypes];
+        AllowedWorkers.ForbiddenPawnHealthStates = [.. AllowedWorkersForbiddenPawnHealthStates];
         AssignEveryonePriority = Mathf.Clamp(AssignEveryonePriority, 1, WorkManagerMod.Settings.MaxWorkTypePriority);
         if (DefName == null)
         {

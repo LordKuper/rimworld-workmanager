@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<LanguageData>
+	<LordKuper.WorkManager.ModTitle>Менеджер работ</LordKuper.WorkManager.ModTitle>
+	<LordKuper.WorkManager.Settings.WorkPriorities.Title>Приоритеты работ</LordKuper.WorkManager.Settings.WorkPriorities.Title>
+	<LordKuper.WorkManager.Settings.WorkPriorities.UpdateFrequency>Частота обновления</LordKuper.WorkManager.Settings.WorkPriorities.UpdateFrequency>
+	<LordKuper.WorkManager.Settings.WorkPriorities.UpdateFrequencyTooltip>Определяет, как часто будут обновляться приоритеты типов работ у пешек.</LordKuper.WorkManager.Settings.WorkPriorities.UpdateFrequencyTooltip>
+	<LordKuper.WorkManager.Settings.WorkPriorities.UseDedicatedWorkers>Назначать выделенных работников</LordKuper.WorkManager.Settings.WorkPriorities.UseDedicatedWorkers>
+	<LordKuper.WorkManager.Settings.WorkPriorities.UseDedicatedWorkersTooltip>Если включено, мод будет назначать выделенных работников для типов работ в соответствии с настройками конкретного типа.\nЕсли выключено, мод будет назначать типы работ пешкам с наивысшим уровнем навыка.</LordKuper.WorkManager.Settings.WorkPriorities.UseDedicatedWorkersTooltip>
+	<LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerPriority>Приоритет выделенного работника</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerPriority>
+	<LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerPriorityTooltip>Приоритет типа работ по умолчанию для выделенных работников. Может быть переопределён в настройках конкретного типа работ.</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerPriorityTooltip>
+	<LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerSkillScoreFactor>Коэффициент оценки уровня навыка</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerSkillScoreFactor>
+	<LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerSkillScoreFactorTooltip>Фактор уровня навыка в общей оценке колониста при определении выделенных работников.</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerSkillScoreFactorTooltip>
+	<LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerPassionScoreFactor>Коэффициент оценки уровня страсти</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerPassionScoreFactor>
+	<LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerPassionScoreFactorTooltip>Фактор уровня страсти в общей оценке колониста при определении выделенных работников.</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerPassionScoreFactorTooltip>
+	<LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerLearningRateScoreFactor>Коэффициент скорости обучения навыку</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerLearningRateScoreFactor>
+	<LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerLearningRateScoreFactorTooltip>Фактор скорости обучения навыку в общей оценке колониста при определении выделенных работников.\nСкорость обучения навыку снижается после получения определённого количества опыта для этого навыка. Это будет влиять на приоритет работ в зависимости от значения этой настройки.</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerLearningRateScoreFactorTooltip>
+	<LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerWorkCountScoreFactor>Коэффициент количества назначенных типов работ</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerWorkCountScoreFactor>
+	<LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerWorkCountScoreFactorTooltip>Фактор количества назначенных типов работ в общей оценке колониста при определении выделенных работников.</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerWorkCountScoreFactorTooltip>
+	<LordKuper.WorkManager.Settings.WorkPriorities.HighestSkillPriority>Приоритет работника с наивысшим навыком</LordKuper.WorkManager.Settings.WorkPriorities.HighestSkillPriority>
+	<LordKuper.WorkManager.Settings.WorkPriorities.HighestSkillPriorityTooltip>Приоритет работ для пешек с наивысшим значением навыка.</LordKuper.WorkManager.Settings.WorkPriorities.HighestSkillPriorityTooltip>
+	<LordKuper.WorkManager.Settings.WorkPriorities.AssignAllWorkTypes>Назначать все типы работ</LordKuper.WorkManager.Settings.WorkPriorities.AssignAllWorkTypes>
+	<LordKuper.WorkManager.Settings.WorkPriorities.AssignAllWorkTypesTooltip>Назначать каждой пешке все оставшиеся типы работ с приоритетом, указанным ниже, чтобы предотвратить безделье.</LordKuper.WorkManager.Settings.WorkPriorities.AssignAllWorkTypesTooltip>
+	<LordKuper.WorkManager.Settings.WorkPriorities.LeftoverPriority>Приоритет оставшихся работ</LordKuper.WorkManager.Settings.WorkPriorities.LeftoverPriority>
+	<LordKuper.WorkManager.Settings.WorkPriorities.LeftoverPriorityTooltip>Приоритет для оставшихся типов работ.</LordKuper.WorkManager.Settings.WorkPriorities.LeftoverPriorityTooltip>
+	<LordKuper.WorkManager.Settings.WorkPriorities.AssignWorkToIdlePawns>Назначать дополнительную работу бездельничающим пешкам</LordKuper.WorkManager.Settings.WorkPriorities.AssignWorkToIdlePawns>
+	<LordKuper.WorkManager.Settings.WorkPriorities.AssignWorkToIdlePawnsTooltip>Назначать бездельничающим пешкам все типы работ (кроме особых) на 12 часов.</LordKuper.WorkManager.Settings.WorkPriorities.AssignWorkToIdlePawnsTooltip>
+	<LordKuper.WorkManager.Settings.WorkPriorities.IdlePriority>Приоритет работы при простое</LordKuper.WorkManager.Settings.WorkPriorities.IdlePriority>
+	<LordKuper.WorkManager.Settings.WorkPriorities.IdlePriorityTooltip>Приоритет для типов работ, назначаемых бездельничающим пешкам.</LordKuper.WorkManager.Settings.WorkPriorities.IdlePriorityTooltip>
+	<LordKuper.WorkManager.Settings.WorkPriorities.UsePassionPriorities>Приоритизировать работу по уровню страсти</LordKuper.WorkManager.Settings.WorkPriorities.UsePassionPriorities>
+	<LordKuper.WorkManager.Settings.WorkPriorities.UsePassionPrioritiesTooltip>Назначать приоритеты работ на основе уровня страсти пешки. Значение 0 означает, что соответствующий уровень страсти будет игнорироваться.</LordKuper.WorkManager.Settings.WorkPriorities.UsePassionPrioritiesTooltip>
+	<LordKuper.WorkManager.Settings.WorkPriorities.UseLearningRatesPriorities>Приоритизировать работу по скоростям обучения навыкам</LordKuper.WorkManager.Settings.WorkPriorities.UseLearningRatesPriorities>
+	<LordKuper.WorkManager.Settings.WorkPriorities.UseLearningRatesPrioritiesTooltip>Назначать приоритеты работ на основе скорости обучения навыку у пешки.\nСкорость обучения снижается после получения определённого количества очков опыта для этого навыка. Это будет влиять на приоритет работ, если настройка включена.</LordKuper.WorkManager.Settings.WorkPriorities.UseLearningRatesPrioritiesTooltip>
+	<LordKuper.WorkManager.Settings.WorkPriorities.UsePawnLearningRateThresholds>Использовать индивидуальные пороги скорости обучения навыкам</LordKuper.WorkManager.Settings.WorkPriorities.UsePawnLearningRateThresholds>
+	<LordKuper.WorkManager.Settings.WorkPriorities.UsePawnLearningRateThresholdsTooltip>Использовать пороги скорости обучения, рассчитываемые для каждой пешки индивидуально с учётом её минимальной и максимальной скоростей обучения.</LordKuper.WorkManager.Settings.WorkPriorities.UsePawnLearningRateThresholdsTooltip>
+	<LordKuper.WorkManager.Settings.WorkPriorities.MinorLearningRateThreshold>Малый порог скорости обучения</LordKuper.WorkManager.Settings.WorkPriorities.MinorLearningRateThreshold>
+	<LordKuper.WorkManager.Settings.WorkPriorities.MinorLearningRateThresholdTooltip>Пешки со скоростью обучения выше этого порога будут назначены на соответствующие типы работ с приоритетом, указанным ниже.</LordKuper.WorkManager.Settings.WorkPriorities.MinorLearningRateThresholdTooltip>
+	<LordKuper.WorkManager.Settings.WorkPriorities.MinorLearningRatePriority>Приоритет при малой скорости обучения</LordKuper.WorkManager.Settings.WorkPriorities.MinorLearningRatePriority>
+	<LordKuper.WorkManager.Settings.WorkPriorities.MinorLearningRatePriorityTooltip>Приоритет для типов работ со скоростями обучения между малым и большим порогами.</LordKuper.WorkManager.Settings.WorkPriorities.MinorLearningRatePriorityTooltip>
+	<LordKuper.WorkManager.Settings.WorkPriorities.MajorLearningRateThreshold>Большой порог скорости обучения</LordKuper.WorkManager.Settings.WorkPriorities.MajorLearningRateThreshold>
+	<LordKuper.WorkManager.Settings.WorkPriorities.MajorLearningRateThresholdTooltip>Пешки со скоростью обучения выше этого порога будут назначены на соответствующие типы работ с приоритетом, указанным ниже.</LordKuper.WorkManager.Settings.WorkPriorities.MajorLearningRateThresholdTooltip>
+	<LordKuper.WorkManager.Settings.WorkPriorities.MajorLearningRatePriority>Приоритет при большой скорости обучения</LordKuper.WorkManager.Settings.WorkPriorities.MajorLearningRatePriority>
+	<LordKuper.WorkManager.Settings.WorkPriorities.MajorLearningRatePriorityTooltip>Приоритет для типов работ со скоростью обучения выше большого порога.</LordKuper.WorkManager.Settings.WorkPriorities.MajorLearningRatePriorityTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.Title>Типы работ</LordKuper.WorkManager.Settings.WorkTypes.Title>
+	<LordKuper.WorkManager.Settings.WorkTypes.DefaultWorkTypeRuleLabel>* По умолчанию *</LordKuper.WorkManager.Settings.WorkTypes.DefaultWorkTypeRuleLabel>
+	<LordKuper.WorkManager.Settings.WorkTypes.SelectWorkTypeTooltip>Выберите правило назначения типа работ для его редактирования.</LordKuper.WorkManager.Settings.WorkTypes.SelectWorkTypeTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.AddWorkTypeTooltip>Добавить новое правило назначения, которое переопределит правило по умолчанию для выбранного типа работ.</LordKuper.WorkManager.Settings.WorkTypes.AddWorkTypeTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.DeleteWorkTypeTooltip>Удалить существующее правило назначения типа работ (не по умолчанию).</LordKuper.WorkManager.Settings.WorkTypes.DeleteWorkTypeTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.ResetWorkTypesTooltip>Сбросить все правила назначения типов работ к значениям по умолчанию.\nВНИМАНИЕ: ЭТО УДАЛИТ ВСЕ ПОЛЬЗОВАТЕЛЬСКИЕ ПРАВИЛА И СБРОСИТ ВСЕ ПАРАМЕТРЫ ПРАВИЛ К ИХ ЗНАЧЕНИЯМ ПО УМОЛЧАНИЮ!</LordKuper.WorkManager.Settings.WorkTypes.ResetWorkTypesTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.NoRuleSelected>Выберите правило назначения типа работ с помощью кнопки выше.</LordKuper.WorkManager.Settings.WorkTypes.NoRuleSelected>
+	<LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleHeader>Правило назначения типа работ для '{0}'</LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleHeader>
+	<LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleHeaderTooltip>Настройки на этой вкладке будут применены к назначению типа работ '{0}'.</LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleHeaderTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleHeaderDefault>Правило назначения типа работ по умолчанию</LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleHeaderDefault>
+	<LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleHeaderTooltipDefault>Настройки на этой вкладке будут применены к типам работ, для которых нет специальных правил, переопределяющих значения по умолчанию.</LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleHeaderTooltipDefault>
+	<LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleSummary>Сводка правила</LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleSummary>
+	<LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleEnabledSettingTooltip>Да</LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleEnabledSettingTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleDisabledSettingTooltip>Нет</LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleDisabledSettingTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleUndefinedSettingTooltip>Будет использовано значение настройки из правила по умолчанию.</LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleUndefinedSettingTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleUndefinedSectionTooltip>Будут использованы настройки из правила по умолчанию.</LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleUndefinedSectionTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.AllowedWorkersLabel>Допустимые работники</LordKuper.WorkManager.Settings.WorkTypes.AllowedWorkersLabel>
+	<LordKuper.WorkManager.Settings.WorkTypes.AllowedWorkersTooltip>Настройки в этом разделе определяют, какие пешки считаются подходящими для назначения на тип работ.</LordKuper.WorkManager.Settings.WorkTypes.AllowedWorkersTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.AssignmentSettingsLabel>Настройки назначения</LordKuper.WorkManager.Settings.WorkTypes.AssignmentSettingsLabel>
+	<LordKuper.WorkManager.Settings.WorkTypes.AssignmentSettingsTooltip>Настройки, определяющие критерии назначения типа работ и его приоритета.</LordKuper.WorkManager.Settings.WorkTypes.AssignmentSettingsTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.AssignEveryoneLabel>Назначать всем</LordKuper.WorkManager.Settings.WorkTypes.AssignEveryoneLabel>
+	<LordKuper.WorkManager.Settings.WorkTypes.AssignEveryoneOnTooltip>Работа будет назначена всем подходящим работникам.</LordKuper.WorkManager.Settings.WorkTypes.AssignEveryoneOnTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.AssignEveryoneOffTooltip>Работа будет назначаться согласно другим настройкам (выделенные работники, страсти к работе и т. п.).</LordKuper.WorkManager.Settings.WorkTypes.AssignEveryoneOffTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.AssignEveryonePriorityLabel>Приоритет для «назначать всем»</LordKuper.WorkManager.Settings.WorkTypes.AssignEveryonePriorityLabel>
+	<LordKuper.WorkManager.Settings.WorkTypes.AssignEveryonePriorityTooltip>Значение приоритета, с которым работа будет назначена всем подходящим работникам.</LordKuper.WorkManager.Settings.WorkTypes.AssignEveryonePriorityTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedLabel>Гарантировать назначение работников</LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedLabel>
+	<LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedOnTooltip>Как минимум один работник будет назначен, даже если ни одна пешка не удовлетворяет фильтру допустимых работников.</LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedOnTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedOffTooltip>Работник будет назначен только при наличии пешек, удовлетворяющих фильтру допустимых работников.</LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedOffTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.MinWorkerNumberLabel>Минимальное число работников</LordKuper.WorkManager.Settings.WorkTypes.MinWorkerNumberLabel>
+	<LordKuper.WorkManager.Settings.WorkTypes.MinWorkerNumberTooltip>Будет назначено как минимум указанное количество работников.</LordKuper.WorkManager.Settings.WorkTypes.MinWorkerNumberTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.DedicatedWorkerSettingsLabel>Настройки выделенных работников</LordKuper.WorkManager.Settings.WorkTypes.DedicatedWorkerSettingsLabel>
+	<LordKuper.WorkManager.Settings.WorkTypes.DedicatedWorkerSettingsTooltip>Настройки, определяющие критерии назначения выделенных работников.</LordKuper.WorkManager.Settings.WorkTypes.DedicatedWorkerSettingsTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.AllowDedicatedWorkerLabel>Разрешить выделенных работников</LordKuper.WorkManager.Settings.WorkTypes.AllowDedicatedWorkerLabel>
+	<LordKuper.WorkManager.Settings.WorkTypes.AllowDedicatedWorkerOnTooltip>Выделенные работники будут назначаться согласно настройкам этого раздела.</LordKuper.WorkManager.Settings.WorkTypes.AllowDedicatedWorkerOnTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.AllowDedicatedWorkerOffTooltip>Выделенные работники назначаться не будут.</LordKuper.WorkManager.Settings.WorkTypes.AllowDedicatedWorkerOffTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.DedicatedWorkerModeLabel>Режим расчёта числа работников</LordKuper.WorkManager.Settings.WorkTypes.DedicatedWorkerModeLabel>
+	<LordKuper.WorkManager.Settings.WorkTypes.DedicatedWorkerModeTooltip>Определяет способ вычисления целевого количества выделенных работников.</LordKuper.WorkManager.Settings.WorkTypes.DedicatedWorkerModeTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.ConstantWorkerCountLabel>Целевое число работников</LordKuper.WorkManager.Settings.WorkTypes.ConstantWorkerCountLabel>
+	<LordKuper.WorkManager.Settings.WorkTypes.ConstantWorkerCountTooltip>Количество выделенных работников, которое будет назначено на тип работ.</LordKuper.WorkManager.Settings.WorkTypes.ConstantWorkerCountTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.WorkTypeCountFactorLabel>Коэффициент количества типов работ</LordKuper.WorkManager.Settings.WorkTypes.WorkTypeCountFactorLabel>
+	<LordKuper.WorkManager.Settings.WorkTypes.WorkTypeCountFactorTooltip>Целевое число выделенных работников будет рассчитано умножением количества типов работ на это число с округлением вверх до ближайшего целого.</LordKuper.WorkManager.Settings.WorkTypes.WorkTypeCountFactorTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.CapablePawnRatioFactorLabel>Коэффициент доли пешек</LordKuper.WorkManager.Settings.WorkTypes.CapablePawnRatioFactorLabel>
+	<LordKuper.WorkManager.Settings.WorkTypes.CapablePawnRatioFactorTooltip>Целевое число выделенных работников будет рассчитано делением числа способных пешек на число типов работ, использующих выделенных работников, умножением на это число и округлением до ближайшего целого.</LordKuper.WorkManager.Settings.WorkTypes.CapablePawnRatioFactorTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.PawnCountFactorLabel>Коэффициент числа пешек</LordKuper.WorkManager.Settings.WorkTypes.PawnCountFactorLabel>
+	<LordKuper.WorkManager.Settings.WorkTypes.PawnCountFactorTooltip>Целевое число выделенных работников будет рассчитано умножением числа пешек, удовлетворяющих указанным ниже критериям, на это число и округлением до ближайшего целого.</LordKuper.WorkManager.Settings.WorkTypes.PawnCountFactorTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.AvailablePawnsLabel>Доступные пешки</LordKuper.WorkManager.Settings.WorkTypes.AvailablePawnsLabel>
+	<LordKuper.WorkManager.Settings.WorkTypes.AvailablePawnsTooltip>Список пешек, удовлетворяющих фильтру допустимых работников.</LordKuper.WorkManager.Settings.WorkTypes.AvailablePawnsTooltip>
+	<LordKuper.WorkManager.DedicatedWorkerMode.Constant.Label>Постоянное число</LordKuper.WorkManager.DedicatedWorkerMode.Constant.Label>
+	<LordKuper.WorkManager.DedicatedWorkerMode.Constant.Tooltip>Для типа работ будет назначено фиксированное число выделенных работников.</LordKuper.WorkManager.DedicatedWorkerMode.Constant.Tooltip>
+	<LordKuper.WorkManager.DedicatedWorkerMode.WorkTypeCount.Label>Количество типов работ</LordKuper.WorkManager.DedicatedWorkerMode.WorkTypeCount.Label>
+	<LordKuper.WorkManager.DedicatedWorkerMode.WorkTypeCount.Tooltip>Количество выделенных работников будет назначено как кратное общему количеству типов работ.</LordKuper.WorkManager.DedicatedWorkerMode.WorkTypeCount.Tooltip>
+	<LordKuper.WorkManager.DedicatedWorkerMode.CapablePawnRatio.Label>Соотношение доступных работников</LordKuper.WorkManager.DedicatedWorkerMode.CapablePawnRatio.Label>
+	<LordKuper.WorkManager.DedicatedWorkerMode.CapablePawnRatio.Tooltip>Количество выделенных работников будет назначено равным числу способных пешек, делённому на число типов работ, использующих выделенных работников, с округлением вверх до ближайшего целого.\nНапример, если в колонии 6 способных пешек и 5 типов работ используют выделенных работников, то каждому из этих 5 типов будет назначено по 2 выделенных работника. (6 / 5 = 1,2 ≈ 2)</LordKuper.WorkManager.DedicatedWorkerMode.CapablePawnRatio.Tooltip>
+	<LordKuper.WorkManager.DedicatedWorkerMode.PawnCount.Label>Число пешек</LordKuper.WorkManager.DedicatedWorkerMode.PawnCount.Label>
+	<LordKuper.WorkManager.DedicatedWorkerMode.PawnCount.Tooltip>Количество выделенных работников будет назначено как кратное числу пешек, соответствующих заданным критериям отбора.</LordKuper.WorkManager.DedicatedWorkerMode.PawnCount.Tooltip>
+	<WorkManager.GlobalEnableTooltip>Включить систему автоматического назначения приоритетов типов работ</WorkManager.GlobalEnableTooltip>
+	<WorkManager.GlobalDisableTooltip>Отключить систему автоматического назначения приоритетов типов работ</WorkManager.GlobalDisableTooltip>
+	<WorkManager.PawnEnableTooltip>Включить автоматическое назначение приоритетов типов работ для пешки</WorkManager.PawnEnableTooltip>
+	<WorkManager.PawnDisableTooltip>Отключить автоматическое назначение приоритетов типов работ для пешки</WorkManager.PawnDisableTooltip>
+	<WorkManager.WorkTypeEnableTooltip>Включить автоматическое назначение приоритета для типа работ</WorkManager.WorkTypeEnableTooltip>
+	<WorkManager.WorkTypeDisableTooltip>Отключить автоматическое назначение приоритета для типа работ</WorkManager.WorkTypeDisableTooltip>
+	<WorkManager.PawnScheduleEnableTooltip>Включить автоматическое управление расписанием для пешки</WorkManager.PawnScheduleEnableTooltip>
+	<WorkManager.PawnScheduleDisableTooltip>Отключить автоматическое управление расписанием для пешки</WorkManager.PawnScheduleDisableTooltip>
+	<WorkManager.Settings_Schedule_Title>Расписание</WorkManager.Settings_Schedule_Title>
+	<WorkManager.Settings_Schedule_ManageWorkSchedule>Управление расписанием работ</WorkManager.Settings_Schedule_ManageWorkSchedule>
+	<WorkManager.Settings_Schedule_ManageWorkScheduleTooltip>Автоматическое управление рабочими сменами колонистов</WorkManager.Settings_Schedule_ManageWorkScheduleTooltip>
+	<WorkManager.Settings_Schedule_UpdateFrequency>Частота обновления</WorkManager.Settings_Schedule_UpdateFrequency>
+	<WorkManager.Settings_Schedule_UpdateFrequencyTooltip>Сколько раз обновлять расписания за игровой день</WorkManager.Settings_Schedule_UpdateFrequencyTooltip>
+	<WorkManager.Settings_Schedule_ColonistWorkShifts>Рабочие смены колонистов</WorkManager.Settings_Schedule_ColonistWorkShifts>
+	<WorkManager.Settings_Schedule_ColonistWorkShiftsTooltip>Общие рабочие смены для колонистов</WorkManager.Settings_Schedule_ColonistWorkShiftsTooltip>
+	<WorkManager.Settings_Schedule_AddWorkShift>Добавить</WorkManager.Settings_Schedule_AddWorkShift>
+	<WorkManager.Settings_Schedule_DeleteWorkShift>Удалить…</WorkManager.Settings_Schedule_DeleteWorkShift>
+	<WorkManager.Settings_Schedule_ResetWorkShifts>Сбросить по умолчанию</WorkManager.Settings_Schedule_ResetWorkShifts>
+	<WorkManager.Settings_Schedule_WorkShiftNumberColumnHeader>#</WorkManager.Settings_Schedule_WorkShiftNumberColumnHeader>
+	<WorkManager.Settings_Schedule_WorkShiftColumnHeader>Рабочая смена</WorkManager.Settings_Schedule_WorkShiftColumnHeader>
+	<WorkManager.Settings_Schedule_WorkShiftColumnHeaderTooltip>Настроить распределение времени для смены</WorkManager.Settings_Schedule_WorkShiftColumnHeaderTooltip>
+	<WorkManager.Settings_Schedule_WorkShiftThresholdColumnHeader>Порог пешек</WorkManager.Settings_Schedule_WorkShiftThresholdColumnHeader>
+	<WorkManager.Settings_Schedule_WorkShiftThresholdColumnHeaderTooltip>Пешки будут назначены на смену только если количество подходящих пешек равно или больше этого значения (для первой смены всегда равно 1)</WorkManager.Settings_Schedule_WorkShiftThresholdColumnHeaderTooltip>
+	<WorkManager.Settings_Schedule_NightOwlWorkShifts>Смены для «Сов»</WorkManager.Settings_Schedule_NightOwlWorkShifts>
+	<WorkManager.Settings_Schedule_NightOwlWorkShiftsTooltip>Рабочие смены для колонистов с чертой «Сова»</WorkManager.Settings_Schedule_NightOwlWorkShiftsTooltip>
+	<WorkManager.Settings_Misc_Title>Разное</WorkManager.Settings_Misc_Title>
+	<WorkManager.Settings_Misc_VerboseLogging>Подробное логирование</WorkManager.Settings_Misc_VerboseLogging>
+	<WorkManager.Settings_Misc_VerboseLoggingTooltip>Показывать подробности работы мода в журнале (работает только при включённом режиме разработчика)</WorkManager.Settings_Misc_VerboseLoggingTooltip>
+</LanguageData>

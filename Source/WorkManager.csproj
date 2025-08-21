@@ -70,15 +70,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Helpers\UIHelper.cs" />
+    <Compile Include="Cache\PawnSkillCache.cs" />
+    <Compile Include="Cache\PawnWorkCache.cs" />
+    <Compile Include="Helpers\PassionHelper.cs" />
+    <Compile Include="Helpers\WorkTypeAssignmentRuleComparer.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Settings\DedicatedWorkerSettings.cs" />
-    <Compile Include="Settings\DisabledWorkType.cs" />
-    <Compile Include="Settings\AssignEveryoneWorkType.cs" />
     <Compile Include="Compatibility\MoreThanCapable.cs" />
     <Compile Include="Compatibility\WorkTab.cs" />
     <Compile Include="Helpers\WorkTypePriorityHelper.cs" />
-    <Compile Include="Settings\PawnCapacityLimit.cs" />
     <Compile Include="PawnColumnWorkers\AutoWorkSchedule.cs" />
     <Compile Include="DefOfs\PawnColumnDefOf.cs" />
     <Compile Include="Patches\DefGeneratorPatch.cs" />
@@ -89,16 +89,12 @@
     <Compile Include="Cache\PawnCache.cs" />
     <Compile Include="PawnColumnWorkers\AutoWorkPriorities.cs" />
     <Compile Include="Resources.cs" />
-    <Compile Include="Settings\PawnCountSettings.cs" />
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="CustomWidgets.cs" />
     <Compile Include="Settings\SettingsTabs.cs" />
     <Compile Include="Settings\Settings_Schedules.cs" />
-    <Compile Include="Settings\Settings_Priorities.cs" />
     <Compile Include="Settings\Settings_WorkPriorities.cs" />
-    <Compile Include="Settings\Settings_Works.cs" />
     <Compile Include="Settings\Settings_WorkTypes.cs" />
-    <Compile Include="Settings\SkillLimit.cs" />
     <Compile Include="Settings\DedicatedWorkerMode.cs" />
     <Compile Include="WorkManagerMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -107,7 +103,6 @@
     <Compile Include="Settings\WorkTypeAssignmentRule.cs" />
     <Compile Include="WorkPriorityUpdater.cs" />
     <Compile Include="WorkShift.cs" />
-    <Compile Include="Settings\WorkTypeSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

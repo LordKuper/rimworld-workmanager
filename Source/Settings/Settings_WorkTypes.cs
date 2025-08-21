@@ -212,6 +212,10 @@ public partial class Settings
                 ref SelectedWorkTypeRule.EnsureWorkerAssigned, Strings.EnsureWorkerAssignedLabel,
                 Strings.GetEnsureWorkerAssignedTooltip(true), null, out assignmentRect);
         }
+        if (SelectedWorkTypeRule.EnsureWorkerAssigned == true)
+            assignmentContentHeight += Fields.DoLabeledIntegerSlider(assignmentRect, 1, null,
+                Strings.MinWorkerNumberLabel, Strings.MinWorkerNumberTooltip, ref SelectedWorkTypeRule.MinWorkerNumber,
+                1, 10, 1, null, out assignmentRect);
         if (defaultRule)
         {
             var value = SelectedWorkTypeRule.AssignEveryone == true;
@@ -221,9 +225,10 @@ public partial class Settings
         }
         else
         {
-            assignmentContentHeight += Fields.DoLabeledCheckbox(assignmentRect, 0, null,
-                ref SelectedWorkTypeRule.AssignEveryone, Strings.AssignEveryoneLabel,
-                Strings.GetAssignEveryoneTooltip(true), null, out assignmentRect);
+            var value = SelectedWorkTypeRule.AssignEveryone;
+            assignmentContentHeight += Fields.DoLabeledCheckbox(assignmentRect, 0, null, ref value,
+                Strings.AssignEveryoneLabel, Strings.GetAssignEveryoneTooltip(true), null, out assignmentRect);
+            SelectedWorkTypeRule.AssignEveryone = value;
         }
         if (SelectedWorkTypeRule.AssignEveryone == true)
             assignmentContentHeight += Fields.DoLabeledIntegerSlider(assignmentRect, 1, null,

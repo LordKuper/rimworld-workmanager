@@ -200,6 +200,14 @@ internal static class Resources
                     $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkPriorities)}.{nameof(DedicatedWorkerSkillScoreFactorTooltip)}"
                         .Translate();
 
+                internal static readonly string DedicatedWorkerWorkCountScoreFactor =
+                    $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkPriorities)}.{nameof(DedicatedWorkerWorkCountScoreFactor)}"
+                        .Translate();
+
+                internal static readonly string DedicatedWorkerWorkCountScoreFactorTooltip =
+                    $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkPriorities)}.{nameof(DedicatedWorkerWorkCountScoreFactorTooltip)}"
+                        .Translate();
+
                 internal static readonly string HighestSkillPriority =
                     $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkPriorities)}.{nameof(HighestSkillPriority)}"
                         .Translate();
@@ -308,17 +316,10 @@ internal static class Resources
                 private static string _assignEveryoneTriStateTooltip;
                 private static string _ensureWorkerAssignedTooltip;
                 private static string _ensureWorkerAssignedTriStateTooltip;
-                internal static readonly string AddWorkType = "WorkManager.Settings_WorkTypes_AddWorkType".Translate();
 
                 internal static readonly string AddWorkTypeTooltip =
                     $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(AddWorkTypeTooltip)}"
                         .Translate();
-
-                internal static readonly string AllowDedicated =
-                    "WorkManager.Settings_WorkTypes_AllowDedicated".Translate();
-
-                internal static readonly string AllowDedicatedTooltip =
-                    "WorkManager.Settings_WorkTypes_AllowDedicatedTooltip".Translate();
 
                 internal static readonly string AllowDedicatedWorkerLabel =
                     $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(AllowDedicatedWorkerLabel)}"
@@ -359,12 +360,6 @@ internal static class Resources
                 internal static readonly string AssignEveryonePriorityTooltip =
                     $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(AssignEveryonePriorityTooltip)}"
                         .Translate();
-
-                internal static readonly string AssignEveryoneWorkTypes =
-                    "WorkManager.Settings_WorkTypes_AssignEveryoneWorkTypes".Translate();
-
-                internal static readonly string AssignEveryoneWorkTypesTooltip =
-                    "WorkManager.Settings_WorkTypes_AssignEveryoneWorkTypesTooltip".Translate();
 
                 internal static readonly string AssignmentSettingsLabel =
                     $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(AssignmentSettingsLabel)}"
@@ -418,24 +413,9 @@ internal static class Resources
                     $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(DefaultWorkTypeRuleLabel)}"
                         .Translate();
 
-                internal static readonly string DeleteWorkType =
-                    "WorkManager.Settings_WorkTypes_DeleteWorkType".Translate();
-
                 internal static readonly string DeleteWorkTypeTooltip =
                     $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(DeleteWorkTypeTooltip)}"
                         .Translate();
-
-                internal static readonly string DisabledWorkTypesForForeigners =
-                    "WorkManager.Settings_WorkTypes_DisabledWorkTypesForForeigners".Translate();
-
-                internal static readonly string DisabledWorkTypesForForeignersTooltip =
-                    "WorkManager.Settings_WorkTypes_DisabledWorkTypesForForeignersTooltip".Translate();
-
-                internal static readonly string DisabledWorkTypesForSlaves =
-                    "WorkManager.Settings_WorkTypes_DisabledWorkTypesForSlaves".Translate();
-
-                internal static readonly string DisabledWorkTypesForSlavesTooltip =
-                    "WorkManager.Settings_WorkTypes_DisabledWorkTypesForSlavesTooltip".Translate();
 
                 internal static readonly string EnsureWorkerAssignedLabel =
                     $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(EnsureWorkerAssignedLabel)}"
@@ -449,6 +429,14 @@ internal static class Resources
                     $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(EnsureWorkerAssignedOnTooltip)}"
                         .Translate();
 
+                internal static readonly string MinWorkerNumberLabel =
+                    $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(MinWorkerNumberLabel)}"
+                        .Translate();
+
+                internal static readonly string MinWorkerNumberTooltip =
+                    $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(MinWorkerNumberTooltip)}"
+                        .Translate();
+
                 internal static readonly string NoRuleSelected =
                     $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(NoRuleSelected)}"
                         .Translate();
@@ -460,9 +448,6 @@ internal static class Resources
                 internal static readonly string PawnCountFactorTooltip =
                     $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(PawnCountFactorTooltip)}"
                         .Translate();
-
-                internal static readonly string ResetWorkTypes =
-                    "WorkManager.Settings_WorkTypes_ResetWorkTypes".Translate();
 
                 internal static readonly string ResetWorkTypesTooltip =
                     $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(ResetWorkTypesTooltip)}"
@@ -482,21 +467,6 @@ internal static class Resources
                 internal static readonly string WorkTypeCountFactorTooltip =
                     $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(WorkTypeCountFactorTooltip)}"
                         .Translate();
-
-                internal static readonly string WorkTypeName =
-                    "WorkManager.Settings_WorkTypes_WorkTypeName".Translate();
-
-                internal static readonly string WorkTypeNameTooltip =
-                    "WorkManager.Settings_WorkTypes_WorkTypeNameTooltip".Translate();
-
-                internal static readonly string WorkTypeNotLoadedTooltip =
-                    "WorkManager.Settings_WorkTypes_WorkTypeNotLoadedTooltip".Translate();
-
-                internal static readonly string WorkTypePriority =
-                    "WorkManager.Settings_WorkTypes_WorkTypePriority".Translate();
-
-                internal static readonly string WorkTypePriorityTooltip =
-                    "WorkManager.Settings_WorkTypes_WorkTypePriorityTooltip".Translate();
 
                 internal static readonly string WorkTypeRuleDisabledSettingTooltip =
                     $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(WorkTypeRuleDisabledSettingTooltip)}"

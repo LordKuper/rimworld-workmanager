@@ -72,4 +72,14 @@ public class WorkManagerMod : Mod
     {
         return Resources.Strings.ModTitle;
     }
+
+    /// <summary>
+    ///     Writes the current settings to the appropriate game component, ensuring they are updated in the game's settings
+    ///     cache.
+    /// </summary>
+    public override void WriteSettings()
+    {
+        base.WriteSettings();
+        WorkManagerGameComponent.Instance?.UpdateSettingsCache();
+    }
 }

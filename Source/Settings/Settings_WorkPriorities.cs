@@ -28,6 +28,9 @@ public partial class Settings
     /// <summary>Default score factor for skill of dedicated workers.</summary>
     private const float DedicatedWorkerSkillScoreFactorDefault = 1f;
 
+    /// <summary>Default score factor for number of assigned dedicated work types of dedicated workers.</summary>
+    private const float DedicatedWorkerWorkCountScoreFactorDefault = 0.5f;
+
     /// <summary>Default priority for highest skill.</summary>
     private const int HighestSkillPriorityDefault = 1;
 
@@ -89,6 +92,9 @@ public partial class Settings
 
     /// <summary>Score factor for skill of dedicated workers.</summary>
     public float DedicatedWorkerSkillScoreFactor = DedicatedWorkerSkillScoreFactorDefault;
+
+    /// <summary>Score factor for number of assigned dedicated work types of dedicated workers.</summary>
+    public float DedicatedWorkerWorkCountScoreFactor = DedicatedWorkerWorkCountScoreFactorDefault;
 
     /// <summary>Priority for highest skill.</summary>
     public int HighestSkillPriority = HighestSkillPriorityDefault;
@@ -182,6 +188,9 @@ public partial class Settings
             y += Fields.DoLabeledFloatSlider(remRect, 1, null, Strings.DedicatedWorkerLearningRateScoreFactor,
                 Strings.DedicatedWorkerLearningRateScoreFactorTooltip, ref DedicatedWorkerLearningRateScoreFactor,
                 ScoreFactorMin, ScoreFactorMax, 0.1f, null, out remRect);
+            y += Fields.DoLabeledFloatSlider(remRect, 1, null, Strings.DedicatedWorkerWorkCountScoreFactor,
+                Strings.DedicatedWorkerWorkCountScoreFactorTooltip, ref DedicatedWorkerWorkCountScoreFactor,
+                ScoreFactorMin, ScoreFactorMax, 0.1f, null, out remRect);
         }
         else
         {
@@ -249,6 +258,8 @@ public partial class Settings
             DedicatedWorkerPassionScoreFactorDefault);
         Scribe_Values.Look(ref DedicatedWorkerLearningRateScoreFactor, nameof(DedicatedWorkerLearningRateScoreFactor),
             DedicatedWorkerLearningRateScoreFactorDefault);
+        Scribe_Values.Look(ref DedicatedWorkerWorkCountScoreFactor, nameof(DedicatedWorkerWorkCountScoreFactor),
+            DedicatedWorkerWorkCountScoreFactorDefault);
         Scribe_Values.Look(ref HighestSkillPriority, nameof(HighestSkillPriority), HighestSkillPriorityDefault);
         Scribe_Values.Look(ref AssignAllWorkTypes, nameof(AssignAllWorkTypes));
         Scribe_Values.Look(ref LeftoverPriority, nameof(LeftoverPriority), LeftoverPriorityDefault);
@@ -303,8 +314,10 @@ public partial class Settings
             PassionPriorities = PassionPrioritiesDefault;
         foreach (var passion in PassionHelper.Passions)
         {
-            if (PassionPriorities.ContainsKey(passion.DefName)) continue;
-            PassionPriorities[passion.DefName] = 0;
+            if (PassionPriorities.TryGetValue(passion.DefName, out var priority))
+                PassionPriorities[passion.DefName] = Mathf.Clamp(priority, 0, MaxWorkTypePriority);
+            else
+                PassionPriorities[passion.DefName] = 0;
         }
         MajorLearningRateThreshold = MajorLearningRateThreshold == 0
             ? MajorLearningRateThresholdDefault
