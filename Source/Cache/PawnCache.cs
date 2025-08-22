@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
 using LordKuper.Common;
 using LordKuper.WorkManager.Helpers;
@@ -202,17 +201,15 @@ internal class PawnCache(Pawn pawn)
     /// <param name="time">The current RimWorld time.</param>
     public void Update(RimWorldTime time)
     {
-        IsCapable = !Pawn.Dead && !Pawn.InContainerEnclosed;
+        IsCapable = !Pawn.Dead && !Pawn.InContainerEnclosed && !Pawn.InMentalState && !Pawn.Downed;
         IsManaged = WorkManagerGameComponent.Instance.GetPawnEnabled(Pawn);
         _workPriorities.Clear();
         _managedWorkTypes.Clear();
-        var workTypes = DefDatabase<WorkTypeDef>.AllDefsListForReading.Where(w => w.visible);
-        foreach (var workType in workTypes)
+        foreach (var workType in WorkManagerGameComponent.Instance?.AllWorkTypes ?? [])
         {
             _workPriorities.Add(workType,
                 IsManagedWork(workType) ? 0 : WorkTypePriorityHelper.GetPriority(Pawn, workType));
         }
-        if (!IsCapable) return;
         Work.Update(time);
         Skill.Update(time);
     }

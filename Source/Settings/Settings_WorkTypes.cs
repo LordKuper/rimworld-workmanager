@@ -383,7 +383,7 @@ public partial class Settings
     {
         var workTypeRules = _workTypeRules;
         var workTypeRulesCount = workTypeRules.Count;
-        var allDefs = DefDatabase<WorkTypeDef>.AllDefsListForReading;
+        var allDefs = WorkManagerGameComponent.Instance.AllWorkTypes;
         List<WorkTypeDef> addableDefs;
         var canAdd = false;
         if (allDefs.Count > 0)

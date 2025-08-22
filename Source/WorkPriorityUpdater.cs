@@ -409,6 +409,10 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
                 var skill = pc.GetWorkSkillLevel(rule.Def);
                 if (skill > maxSkillValue) maxSkillValue = skill;
             }
+#if DEBUG
+            Logger.LogMessage(
+                $"Allowed workers for '{rule.Label}': {string.Join(", ", allowedWorkers.Select(pc => $"{pc.Pawn.LabelShort} ({pc.GetWorkSkillLevel(rule.Def)})"))} (max skill = {maxSkillValue})");
+#endif
             if (allowedWorkers.Count == 0) continue;
             var activeWorkerCount = 0;
             foreach (var pc in _capablePawns)
@@ -427,6 +431,7 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
                     $"Setting {pc.Pawn.LabelShort}'s priority of '{rule.Label}' to {WorkManagerMod.Settings.HighestSkillPriority} (skill = {skill}, max = {maxSkillValue})");
 #endif
                 pc.SetWorkPriority(rule.Def, WorkManagerMod.Settings.HighestSkillPriority);
+                activeWorkerCount++;
             }
         }
     }

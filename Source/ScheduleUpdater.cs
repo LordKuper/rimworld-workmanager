@@ -58,7 +58,7 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
             {
                 var shiftWorkers = _workers.Where(pair => pair.Value == shift).Select(pair => pair.Key).ToList();
                 scores[shift] += shiftWorkers.Intersect(lovers).Count() * 10f;
-                foreach (var workType in DefDatabase<WorkTypeDef>.AllDefsListForReading.Where(w => w.visible))
+                foreach (var workType in WorkManagerGameComponent.Instance.AllWorkTypes)
                 {
                     var priority = WorkTypePriorityHelper.GetPriority(pawn, workType);
                     if (priority == 0) continue;
