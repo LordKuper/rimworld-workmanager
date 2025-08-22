@@ -69,11 +69,6 @@ public class WorkManagerGameComponent : GameComponent
     }
 
     /// <summary>
-    ///     Gets the collection of all available work types.
-    /// </summary>
-    internal IReadOnlyList<WorkTypeDef> AllWorkTypes { get; private set; }
-
-    /// <summary>
     ///     Gets the dictionary of work types assigned to everyone and their priorities.
     /// </summary>
     internal IReadOnlyDictionary<WorkTypeDef, int> AssignEveryoneWorkTypes => _assignEveryoneWorkTypes;
@@ -286,19 +281,6 @@ public class WorkManagerGameComponent : GameComponent
     }
 
     /// <summary>
-    ///     Updates the list of all work types to include only those that are visible.
-    /// </summary>
-    /// <remarks>
-    ///     If the list of work types is already initialized, this method does nothing.  Otherwise, it
-    ///     initializes the list with all visible work types retrieved from the database.
-    /// </remarks>
-    private void UpdateAllWorkTypes()
-    {
-        if (AllWorkTypes == null || AllWorkTypes.Count == 0)
-            AllWorkTypes = DefDatabase<WorkTypeDef>.AllDefsListForReading.ToList();
-    }
-
-    /// <summary>
     ///     Updates the dictionary of work types that should be assigned to everyone, along with their priorities.
     /// </summary>
     /// <remarks>
@@ -352,7 +334,7 @@ public class WorkManagerGameComponent : GameComponent
             if (rule.Def != null && rule.DefName != null)
                 specialRulesDict[rule.Def] = rule;
         }
-        foreach (var def in AllWorkTypes)
+        foreach (var def in DefDatabase<WorkTypeDef>.AllDefsListForReading)
         {
             if (!specialRulesDict.TryGetValue(def, out var specialRule))
                 specialRule = WorkTypeAssignmentRule.CreateRule(def.defName);
@@ -390,7 +372,6 @@ public class WorkManagerGameComponent : GameComponent
 #if DEBUG
         Logger.LogMessage("Updating settings cache...");
 #endif
-        UpdateAllWorkTypes();
         UpdateCombinedRules();
         UpdateAssignEveryoneWorkTypes();
         UpdateDedicatedWorkTypes();
@@ -409,6 +390,7 @@ public class WorkManagerGameComponent : GameComponent
     {
         _ = _disabledPawns?.RemoveAll(pawn => pawn?.Destroyed ?? true);
         _ = _disabledPawnSchedules?.RemoveAll(pawn => pawn?.Destroyed ?? true);
-        _ = _disabledWorkTypes?.RemoveAll(workType => !AllWorkTypes.Contains(workType));
+        _ = _disabledWorkTypes?.RemoveAll(workType =>
+            !DefDatabase<WorkTypeDef>.AllDefsListForReading.Contains(workType));
     }
 }

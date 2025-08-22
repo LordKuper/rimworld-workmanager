@@ -205,7 +205,7 @@ internal class PawnCache(Pawn pawn)
         IsManaged = WorkManagerGameComponent.Instance.GetPawnEnabled(Pawn);
         _workPriorities.Clear();
         _managedWorkTypes.Clear();
-        foreach (var workType in WorkManagerGameComponent.Instance?.AllWorkTypes ?? [])
+        foreach (var workType in DefDatabase<WorkTypeDef>.AllDefsListForReading)
         {
             _workPriorities.Add(workType,
                 IsManagedWork(workType) ? 0 : WorkTypePriorityHelper.GetPriority(Pawn, workType));
