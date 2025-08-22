@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
 using LordKuper.Common.Cache;
@@ -372,6 +371,7 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
         Scribe_Deep.Look(ref AllowedWorkers, nameof(AllowedWorkers));
         Scribe_Values.Look(ref AssignEveryone, nameof(AssignEveryone));
         Scribe_Values.Look(ref AssignEveryonePriority, nameof(AssignEveryonePriority), AssignEveryonePriorityDefault);
+        Scribe_Values.Look(ref EnsureWorkerAssigned, nameof(EnsureWorkerAssigned));
         Scribe_Values.Look(ref MinWorkerNumber, nameof(MinWorkerNumber));
         Scribe_Deep.Look(ref DedicatedWorkerSettings, nameof(DedicatedWorkerSettings));
     }
