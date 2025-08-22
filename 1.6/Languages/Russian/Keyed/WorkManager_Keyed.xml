@@ -2,6 +2,8 @@
 
 <LanguageData>
 	<LordKuper.WorkManager.ModTitle>Менеджер работ</LordKuper.WorkManager.ModTitle>
+	<LordKuper.WorkManager.UpdateNowTooltip>Немедленно обновить автоматические назначения работ.</LordKuper.WorkManager.UpdateNowTooltip>
+	<LordKuper.WorkManager.OpenSettingsTooltip>Открыть окно настроек мода Work Manager.</LordKuper.WorkManager.OpenSettingsTooltip>
 	<LordKuper.WorkManager.Settings.WorkPriorities.Title>Приоритеты работ</LordKuper.WorkManager.Settings.WorkPriorities.Title>
 	<LordKuper.WorkManager.Settings.WorkPriorities.UpdateFrequency>Частота обновления</LordKuper.WorkManager.Settings.WorkPriorities.UpdateFrequency>
 	<LordKuper.WorkManager.Settings.WorkPriorities.UpdateFrequencyTooltip>Определяет, как часто будут обновляться приоритеты типов работ у пешек.</LordKuper.WorkManager.Settings.WorkPriorities.UpdateFrequencyTooltip>

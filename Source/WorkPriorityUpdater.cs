@@ -494,6 +494,19 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
     }
 
     /// <summary>
+    ///     Forces an immediate update by resetting the internal update time.
+    /// </summary>
+    /// <remarks>
+    ///     This method resets the update time to its initial state, triggering any dependent processes
+    ///     to recognize the need for an update. Use this method when an update is required outside of the normal update
+    ///     cycle.
+    /// </remarks>
+    internal void ForceUpdate()
+    {
+        _workUpdateTime = new RimWorldTime(0);
+    }
+
+    /// <summary>
     ///     Calculates and returns a dictionary of scores for a collection of pawns, indicating their suitability as
     ///     dedicated workers for a specified work type based on various factors.
     /// </summary>

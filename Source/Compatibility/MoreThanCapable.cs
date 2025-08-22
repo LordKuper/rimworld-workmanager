@@ -32,8 +32,11 @@ internal static class MoreThanCapable
     {
         if (_isInitialized) return;
         _isInitialized = true;
-        MoreThanCapableActive = LoadedModManager.RunningModsListForReading.Any(m =>
-            "notfood.MoreThanCapable".Equals(m.PackageId, StringComparison.OrdinalIgnoreCase));
+        MoreThanCapableActive =
+            LoadedModManager.RunningModsListForReading.Any(m =>
+                "notfood.MoreThanCapable".Equals(m.PackageId, StringComparison.OrdinalIgnoreCase)) ||
+            LoadedModManager.RunningModsListForReading.Any(m =>
+                "void.MoreThanCapable".Equals(m.PackageId, StringComparison.OrdinalIgnoreCase));
         if (!MoreThanCapableActive) return;
 #if DEBUG
         Logger.LogMessage("MoreThanCapable detected.");

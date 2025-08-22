@@ -90,7 +90,6 @@
     <Compile Include="PawnColumnWorkers\AutoWorkPriorities.cs" />
     <Compile Include="Resources.cs" />
     <Compile Include="Settings\Settings.cs" />
-    <Compile Include="CustomWidgets.cs" />
     <Compile Include="Settings\SettingsTabs.cs" />
     <Compile Include="Settings\Settings_Schedules.cs" />
     <Compile Include="Settings\Settings_WorkPriorities.cs" />

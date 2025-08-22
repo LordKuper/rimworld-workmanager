@@ -124,6 +124,26 @@ public class WorkManagerGameComponent : GameComponent
     }
 
     /// <summary>
+    ///     Forces an update of work assignments for the current map.
+    /// </summary>
+    internal static void ForceUpdateAssignments()
+    {
+        var map = Find.CurrentMap;
+#if DEBUG
+        if (map == null) Logger.LogMessage("Can not force update assignments (map = null).");
+        Logger.LogMessage($"Force updating assignments for {map}");
+#endif
+        if (map == null) return;
+        var priorityUpdater = map.GetComponent<WorkPriorityUpdater>();
+        if (priorityUpdater == null)
+        {
+            Logger.LogError("Could not get work priority updater component for current map.");
+            return;
+        }
+        priorityUpdater.ForceUpdate();
+    }
+
+    /// <summary>
     ///     Determines if a pawn is enabled for work assignments.
     /// </summary>
     /// <param name="pawn">The pawn to check.</param>

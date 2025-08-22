@@ -6,11 +6,17 @@ using RimWorld;
 
 namespace LordKuper.WorkManager.Patches;
 
+/// <summary>
+///     Harmony patch for <see cref="DefGenerator.GenerateImpliedDefs_PreResolve" /> to inject custom pawn columns.
+/// </summary>
 [HarmonyPatch(typeof(DefGenerator), nameof(DefGenerator.GenerateImpliedDefs_PreResolve))]
 [HarmonyBefore("fluffy.worktab")]
 [UsedImplicitly]
 public static class DefGeneratorPatch
 {
+    /// <summary>
+    ///     Postfix method that inserts custom pawn columns into the Work and Restrict tables after the "Label" column.
+    /// </summary>
     [UsedImplicitly]
     public static void Postfix()
     {

@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using LordKuper.Common.UI;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -11,20 +12,21 @@ public class AutoWorkSchedule : PawnColumnWorker
     public override void DoCell(Rect rect, [NotNull] Pawn pawn, PawnTable table)
     {
         if (pawn.Dead) return;
-        var component = Current.Game.GetComponent<WorkManagerGameComponent>();
+        var component = WorkManagerGameComponent.Instance;
+        var buttonRect = new Rect(rect.center.x - 8, rect.center.y - 8, 16, 16);
         if (component.PriorityManagementEnabled)
         {
-            CustomWidgets.ButtonImageToggle(() => component.GetPawnScheduleEnabled(pawn),
+            Buttons.DoIconButtonToggle(buttonRect, () => component.GetPawnScheduleEnabled(pawn),
                 newValue => component.SetPawnScheduleEnabled(pawn, newValue),
-                new Rect(rect.center.x - 8, rect.center.y - 8, 16, 16), Resources.Strings.PawnScheduleDisableTooltip,
-                Resources.Textures.ScheduleToggleButtonEnabled, Resources.Strings.PawnScheduleEnableTooltip,
-                Resources.Textures.ScheduleToggleButtonDisabled);
+                Resources.Strings.PawnScheduleDisableTooltip, Resources.Textures.ScheduleToggleButtonEnabled,
+                Resources.Strings.PawnScheduleEnableTooltip, Resources.Textures.ScheduleToggleButtonDisabled);
         }
         else
         {
+            var color = GUI.color;
             GUI.color = Color.white;
-            GUI.DrawTexture(new Rect(rect.center.x - 8, rect.center.y - 8, 16, 16),
-                Resources.Textures.PawnToggleButtonInactive);
+            GUI.DrawTexture(buttonRect, Resources.Textures.PawnToggleButtonInactive);
+            GUI.color = color;
         }
     }
 

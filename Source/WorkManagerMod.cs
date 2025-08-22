@@ -2,6 +2,7 @@
 using HarmonyLib;
 using JetBrains.Annotations;
 using LordKuper.WorkManager.Compatibility;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -62,6 +63,14 @@ public class WorkManagerMod : Mod
     internal static int GetModInputId(int localId)
     {
         return ModId.GetHashCode() + localId;
+    }
+
+    /// <summary>
+    ///     Opens the Mod Settings window, allowing the user to configure settings for the current mod.
+    /// </summary>
+    internal static void OpenModSettingsWindow()
+    {
+        Find.WindowStack.Add(new Dialog_ModSettings(Settings.Mod));
     }
 
     /// <summary>

@@ -2,6 +2,8 @@
 
 <LanguageData>
 	<LordKuper.WorkManager.ModTitle>Work Manager</LordKuper.WorkManager.ModTitle>
+	<LordKuper.WorkManager.UpdateNowTooltip>Update automatic work assignments immediately.</LordKuper.WorkManager.UpdateNowTooltip>
+	<LordKuper.WorkManager.OpenSettingsTooltip>Open Work Manager mod settings window.</LordKuper.WorkManager.OpenSettingsTooltip>
 	<LordKuper.WorkManager.Settings.WorkPriorities.Title>Work Priorities</LordKuper.WorkManager.Settings.WorkPriorities.Title>
 	<LordKuper.WorkManager.Settings.WorkPriorities.UpdateFrequency>Update frequency</LordKuper.WorkManager.Settings.WorkPriorities.UpdateFrequency>
 	<LordKuper.WorkManager.Settings.WorkPriorities.UpdateFrequencyTooltip>Determines how often pawn work type priorities will be updated.</LordKuper.WorkManager.Settings.WorkPriorities.UpdateFrequencyTooltip>

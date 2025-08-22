@@ -14,6 +14,10 @@ internal static class Resources
         internal static readonly string GlobalDisableTooltip = "WorkManager.GlobalDisableTooltip".Translate();
         internal static readonly string GlobalEnableTooltip = "WorkManager.GlobalEnableTooltip".Translate();
         internal static readonly string ModTitle = $"{WorkManagerMod.ModId}.{nameof(ModTitle)}".Translate();
+
+        internal static readonly string OpenSettingsTooltip =
+            $"{WorkManagerMod.ModId}.{nameof(OpenSettingsTooltip)}".Translate();
+
         internal static readonly string PawnDisableTooltip = "WorkManager.PawnDisableTooltip".Translate();
         internal static readonly string PawnEnableTooltip = "WorkManager.PawnEnableTooltip".Translate();
 
@@ -21,6 +25,10 @@ internal static class Resources
             "WorkManager.PawnScheduleDisableTooltip".Translate();
 
         internal static readonly string PawnScheduleEnableTooltip = "WorkManager.PawnScheduleEnableTooltip".Translate();
+
+        internal static readonly string UpdateNowTooltip =
+            $"{WorkManagerMod.ModId}.{nameof(UpdateNowTooltip)}".Translate();
+
         internal static readonly string WorkTypeDisableTooltip = "WorkManager.WorkTypeDisableTooltip".Translate();
         internal static readonly string WorkTypeEnableTooltip = "WorkManager.WorkTypeEnableTooltip".Translate();
 
@@ -574,11 +582,15 @@ internal static class Resources
         internal static readonly Texture2D PrioritiesToggleButtonEnabled =
             ContentFinder<Texture2D>.Get("work-manager-priorities-on");
 
+        internal static readonly Texture2D RefreshButton = ContentFinder<Texture2D>.Get("work-manager-refresh");
+
         internal static readonly Texture2D ScheduleToggleButtonDisabled =
             ContentFinder<Texture2D>.Get("work-manager-schedule-off");
 
         internal static readonly Texture2D ScheduleToggleButtonEnabled =
             ContentFinder<Texture2D>.Get("work-manager-schedule-on");
+
+        internal static readonly Texture2D SettingsButton = ContentFinder<Texture2D>.Get("work-manager-settings");
 
         internal static readonly Texture2D WorkTypeToggleButtonDisabled =
             ContentFinder<Texture2D>.Get("work-manager-work-type-off");

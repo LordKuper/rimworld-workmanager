@@ -6,10 +6,21 @@ using Verse;
 
 namespace LordKuper.WorkManager.Patches;
 
+/// <summary>
+///     Harmony patch class for customizing the behavior of work box drawing in the work tab.
+/// </summary>
 [HarmonyPatch(typeof(WidgetsWork))]
 [UsedImplicitly]
 public static class WidgetsWorkPatch
 {
+    /// <summary>
+    ///     Postfix patch for <see cref="WidgetsWork.DrawWorkBoxFor" />.
+    ///     Draws a semi-transparent overlay if the pawn's work type is disabled.
+    /// </summary>
+    /// <param name="x">The x position of the work box.</param>
+    /// <param name="y">The y position of the work box.</param>
+    /// <param name="p">The pawn for which the work box is drawn.</param>
+    /// <param name="wType">The work type definition.</param>
     [UsedImplicitly]
     [HarmonyPatch(nameof(WidgetsWork.DrawWorkBoxFor))]
     [HarmonyPostfix]
@@ -30,6 +41,14 @@ public static class WidgetsWorkPatch
         GUI.color = Color.white;
     }
 
+    /// <summary>
+    ///     Prefix patch for <see cref="WidgetsWork.DrawWorkBoxFor" />.
+    ///     Handles middle mouse button clicks to toggle the enabled state of a pawn's work type.
+    /// </summary>
+    /// <param name="x">The x position of the work box.</param>
+    /// <param name="y">The y position of the work box.</param>
+    /// <param name="p">The pawn for which the work box is drawn.</param>
+    /// <param name="wType">The work type definition.</param>
     [UsedImplicitly]
     [HarmonyPatch(nameof(WidgetsWork.DrawWorkBoxFor))]
     [HarmonyPrefix]
