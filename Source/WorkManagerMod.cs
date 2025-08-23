@@ -89,6 +89,7 @@ public class WorkManagerMod : Mod
     public override void WriteSettings()
     {
         base.WriteSettings();
+        Settings.Validate();
         WorkManagerGameComponent.Instance?.UpdateSettingsCache();
     }
 }

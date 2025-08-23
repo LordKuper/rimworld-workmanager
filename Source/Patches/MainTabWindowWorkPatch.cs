@@ -28,14 +28,11 @@ public static class MainTabWindowWorkPatch
         Buttons.DoIconButtonToggle(buttonRect, ref component.PriorityManagementEnabled,
             Resources.Strings.GlobalDisableTooltip, Resources.Textures.PrioritiesToggleButtonEnabled,
             Resources.Strings.GlobalEnableTooltip, Resources.Textures.PrioritiesToggleButtonDisabled);
-        if (component.PriorityManagementEnabled)
-        {
-            Layout.GetRightColumnRect(buttonRow, Layout.ElementGapSmall, out buttonRow);
-            buttonRect = Layout.GetRightColumnRect(buttonRow, Buttons.IconButtonSize, out buttonRow);
-            Buttons.DoIconButton(buttonRect,
-                new IconButton(Resources.Textures.RefreshButton, WorkManagerGameComponent.ForceUpdateAssignments,
-                    Resources.Strings.UpdateNowTooltip));
-        }
+        Layout.GetRightColumnRect(buttonRow, Layout.ElementGapSmall, out buttonRow);
+        buttonRect = Layout.GetRightColumnRect(buttonRow, Buttons.IconButtonSize, out buttonRow);
+        Buttons.DoIconButton(buttonRect,
+            new IconButton(Resources.Textures.RefreshButton, WorkManagerGameComponent.ForceUpdateAssignments,
+                Resources.Strings.UpdateNowTooltip));
         Layout.GetRightColumnRect(buttonRow, Layout.ElementGapSmall, out buttonRow);
         buttonRect = Layout.GetRightColumnRect(buttonRow, Buttons.IconButtonSize, out buttonRow);
         Buttons.DoIconButton(buttonRect,

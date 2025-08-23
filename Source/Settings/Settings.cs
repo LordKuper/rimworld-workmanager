@@ -74,6 +74,7 @@ public partial class Settings : ModSettings
     public override void ExposeData()
     {
         base.ExposeData();
+        ExposeVersionData();
         ExposeWorkPrioritiesData();
         ExposeWorkTypesData();
         ExposeSchedulesData();
@@ -114,14 +115,29 @@ public partial class Settings : ModSettings
     }
 
     /// <summary>
+    ///     Resets all work-related configurations to their default states.
+    /// </summary>
+    /// <remarks>
+    ///     This method resets work priorities, work types, and schedules to their default values. It is
+    ///     intended to restore the system to its initial configuration.
+    /// </remarks>
+    private void ResetAll()
+    {
+        ResetWorkPriorities();
+        ResetWorkTypes();
+        ResetSchedules();
+    }
+
+    /// <summary>
     ///     Validates the current state of the object to ensure it meets required conditions.
     /// </summary>
     /// <remarks>
     ///     This method performs internal validation checks. It is
     ///     intended to ensure the object is in a consistent and valid state before further processing.
     /// </remarks>
-    private void Validate()
+    internal void Validate()
     {
+        ValidateVersion();
         ValidateWorkPriorities();
         ValidateWorkTypes();
     }

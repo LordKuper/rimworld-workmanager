@@ -280,6 +280,33 @@ public partial class Settings
     }
 
     /// <summary>
+    ///     Resets all work priority settings to their default values.
+    /// </summary>
+    private void ResetWorkPriorities()
+    {
+        WorkPrioritiesUpdateFrequency = WorkPrioritiesUpdateFrequencyDefault;
+        UseDedicatedWorkers = true;
+        DedicatedWorkerPriority = DedicatedWorkerPriorityDefault;
+        DedicatedWorkerSkillScoreFactor = DedicatedWorkerSkillScoreFactorDefault;
+        DedicatedWorkerPassionScoreFactor = DedicatedWorkerPassionScoreFactorDefault;
+        DedicatedWorkerLearningRateScoreFactor = DedicatedWorkerLearningRateScoreFactorDefault;
+        DedicatedWorkerWorkCountScoreFactor = DedicatedWorkerWorkCountScoreFactorDefault;
+        HighestSkillPriority = HighestSkillPriorityDefault;
+        AssignAllWorkTypes = false;
+        LeftoverPriority = LeftoverPriorityDefault;
+        AssignWorkToIdlePawns = true;
+        IdlePriority = IdlePriorityDefault;
+        UsePassionPriorities = true;
+        PassionPriorities = PassionPrioritiesDefault;
+        UseLearningRatesPriorities = false;
+        UsePawnLearningRateThresholds = false;
+        MinorLearningRateThreshold = MinorLearningRateThresholdDefault;
+        MinorLearningRatePriority = MinorLearningRatePriorityDefault;
+        MajorLearningRateThreshold = MajorLearningRateThresholdDefault;
+        MajorLearningRatePriority = MajorLearningRatePriorityDefault;
+    }
+
+    /// <summary>
     ///     Validates and adjusts work priority-related settings to ensure they fall within acceptable ranges or default
     ///     values.
     /// </summary>

@@ -92,6 +92,7 @@
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="Settings\SettingsTabs.cs" />
     <Compile Include="Settings\Settings_Schedules.cs" />
+    <Compile Include="Settings\Settings_Version.cs" />
     <Compile Include="Settings\Settings_WorkPriorities.cs" />
     <Compile Include="Settings\Settings_WorkTypes.cs" />
     <Compile Include="Settings\DedicatedWorkerMode.cs" />

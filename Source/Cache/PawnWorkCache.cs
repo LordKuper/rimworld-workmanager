@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
 using LordKuper.Common;
 using LordKuper.Common.Cache;
@@ -17,12 +16,6 @@ namespace LordKuper.WorkManager.Cache;
 /// </summary>
 internal class PawnWorkCache(Pawn pawn) : TimedCache(RimWorldTime.HoursInDay)
 {
-    /// <summary>
-    ///     Dictionary of work types and whether they are allowed for the pawn.
-    ///     The key is the <see cref="WorkTypeDef" />, and the value indicates if it is allowed.
-    /// </summary>
-    private readonly Dictionary<WorkTypeDef, bool> _allowedWorkTypes = [];
-
     /// <summary>
     ///     Dictionary of work types and whether they are considered bad for the pawn.
     ///     The key is the <see cref="WorkTypeDef" />, and the value indicates if it is bad.
@@ -57,32 +50,6 @@ internal class PawnWorkCache(Pawn pawn) : TimedCache(RimWorldTime.HoursInDay)
         passion = PawnHelper.GetWorkPassion(pawn, workType);
         _workPassions.Add(workType, passion);
         return passion;
-    }
-
-    /// <summary>
-    ///     Determines whether the specified work type is allowed for the pawn.
-    ///     Results are cached for performance.
-    /// </summary>
-    /// <param name="workType">The work type to check.</param>
-    /// <returns>
-    ///     <c>true</c> if the work type is allowed for the pawn; otherwise, <c>false</c>.
-    /// </returns>
-    /// <exception cref="ArgumentNullException">Thrown if <paramref name="workType" /> is <c>null</c>.</exception>
-    public bool IsAllowedWorker([NotNull] WorkTypeDef workType)
-    {
-        if (workType == null) throw new ArgumentNullException(nameof(workType));
-        if (_allowedWorkTypes.TryGetValue(workType, out var allowed)) return allowed;
-        if (pawn.WorkTypeIsDisabled(workType))
-        {
-            allowed = false;
-        }
-        else
-        {
-            var rule = WorkManagerGameComponent.Instance.CombinedRules.First(r => r.Def == workType);
-            allowed = rule.IsAllowedWorker(pawn);
-        }
-        _allowedWorkTypes.Add(workType, allowed);
-        return allowed;
     }
 
     /// <summary>
@@ -138,7 +105,6 @@ internal class PawnWorkCache(Pawn pawn) : TimedCache(RimWorldTime.HoursInDay)
     public override bool Update(RimWorldTime time)
     {
         if (!base.Update(time)) return false;
-        _allowedWorkTypes.Clear();
         _badWorkTypes.Clear();
         _workPassions.Clear();
         _dangerousWorkTypes.Clear();

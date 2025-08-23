@@ -46,6 +46,10 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
         {
             if (!pawnCache.IsManaged)
                 continue;
+#if DEBUG
+            Logger.LogMessage(
+                $"Applying work priorities for {pawnCache.Pawn.LabelShort}: {string.Join(", ", _managedWorkTypeRules.Keys.Where(wt => pawnCache.IsManagedWork(wt)).Select(wt => $"{wt.defName}={pawnCache.GetWorkPriority(wt)}"))}");
+#endif
             foreach (var workType in _managedWorkTypeRules.Keys)
             {
                 if (!pawnCache.IsManagedWork(workType))
@@ -118,12 +122,17 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
                 targetWorkersCount = Math.Max(targetWorkersCount, rule.MinWorkerNumber);
 #if DEBUG
             Logger.LogMessage($"Target dedicated workers for {rule.Label} = {targetWorkersCount}");
+            Logger.LogMessage($"Allowed workers filter for {rule.Label}:\n{rule.AllowedWorkers.GetSummary(0)}");
 #endif
             var allowedWorkers = new List<PawnCache>(_capablePawns.Count);
             foreach (var pc in _capablePawns)
             {
                 if (pc.IsAllowedWorker(rule.Def)) allowedWorkers.Add(pc);
             }
+#if DEBUG
+            Logger.LogMessage(
+                $"Allowed workers for '{rule.Label}': {string.Join(", ", allowedWorkers.Select(pc => $"{pc.Pawn.LabelShort}"))}");
+#endif
             if (allowedWorkers.Count == 0) continue;
             var goodWorkers = new List<PawnCache>(allowedWorkers.Count);
             foreach (var pc in allowedWorkers)
@@ -494,19 +503,6 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
     }
 
     /// <summary>
-    ///     Forces an immediate update by resetting the internal update time.
-    /// </summary>
-    /// <remarks>
-    ///     This method resets the update time to its initial state, triggering any dependent processes
-    ///     to recognize the need for an update. Use this method when an update is required outside of the normal update
-    ///     cycle.
-    /// </remarks>
-    internal void ForceUpdate()
-    {
-        _workUpdateTime = new RimWorldTime(0);
-    }
-
-    /// <summary>
     ///     Calculates and returns a dictionary of scores for a collection of pawns, indicating their suitability as
     ///     dedicated workers for a specified work type based on various factors.
     /// </summary>
@@ -640,6 +636,21 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
         var time = RimWorldTime.GetHomeTime();
         var hoursPassed = time - _workUpdateTime;
         if (hoursPassed < WorkManagerMod.Settings.WorkPrioritiesUpdateFrequency * RimWorldTime.HoursInDay) return;
+        Update();
+        _workUpdateTime = time;
+    }
+
+    /// <summary>
+    ///     Updates the work priorities for all player-controlled pawns, ensuring that work priorities are enabled and
+    ///     recalculated as necessary.
+    /// </summary>
+    /// <remarks>
+    ///     This method ensures that the game's work priorities setting is enabled and notifies all
+    ///     relevant pawns of the change. It then updates internal caches and recalculates work priorities to reflect the
+    ///     current state.
+    /// </remarks>
+    internal void Update()
+    {
         if (!Current.Game.playSettings.useWorkPriorities)
         {
             Current.Game.playSettings.useWorkPriorities = true;
@@ -652,9 +663,8 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
             }
         }
 #if DEBUG
-        Logger.LogMessage($"Updating work priorities... ({time}, passed = {hoursPassed:N1})");
+        Logger.LogMessage("Updating work priorities...");
 #endif
-        _workUpdateTime = time;
         UpdateCache();
         UpdateWorkPriorities();
         ApplyWorkPriorities();
@@ -726,6 +736,10 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
         {
             if (pc.IsCapable) _capablePawns.Add(pc);
         }
+#if DEBUG
+        Logger.LogMessage(
+            $"Capable pawns: {string.Join(", ", _capablePawns.Select(pc => $"{pc.Pawn.LabelShort} ({string.Join(", ", EnumHelper.GetUniqueFlags(PawnHelper.GetPawnHealthState(pc.Pawn)))})"))}");
+#endif
     }
 
     /// <summary>

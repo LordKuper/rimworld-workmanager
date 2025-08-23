@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using LordKuper.Common;
 using LordKuper.WorkManager.Helpers;
@@ -15,6 +16,12 @@ namespace LordKuper.WorkManager.Cache;
 /// </summary>
 internal class PawnCache(Pawn pawn)
 {
+    /// <summary>
+    ///     Dictionary of work types and whether they are allowed for the pawn.
+    ///     The key is the <see cref="WorkTypeDef" />, and the value indicates if it is allowed.
+    /// </summary>
+    private readonly Dictionary<WorkTypeDef, bool> _allowedWorkTypes = [];
+
     /// <summary>
     ///     Stores whether each work type is managed for the pawn.
     ///     The key is the <see cref="WorkTypeDef" />, and the value indicates if it is managed.
@@ -114,16 +121,29 @@ internal class PawnCache(Pawn pawn)
     }
 
     /// <summary>
-    ///     Determines whether the specified work type is allowed for the worker.
+    ///     Determines whether the specified work type is allowed for the pawn.
+    ///     Results are cached for performance.
     /// </summary>
-    /// <param name="workType">The work type to evaluate. Cannot be <see langword="null" />.</param>
+    /// <param name="workType">The work type to check.</param>
     /// <returns>
-    ///     <see langword="true" /> if the specified work type is allowed for the worker; otherwise,
-    ///     <see langword="false" />.
+    ///     <c>true</c> if the work type is allowed for the pawn; otherwise, <c>false</c>.
     /// </returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="workType" /> is <c>null</c>.</exception>
     public bool IsAllowedWorker([NotNull] WorkTypeDef workType)
     {
-        return Work.IsAllowedWorker(workType);
+        if (workType == null) throw new ArgumentNullException(nameof(workType));
+        if (_allowedWorkTypes.TryGetValue(workType, out var allowed)) return allowed;
+        if (Pawn.WorkTypeIsDisabled(workType))
+        {
+            allowed = false;
+        }
+        else
+        {
+            var rule = WorkManagerGameComponent.Instance.CombinedRules.First(r => r.Def == workType);
+            allowed = rule.IsAllowedWorker(Pawn);
+        }
+        _allowedWorkTypes.Add(workType, allowed);
+        return allowed;
     }
 
     /// <summary>
@@ -205,6 +225,7 @@ internal class PawnCache(Pawn pawn)
         IsManaged = WorkManagerGameComponent.Instance.GetPawnEnabled(Pawn);
         _workPriorities.Clear();
         _managedWorkTypes.Clear();
+        _allowedWorkTypes.Clear();
         foreach (var workType in DefDatabase<WorkTypeDef>.AllDefsListForReading)
         {
             _workPriorities.Add(workType,

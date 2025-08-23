@@ -356,4 +356,14 @@ public partial class Settings
         ColonistWorkShifts ??= [..DefaultColonistWorkShifts];
         NightOwlWorkShifts ??= [..DefaultNightOwlWorkShifts];
     }
+
+    private void ResetSchedules()
+    {
+        ManageWorkSchedule = true;
+        ScheduleUpdateFrequency = 2;
+        ColonistWorkShifts.Clear();
+        ColonistWorkShifts.AddRange(DefaultColonistWorkShifts);
+        NightOwlWorkShifts.Clear();
+        NightOwlWorkShifts.AddRange(DefaultNightOwlWorkShifts);
+    }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
 using LordKuper.Common.Cache;
@@ -19,17 +20,14 @@ namespace LordKuper.WorkManager;
 internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
 {
     /// <summary>
+    ///     The forbidden pawn health states for allowed workers.
+    /// </summary>
+    private const PawnHealthState AllowedWorkersForbiddenPawnHealthStates = PawnHealthState.Dead;
+
+    /// <summary>
     ///     The default priority value for <see cref="AssignEveryonePriority" />.
     /// </summary>
     private const int AssignEveryonePriorityDefault = 1;
-
-    /// <summary>
-    ///     The forbidden pawn health states for allowed workers.
-    /// </summary>
-    private static readonly PawnHealthState[] AllowedWorkersForbiddenPawnHealthStates =
-    [
-        PawnHealthState.Dead
-    ];
 
     /// <summary>
     ///     The forbidden pawn types for allowed workers.
@@ -95,8 +93,8 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
                 AllowedPawnTypes = [PawnType.Colonist, PawnType.Guest, PawnType.Slave],
                 ForbiddenPawnTypes = [..AllowedWorkersForbiddenPawnTypes],
                 FilterPawnHealthStates = true,
-                AllowedPawnHealthStates = [PawnHealthState.Healthy],
-                ForbiddenPawnHealthStates = [..AllowedWorkersForbiddenPawnHealthStates],
+                AllowedPawnHealthStates = PawnHealthState.Healthy,
+                ForbiddenPawnHealthStates = AllowedWorkersForbiddenPawnHealthStates,
                 FilterWorkPassions = false,
                 FilterPawnCapacities = false,
                 FilterPawnSkills = false,
@@ -122,8 +120,8 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
             {
                 TriStateMode = true,
                 ForbiddenPawnTypes = [..AllowedWorkersForbiddenPawnTypes],
-                ForbiddenPawnHealthStates = [..AllowedWorkersForbiddenPawnHealthStates], FilterPawnHealthStates = true,
-                AllowedPawnHealthStates = [PawnHealthState.Healthy, PawnHealthState.Resting]
+                ForbiddenPawnHealthStates = AllowedWorkersForbiddenPawnHealthStates, FilterPawnHealthStates = true,
+                AllowedPawnHealthStates = PawnHealthState.Healthy | PawnHealthState.Resting
             },
             DedicatedWorkerSettings = new DedicatedWorkerSettings { TriStateMode = true, AllowDedicated = false },
             AssignEveryone = true,
@@ -136,12 +134,9 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
             {
                 TriStateMode = true,
                 ForbiddenPawnTypes = [..AllowedWorkersForbiddenPawnTypes],
-                ForbiddenPawnHealthStates = [..AllowedWorkersForbiddenPawnHealthStates], FilterPawnHealthStates = true,
-                AllowedPawnHealthStates =
-                [
-                    PawnHealthState.Healthy, PawnHealthState.Resting, PawnHealthState.NeedsTending,
-                    PawnHealthState.Downed, PawnHealthState.Mental
-                ]
+                ForbiddenPawnHealthStates = AllowedWorkersForbiddenPawnHealthStates, FilterPawnHealthStates = true,
+                AllowedPawnHealthStates = PawnHealthState.Healthy | PawnHealthState.Resting |
+                                          PawnHealthState.NeedsTending | PawnHealthState.Downed | PawnHealthState.Mental
             },
             DedicatedWorkerSettings = new DedicatedWorkerSettings { TriStateMode = true, AllowDedicated = false },
             AssignEveryone = true,
@@ -154,12 +149,9 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
             {
                 TriStateMode = true,
                 ForbiddenPawnTypes = [..AllowedWorkersForbiddenPawnTypes],
-                ForbiddenPawnHealthStates = [..AllowedWorkersForbiddenPawnHealthStates], FilterPawnHealthStates = true,
-                AllowedPawnHealthStates =
-                [
-                    PawnHealthState.Healthy, PawnHealthState.Resting, PawnHealthState.NeedsTending,
-                    PawnHealthState.Downed, PawnHealthState.Mental
-                ]
+                ForbiddenPawnHealthStates = AllowedWorkersForbiddenPawnHealthStates, FilterPawnHealthStates = true,
+                AllowedPawnHealthStates = PawnHealthState.Healthy | PawnHealthState.Resting |
+                                          PawnHealthState.NeedsTending | PawnHealthState.Downed | PawnHealthState.Mental
             },
             DedicatedWorkerSettings = new DedicatedWorkerSettings { TriStateMode = true, AllowDedicated = false },
             AssignEveryone = true,
@@ -172,7 +164,7 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
             {
                 TriStateMode = true,
                 ForbiddenPawnTypes = [..AllowedWorkersForbiddenPawnTypes],
-                ForbiddenPawnHealthStates = [..AllowedWorkersForbiddenPawnHealthStates]
+                ForbiddenPawnHealthStates = AllowedWorkersForbiddenPawnHealthStates
             },
             DedicatedWorkerSettings = new DedicatedWorkerSettings { TriStateMode = true, AllowDedicated = false },
             AssignEveryone = true,
@@ -185,7 +177,7 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
             {
                 TriStateMode = true,
                 ForbiddenPawnTypes = [..AllowedWorkersForbiddenPawnTypes],
-                ForbiddenPawnHealthStates = [..AllowedWorkersForbiddenPawnHealthStates]
+                ForbiddenPawnHealthStates = AllowedWorkersForbiddenPawnHealthStates
             },
             DedicatedWorkerSettings = new DedicatedWorkerSettings { TriStateMode = true, AllowDedicated = true },
             AssignEveryone = true,
@@ -198,7 +190,7 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
             {
                 TriStateMode = true,
                 ForbiddenPawnTypes = [..AllowedWorkersForbiddenPawnTypes],
-                ForbiddenPawnHealthStates = [..AllowedWorkersForbiddenPawnHealthStates]
+                ForbiddenPawnHealthStates = AllowedWorkersForbiddenPawnHealthStates
             },
             DedicatedWorkerSettings = new DedicatedWorkerSettings { TriStateMode = true, AllowDedicated = true },
             AssignEveryone = true,
@@ -211,8 +203,8 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
             {
                 TriStateMode = true,
                 ForbiddenPawnTypes = [..AllowedWorkersForbiddenPawnTypes],
-                ForbiddenPawnHealthStates = [..AllowedWorkersForbiddenPawnHealthStates], FilterPawnHealthStates = true,
-                AllowedPawnHealthStates = [PawnHealthState.Healthy, PawnHealthState.Resting]
+                ForbiddenPawnHealthStates = AllowedWorkersForbiddenPawnHealthStates, FilterPawnHealthStates = true,
+                AllowedPawnHealthStates = PawnHealthState.Healthy | PawnHealthState.Resting
             },
             DedicatedWorkerSettings = new DedicatedWorkerSettings
             {
@@ -229,7 +221,7 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
                         PawnType.Colonist, PawnType.Guest, PawnType.Slave, PawnType.Prisoner, PawnType.Animal
                     ],
                     FilterPawnHealthStates = true,
-                    AllowedPawnHealthStates = [PawnHealthState.NeedsTending]
+                    AllowedPawnHealthStates = PawnHealthState.NeedsTending
                 }
             },
             AssignEveryone = false, EnsureWorkerAssigned = true,
@@ -241,7 +233,7 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
             {
                 TriStateMode = true,
                 ForbiddenPawnTypes = [..AllowedWorkersForbiddenPawnTypes],
-                ForbiddenPawnHealthStates = [..AllowedWorkersForbiddenPawnHealthStates],
+                ForbiddenPawnHealthStates = AllowedWorkersForbiddenPawnHealthStates,
                 FilterPawnPrimaryWeaponTypes = true, AllowedPawnPrimaryWeaponTypes = [PawnPrimaryWeaponType.Ranged]
             },
             DedicatedWorkerSettings = new DedicatedWorkerSettings
@@ -429,7 +421,7 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
             {
                 TriStateMode = workTypeDefName != null,
                 ForbiddenPawnTypes = [.. AllowedWorkersForbiddenPawnTypes],
-                ForbiddenPawnHealthStates = [.. AllowedWorkersForbiddenPawnHealthStates]
+                ForbiddenPawnHealthStates = AllowedWorkersForbiddenPawnHealthStates
             },
             DedicatedWorkerSettings = new DedicatedWorkerSettings
             {
@@ -495,11 +487,22 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
     /// </summary>
     private void Validate()
     {
+        var defaultRule = DefaultRules.FirstOrDefault(r => r.DefName == DefName) ??
+                          DefaultRules.First(r => r.DefName == null);
         DedicatedWorkerSettings ??= new DedicatedWorkerSettings();
         AllowedWorkers ??= new PawnFilter();
+        AllowedWorkers.Validate();
         AllowedWorkers.ForbiddenPawnTypes = [.. AllowedWorkersForbiddenPawnTypes];
-        AllowedWorkers.ForbiddenPawnHealthStates = [.. AllowedWorkersForbiddenPawnHealthStates];
-        AssignEveryonePriority = Mathf.Clamp(AssignEveryonePriority, 1, WorkManagerMod.Settings.MaxWorkTypePriority);
+        AllowedWorkers.ForbiddenPawnHealthStates = AllowedWorkersForbiddenPawnHealthStates;
+        if (AllowedWorkers.FilterPawnHealthStates == true &&
+            AllowedWorkers.AllowedPawnHealthStates == PawnHealthState.None)
+            AllowedWorkers.AllowedPawnHealthStates = defaultRule.AllowedWorkers.AllowedPawnHealthStates;
+        if (AllowedWorkers.FilterPawnPrimaryWeaponTypes == true &&
+            (AllowedWorkers.AllowedPawnPrimaryWeaponTypes == null ||
+             AllowedWorkers.AllowedPawnPrimaryWeaponTypes.Count == 0))
+            AllowedWorkers.AllowedPawnPrimaryWeaponTypes =
+                [.. defaultRule.AllowedWorkers.AllowedPawnPrimaryWeaponTypes];
+        AssignEveryonePriority = Mathf.Clamp(AssignEveryonePriority, 0, WorkManagerMod.Settings.MaxWorkTypePriority);
         if (DefName == null)
         {
             AllowedWorkers.TriStateMode = false;

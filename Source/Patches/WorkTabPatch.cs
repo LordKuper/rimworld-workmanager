@@ -49,18 +49,10 @@ public static class WorkTabPatch
         const int iconSize = 16;
         Rect buttonRect = new(rect.center.x - iconSize / 2, rect.yMax - iconSize - 4, iconSize, iconSize);
         var component = WorkManagerGameComponent.Instance;
-        if (component.PriorityManagementEnabled)
-        {
-            Buttons.DoIconButtonToggle(buttonRect, () => component.GetWorkTypeEnabled(__instance.def.workType),
-                newValue => component.SetWorkTypeEnabled(__instance.def.workType, newValue),
-                Resources.Strings.WorkTypeDisableTooltip, Resources.Textures.WorkTypeToggleButtonEnabled,
-                Resources.Strings.WorkTypeEnableTooltip, Resources.Textures.WorkTypeToggleButtonDisabled);
-        }
-        else
-        {
-            GUI.color = Color.white;
-            GUI.DrawTexture(buttonRect, Resources.Textures.WorkTypeToggleButtonInactive);
-        }
+        Buttons.DoIconButtonToggle(buttonRect, () => component.GetWorkTypeEnabled(__instance.def.workType),
+            newValue => component.SetWorkTypeEnabled(__instance.def.workType, newValue),
+            Resources.Strings.WorkTypeDisableTooltip, Resources.Textures.WorkTypeToggleButtonEnabled,
+            Resources.Strings.WorkTypeEnableTooltip, Resources.Textures.WorkTypeToggleButtonDisabled);
         rect = new Rect(rect.x, rect.y, rect.width, rect.height - 30);
     }
 
@@ -88,14 +80,11 @@ public static class WorkTabPatch
         Buttons.DoIconButtonToggle(buttonRect, ref component.PriorityManagementEnabled,
             Resources.Strings.GlobalDisableTooltip, Resources.Textures.PrioritiesToggleButtonEnabled,
             Resources.Strings.GlobalEnableTooltip, Resources.Textures.PrioritiesToggleButtonDisabled);
-        if (component.PriorityManagementEnabled)
-        {
-            Layout.GetLeftColumnRect(buttonRow, Layout.ElementGapSmall, out buttonRow);
-            buttonRect = Layout.GetLeftColumnRect(buttonRow, Buttons.IconButtonSize, out buttonRow);
-            Buttons.DoIconButton(buttonRect,
-                new IconButton(Resources.Textures.RefreshButton, WorkManagerGameComponent.ForceUpdateAssignments,
-                    Resources.Strings.UpdateNowTooltip));
-        }
+        Layout.GetLeftColumnRect(buttonRow, Layout.ElementGapSmall, out buttonRow);
+        buttonRect = Layout.GetLeftColumnRect(buttonRow, Buttons.IconButtonSize, out buttonRow);
+        Buttons.DoIconButton(buttonRect,
+            new IconButton(Resources.Textures.RefreshButton, WorkManagerGameComponent.ForceUpdateAssignments,
+                Resources.Strings.UpdateNowTooltip));
         Layout.GetLeftColumnRect(buttonRow, Layout.ElementGapSmall, out buttonRow);
         buttonRect = Layout.GetLeftColumnRect(buttonRow, Buttons.IconButtonSize, out buttonRow);
         Buttons.DoIconButton(buttonRect,

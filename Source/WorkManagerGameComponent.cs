@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using JetBrains.Annotations;
 using LordKuper.WorkManager.Helpers;
@@ -63,6 +64,7 @@ public class WorkManagerGameComponent : GameComponent
     ///     used to manage work-related tasks within the game.
     /// </remarks>
     /// <param name="game">The game instance to associate with this component. Cannot be null.</param>
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Game API")]
     public WorkManagerGameComponent(Game game)
     {
         Instance = this;
@@ -140,7 +142,7 @@ public class WorkManagerGameComponent : GameComponent
             Logger.LogError("Could not get work priority updater component for current map.");
             return;
         }
-        priorityUpdater.ForceUpdate();
+        priorityUpdater.Update();
     }
 
     /// <summary>
