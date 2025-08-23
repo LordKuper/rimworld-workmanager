@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LanguageData>
+    <!-- EN: Work Manager -->
+    <LordKuper.WorkManager.ModTitle>工作管理器</LordKuper.WorkManager.ModTitle>
+    <!-- EN: Update automatic work assignments immediately. -->
+    <LordKuper.WorkManager.UpdateNowTooltip>立即更新自动工作分配。</LordKuper.WorkManager.UpdateNowTooltip>
+    <!-- EN: Open Work Manager mod settings window. -->
+    <LordKuper.WorkManager.OpenSettingsTooltip>打开工作管理器模组设置窗口。</LordKuper.WorkManager.OpenSettingsTooltip>
+    <!-- EN: Work Priorities -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.Title>工作优先级</LordKuper.WorkManager.Settings.WorkPriorities.Title>
+    <!-- EN: Update frequency -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.UpdateFrequency>更新频率</LordKuper.WorkManager.Settings.WorkPriorities.UpdateFrequency>
+    <!-- EN: Determines how often pawn work type priorities will be updated. -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.UpdateFrequencyTooltip>确定角色工作类型优先级更新的频率。</LordKuper.WorkManager.Settings.WorkPriorities.UpdateFrequencyTooltip>
+    <!-- EN: Assign dedicated workers -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.UseDedicatedWorkers>分配专职工人</LordKuper.WorkManager.Settings.WorkPriorities.UseDedicatedWorkers>
+    <!-- EN: If enabled, the mod will assign dedicated workers to work types according to the settings of the specific work type.\nIf disabled, the mod will assign work types to pawns with the highest skill level. -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.UseDedicatedWorkersTooltip>启用时，模组将根据各工作类型的设置为其分配专职工人。\n 禁用时，模组会将工作类型分配给技能等级最高的角色。</LordKuper.WorkManager.Settings.WorkPriorities.UseDedicatedWorkersTooltip>
+    <!-- EN: Dedicated worker priority -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerPriority>专职工人优先级</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerPriority>
+    <!-- EN: Default dedicated work type priority. Can be overriden in work type's settings. -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerPriorityTooltip>默认的专职工作类型优先级。可在单个工作类型的设置中覆盖。</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerPriorityTooltip>
+    <!-- EN: Skill level score factor -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerSkillScoreFactor>技能等级评分因子</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerSkillScoreFactor>
+    <!-- EN: Skill level factor for the colonist's overall score when determining dedicated workers. -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerSkillScoreFactorTooltip>在确定专职工人时，技能等级对殖民者总体评分的影响因子。</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerSkillScoreFactorTooltip>
+    <!-- EN: Passion level score factor -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerPassionScoreFactor>热情等级评分因子</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerPassionScoreFactor>
+    <!-- EN: Passion level factor for the colonist's overall score when determining dedicated workers. -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerPassionScoreFactorTooltip>在确定专职工人时，热情等级对殖民者总体评分的影响因子。</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerPassionScoreFactorTooltip>
+    <!-- EN: Skill learning rate factor -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerLearningRateScoreFactor>技能学习率评分因子</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerLearningRateScoreFactor>
+    <!-- EN: Skill learning rate factor for the colonist's overall score when determining dedicated workers.\nSkill learning rate decreases after receiving a certain amount of experience points for that skill. It will impact work priority depending on the value of this setting. -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerLearningRateScoreFactorTooltip>在确定专职工人时，技能学习率对殖民者总体评分的影响因子。\n 技能学习率在获得一定量经验后会下降。该设置的数值将影响工作优先级。</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerLearningRateScoreFactorTooltip>
+    <!-- EN: Number of assigned work types factor -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerWorkCountScoreFactor>已分配工作类型数量因子</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerWorkCountScoreFactor>
+    <!-- EN: Number of assigned work types factor for the colonist's overall score when determining dedicated workers. -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerWorkCountScoreFactorTooltip>在确定专职工人时，已分配工作类型数量对殖民者总体评分的影响因子。</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerWorkCountScoreFactorTooltip>
+    <!-- EN: Highest skill worker priority -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.HighestSkillPriority>最高技能工人的优先级</LordKuper.WorkManager.Settings.WorkPriorities.HighestSkillPriority>
+    <!-- EN: Work priority to be used for pawns with the highest skill value. -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.HighestSkillPriorityTooltip>应用于技能值最高角色的工作优先级。</LordKuper.WorkManager.Settings.WorkPriorities.HighestSkillPriorityTooltip>
+    <!-- EN: Assign all work types -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.AssignAllWorkTypes>分配所有工作类型</LordKuper.WorkManager.Settings.WorkPriorities.AssignAllWorkTypes>
+    <!-- EN: Assign every pawn all leftover work types with priority value set below to prevent idling. -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.AssignAllWorkTypesTooltip>将所有剩余工作类型（优先级值低于指定值的）分配给每个角色，以防止角色闲置。</LordKuper.WorkManager.Settings.WorkPriorities.AssignAllWorkTypesTooltip>
+    <!-- EN: Leftover work priority -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.LeftoverPriority>剩余工作优先级</LordKuper.WorkManager.Settings.WorkPriorities.LeftoverPriority>
+    <!-- EN: Priority for leftover work types. -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.LeftoverPriorityTooltip>剩余工作类型的优先级。</LordKuper.WorkManager.Settings.WorkPriorities.LeftoverPriorityTooltip>
+    <!-- EN: Assign additional work to idle pawns -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.AssignWorkToIdlePawns>为闲置角色分配额外工作</LordKuper.WorkManager.Settings.WorkPriorities.AssignWorkToIdlePawns>
+    <!-- EN: Assign idle pawns all work types (except special ones) for 12 hours. -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.AssignWorkToIdlePawnsTooltip>为闲置角色（除特殊类型外）分配所有工作类型，持续12小时。</LordKuper.WorkManager.Settings.WorkPriorities.AssignWorkToIdlePawnsTooltip>
+    <!-- EN: Idle work priority -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.IdlePriority>闲置工作优先级</LordKuper.WorkManager.Settings.WorkPriorities.IdlePriority>
+    <!-- EN: Priority for work types assigned to idle pawns. -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.IdlePriorityTooltip>分配给闲置角色的工作类型的优先级。</LordKuper.WorkManager.Settings.WorkPriorities.IdlePriorityTooltip>
+    <!-- EN: Prioritize work by passion levels -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.UsePassionPriorities>按热情等级优先排序工作</LordKuper.WorkManager.Settings.WorkPriorities.UsePassionPriorities>
+    <!-- EN: Assign work priorities based on pawn's passion level. Value of 0 means that the corresponding passion level will be ignored. -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.UsePassionPrioritiesTooltip>根据角色的热情等级分配工作优先级。值为0表示忽略该热情等级。</LordKuper.WorkManager.Settings.WorkPriorities.UsePassionPrioritiesTooltip>
+    <!-- EN: Prioritize work by skill learning rates -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.UseLearningRatesPriorities>按技能学习率优先排序工作</LordKuper.WorkManager.Settings.WorkPriorities.UseLearningRatesPriorities>
+    <!-- EN: Assign work priorities based on pawn's skill learning rate.\nSkill learning rate decreases after receiving a certain amount of experience points for that skill. It will impact work priority if this setting is enabled. -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.UseLearningRatesPrioritiesTooltip>根据角色的技能学习率分配工作优先级。\n 技能学习率在获得一定量经验后会下降；启用此设置后，它会影响工作优先级。</LordKuper.WorkManager.Settings.WorkPriorities.UseLearningRatesPrioritiesTooltip>
+    <!-- EN: Use individual skill learning rate thresholds -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.UsePawnLearningRateThresholds>使用角色个体的技能学习率阈值</LordKuper.WorkManager.Settings.WorkPriorities.UsePawnLearningRateThresholds>
+    <!-- EN: Use skill learning rate thresholds calculated for each pawn individually, considering their minimal and maximal skill learning rates. -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.UsePawnLearningRateThresholdsTooltip>为每个角色单独计算技能学习率阈值，考虑其最小和最大技能学习率。</LordKuper.WorkManager.Settings.WorkPriorities.UsePawnLearningRateThresholdsTooltip>
+    <!-- EN: Minor skill learning rate threshold -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.MinorLearningRateThreshold>较低技能学习率阈值</LordKuper.WorkManager.Settings.WorkPriorities.MinorLearningRateThreshold>
+    <!-- EN: Pawns with skill learning rate above this threshold will be assigned to corresponding work types with priority value set below. -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.MinorLearningRateThresholdTooltip>技能学习率高于此阈值的角色将被分配到相应工作类型，其优先级值设定如下。</LordKuper.WorkManager.Settings.WorkPriorities.MinorLearningRateThresholdTooltip>
+    <!-- EN: Minor learning rate work priority -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.MinorLearningRatePriority>较低学习率的工作优先级</LordKuper.WorkManager.Settings.WorkPriorities.MinorLearningRatePriority>
+    <!-- EN: Priority for work types with learning rates between minor and major thresholds. -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.MinorLearningRatePriorityTooltip>适用于技能学习率介于较低和较高阈值之间的工作类型的优先级。</LordKuper.WorkManager.Settings.WorkPriorities.MinorLearningRatePriorityTooltip>
+    <!-- EN: Major skill learning rate threshold -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.MajorLearningRateThreshold>较高技能学习率阈值</LordKuper.WorkManager.Settings.WorkPriorities.MajorLearningRateThreshold>
+    <!-- EN: Pawns with skill learning rate above this threshold will be assigned to corresponding work types with priority value set below. -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.MajorLearningRateThresholdTooltip>技能学习率高于此阈值的角色将被分配到相应工作类型，其优先级值设定如下。</LordKuper.WorkManager.Settings.WorkPriorities.MajorLearningRateThresholdTooltip>
+    <!-- EN: Major learning rate work priority -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.MajorLearningRatePriority>较高学习率的工作优先级</LordKuper.WorkManager.Settings.WorkPriorities.MajorLearningRatePriority>
+    <!-- EN: Priority for work types with learning rates above major threshold. -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.MajorLearningRatePriorityTooltip>适用于技能学习率高于较高阈值的工作类型的优先级。</LordKuper.WorkManager.Settings.WorkPriorities.MajorLearningRatePriorityTooltip>
+    <!-- EN: Work Types -->
+    <LordKuper.WorkManager.Settings.WorkTypes.Title>工作类型</LordKuper.WorkManager.Settings.WorkTypes.Title>
+    <!-- EN: * Default * -->
+    <LordKuper.WorkManager.Settings.WorkTypes.DefaultWorkTypeRuleLabel>* 默认 *</LordKuper.WorkManager.Settings.WorkTypes.DefaultWorkTypeRuleLabel>
+    <!-- EN: Select work type assignment rule to edit it. -->
+    <LordKuper.WorkManager.Settings.WorkTypes.SelectWorkTypeTooltip>选择要编辑的工作类型分配规则。</LordKuper.WorkManager.Settings.WorkTypes.SelectWorkTypeTooltip>
+    <!-- EN: Add new work type assignment rule that will override the default rule for the selected work type. -->
+    <LordKuper.WorkManager.Settings.WorkTypes.AddWorkTypeTooltip>添加新的工作类型分配规则，将覆盖所选工作类型的默认规则。</LordKuper.WorkManager.Settings.WorkTypes.AddWorkTypeTooltip>
+    <!-- EN: Delete existing non-default work type assignment rule. -->
+    <LordKuper.WorkManager.Settings.WorkTypes.DeleteWorkTypeTooltip>删除现有的非默认工作类型分配规则。</LordKuper.WorkManager.Settings.WorkTypes.DeleteWorkTypeTooltip>
+    <!-- EN: Reset all work type assignment rules to default.\nWARNING: THIS WILL DELETE ALL CUSTOM RULES AND RESET ALL RULE PROPERTIES TO THEIR DEFAULT VALUES! -->
+    <LordKuper.WorkManager.Settings.WorkTypes.ResetWorkTypesTooltip>将所有工作类型分配规则重置为默认值。\n 警告：这将删除所有自定义规则并将所有规则属性重置为默认值！</LordKuper.WorkManager.Settings.WorkTypes.ResetWorkTypesTooltip>
+    <!-- EN: Select work type assignment rule using the button above. -->
+    <LordKuper.WorkManager.Settings.WorkTypes.NoRuleSelected>使用上方按钮选择工作类型分配规则。</LordKuper.WorkManager.Settings.WorkTypes.NoRuleSelected>
+    <!-- EN: Work type assignment rule for '{0}' -->
+    <LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleHeader>适用于“{0}”的工作类型分配规则</LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleHeader>
+    <!-- EN: The settings specified on this tab will be applied for '{0}' work type assignment. -->
+    <LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleHeaderTooltip>此选项卡中指定的设置将应用于“{0}”工作类型的分配。</LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleHeaderTooltip>
+    <!-- EN: Default work type assignment rule -->
+    <LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleHeaderDefault>默认的工作类型分配规则</LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleHeaderDefault>
+    <!-- EN: The settings specified on this tab will be applied to work types that do not have special rules that override the defaults. -->
+    <LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleHeaderTooltipDefault>此选项卡中指定的设置将应用于未被特殊规则覆盖的工作类型。</LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleHeaderTooltipDefault>
+    <!-- EN: Rule summary -->
+    <LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleSummary>规则摘要</LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleSummary>
+    <!-- EN: Yes -->
+    <LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleEnabledSettingTooltip>是</LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleEnabledSettingTooltip>
+    <!-- EN: No -->
+    <LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleDisabledSettingTooltip>否</LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleDisabledSettingTooltip>
+    <!-- EN: The setting's value from the default rule will be used. -->
+    <LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleUndefinedSettingTooltip>将使用默认规则中的设置值。</LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleUndefinedSettingTooltip>
+    <!-- EN: The settings from the default rule will be used. -->
+    <LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleUndefinedSectionTooltip>将使用默认规则的设置。</LordKuper.WorkManager.Settings.WorkTypes.WorkTypeRuleUndefinedSectionTooltip>
+    <!-- EN: Allowed workers -->
+    <LordKuper.WorkManager.Settings.WorkTypes.AllowedWorkersLabel>允许的角色</LordKuper.WorkManager.Settings.WorkTypes.AllowedWorkersLabel>
+    <!-- EN: The settings in this section determine which pawns are considered eligible for assignment to a work type. -->
+    <LordKuper.WorkManager.Settings.WorkTypes.AllowedWorkersTooltip>本部分的设置决定哪些角色被视为有资格分配到某个工作类型。</LordKuper.WorkManager.Settings.WorkTypes.AllowedWorkersTooltip>
+    <!-- EN: Assignment settings -->
+    <LordKuper.WorkManager.Settings.WorkTypes.AssignmentSettingsLabel>分配设置</LordKuper.WorkManager.Settings.WorkTypes.AssignmentSettingsLabel>
+    <!-- EN: Settings that define the criteria for assigning a work type and its priority. -->
+    <LordKuper.WorkManager.Settings.WorkTypes.AssignmentSettingsTooltip>定义分配工作类型及其优先级的条件的设置。</LordKuper.WorkManager.Settings.WorkTypes.AssignmentSettingsTooltip>
+    <!-- EN: Assign everyone -->
+    <LordKuper.WorkManager.Settings.WorkTypes.AssignEveryoneLabel>分配给所有人</LordKuper.WorkManager.Settings.WorkTypes.AssignEveryoneLabel>
+    <!-- EN: The job will be assigned to all eligible workers. -->
+    <LordKuper.WorkManager.Settings.WorkTypes.AssignEveryoneOnTooltip>该工作将分配给所有符合条件的工人。</LordKuper.WorkManager.Settings.WorkTypes.AssignEveryoneOnTooltip>
+    <!-- EN: The job will be assigned according to other settings (dedicated workers, work passions, etc.). -->
+    <LordKuper.WorkManager.Settings.WorkTypes.AssignEveryoneOffTooltip>该工作将根据其他设置分配（专职工人、工作热情等）。</LordKuper.WorkManager.Settings.WorkTypes.AssignEveryoneOffTooltip>
+    <!-- EN: Assign everyone priority -->
+    <LordKuper.WorkManager.Settings.WorkTypes.AssignEveryonePriorityLabel>分配给所有人的优先级</LordKuper.WorkManager.Settings.WorkTypes.AssignEveryonePriorityLabel>
+    <!-- EN: The priority value with which work will be assigned to all eligible workers. -->
+    <LordKuper.WorkManager.Settings.WorkTypes.AssignEveryonePriorityTooltip>将工作分配给所有符合条件的工人的优先级数值。</LordKuper.WorkManager.Settings.WorkTypes.AssignEveryonePriorityTooltip>
+    <!-- EN: Ensure workers assigned -->
+    <LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedLabel>确保分配到工人</LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedLabel>
+    <!-- EN: At least one worker will be assigned even if no pawn satisfies the allowed workers filter. -->
+    <LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedOnTooltip>即使没有角色满足允许工人筛选，也至少会分配一名工人。</LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedOnTooltip>
+    <!-- EN: A worker will only be assigned if there is a pawn that satisfies the allowed workers filter. -->
+    <LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedOffTooltip>仅当存在满足允许工人筛选的角色时才会分配工人。</LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedOffTooltip>
+    <!-- EN: Minimum number of workers -->
+    <LordKuper.WorkManager.Settings.WorkTypes.MinWorkerNumberLabel>最低工人数</LordKuper.WorkManager.Settings.WorkTypes.MinWorkerNumberLabel>
+    <!-- EN: At least the specified number of workers will be assigned. -->
+    <LordKuper.WorkManager.Settings.WorkTypes.MinWorkerNumberTooltip>将分配至少指定数量的工人。</LordKuper.WorkManager.Settings.WorkTypes.MinWorkerNumberTooltip>
+    <!-- EN: Dedicated workers settings -->
+    <LordKuper.WorkManager.Settings.WorkTypes.DedicatedWorkerSettingsLabel>专职工人设置</LordKuper.WorkManager.Settings.WorkTypes.DedicatedWorkerSettingsLabel>
+    <!-- EN: Settings that determine the criteria for assigning dedicated workers. -->
+    <LordKuper.WorkManager.Settings.WorkTypes.DedicatedWorkerSettingsTooltip>用于确定分配专职工人条件的设置。</LordKuper.WorkManager.Settings.WorkTypes.DedicatedWorkerSettingsTooltip>
+    <!-- EN: Allow dedicated workers -->
+    <LordKuper.WorkManager.Settings.WorkTypes.AllowDedicatedWorkerLabel>允许专职工人</LordKuper.WorkManager.Settings.WorkTypes.AllowDedicatedWorkerLabel>
+    <!-- EN: The dedicated workers will be assigned according to the settings in this section. -->
+    <LordKuper.WorkManager.Settings.WorkTypes.AllowDedicatedWorkerOnTooltip>将根据本部分的设置分配专职工人。</LordKuper.WorkManager.Settings.WorkTypes.AllowDedicatedWorkerOnTooltip>
+    <!-- EN: No dedicated workers will be assigned. -->
+    <LordKuper.WorkManager.Settings.WorkTypes.AllowDedicatedWorkerOffTooltip>不会分配专职工人。</LordKuper.WorkManager.Settings.WorkTypes.AllowDedicatedWorkerOffTooltip>
+    <!-- EN: Worker number calculation mode -->
+    <LordKuper.WorkManager.Settings.WorkTypes.DedicatedWorkerModeLabel>工人数计算模式</LordKuper.WorkManager.Settings.WorkTypes.DedicatedWorkerModeLabel>
+    <!-- EN: Specifies the method for calculating the target number of allocated workers. -->
+    <LordKuper.WorkManager.Settings.WorkTypes.DedicatedWorkerModeTooltip>指定用于计算目标分配工人数的方法。</LordKuper.WorkManager.Settings.WorkTypes.DedicatedWorkerModeTooltip>
+    <!-- EN: Target number of workers -->
+    <LordKuper.WorkManager.Settings.WorkTypes.ConstantWorkerCountLabel>目标工人数</LordKuper.WorkManager.Settings.WorkTypes.ConstantWorkerCountLabel>
+    <!-- EN: The number of dedicated workers that will be assigned to the work type. -->
+    <LordKuper.WorkManager.Settings.WorkTypes.ConstantWorkerCountTooltip>将分配给该工作类型的专职工人数。</LordKuper.WorkManager.Settings.WorkTypes.ConstantWorkerCountTooltip>
+    <!-- EN: Work type number factor -->
+    <LordKuper.WorkManager.Settings.WorkTypes.WorkTypeCountFactorLabel>工作类型数量因子</LordKuper.WorkManager.Settings.WorkTypes.WorkTypeCountFactorLabel>
+    <!-- EN: The target number of dedicated workers will be calculated by multiplying the number of work types by this number and rounding up to the nearest integer number. -->
+    <LordKuper.WorkManager.Settings.WorkTypes.WorkTypeCountFactorTooltip>专职工人的目标数量将通过将工作类型数量乘以此因子并向上取整来计算。</LordKuper.WorkManager.Settings.WorkTypes.WorkTypeCountFactorTooltip>
+    <!-- EN: Pawn ratio factor -->
+    <LordKuper.WorkManager.Settings.WorkTypes.CapablePawnRatioFactorLabel>角色比例因子</LordKuper.WorkManager.Settings.WorkTypes.CapablePawnRatioFactorLabel>
+    <!-- EN: The target number of dedicated workers will be calculated by dividing the number of capable pawns by the number of work types that use dedicated workers, multiplying by that number, and rounding to the nearest integer number. -->
+    <LordKuper.WorkManager.Settings.WorkTypes.CapablePawnRatioFactorTooltip>专职工人的目标数量将通过用可胜任的角色数量除以使用专职工人的工作类型数量，再乘以该数量并四舍五入到最接近的整数来计算。</LordKuper.WorkManager.Settings.WorkTypes.CapablePawnRatioFactorTooltip>
+    <!-- EN: Pawn number factor -->
+    <LordKuper.WorkManager.Settings.WorkTypes.PawnCountFactorLabel>角色数量因子</LordKuper.WorkManager.Settings.WorkTypes.PawnCountFactorLabel>
+    <!-- EN: The target number of dedicated workers will be calculated by multiplying the number of pawns that meet the specified selection criteria by this number and rounding to the nearest integer number. -->
+    <LordKuper.WorkManager.Settings.WorkTypes.PawnCountFactorTooltip>专职工人的目标数量将通过将符合指定筛选条件的角色数量乘以此因子并四舍五入到最接近的整数来计算。</LordKuper.WorkManager.Settings.WorkTypes.PawnCountFactorTooltip>
+    <!-- EN: Available pawns -->
+    <LordKuper.WorkManager.Settings.WorkTypes.AvailablePawnsLabel>可用角色</LordKuper.WorkManager.Settings.WorkTypes.AvailablePawnsLabel>
+    <!-- EN: List of pawns that satisfy the allowed workers filter. -->
+    <LordKuper.WorkManager.Settings.WorkTypes.AvailablePawnsTooltip>符合允许工人筛选条件的角色列表。</LordKuper.WorkManager.Settings.WorkTypes.AvailablePawnsTooltip>
+    <!-- EN: Constant number -->
+    <LordKuper.WorkManager.DedicatedWorkerMode.Constant.Label>固定数量</LordKuper.WorkManager.DedicatedWorkerMode.Constant.Label>
+    <!-- EN: A fixed number of dedicated workers will be assigned to a type of work. -->
+    <LordKuper.WorkManager.DedicatedWorkerMode.Constant.Tooltip>将为某一工作类型分配固定数量的专职工人。</LordKuper.WorkManager.DedicatedWorkerMode.Constant.Tooltip>
+    <!-- EN: Work types count -->
+    <LordKuper.WorkManager.DedicatedWorkerMode.WorkTypeCount.Label>按工作类型数量</LordKuper.WorkManager.DedicatedWorkerMode.WorkTypeCount.Label>
+    <!-- EN: The number of dedicated workers will be assigned as a multiple of the total number of work types. -->
+    <LordKuper.WorkManager.DedicatedWorkerMode.WorkTypeCount.Tooltip>专职工人数量将按工作类型总数的倍数分配。</LordKuper.WorkManager.DedicatedWorkerMode.WorkTypeCount.Tooltip>
+    <!-- EN: Available workers' ratio -->
+    <LordKuper.WorkManager.DedicatedWorkerMode.CapablePawnRatio.Label>可用工人比例</LordKuper.WorkManager.DedicatedWorkerMode.CapablePawnRatio.Label>
+    <!-- EN: The number of dedicated workers will be assigned equal to the number of capable pawns divided by the number of work types using dedicated workers, rounded up to the nearest integer number.\nFor example, if there are 6 capable pawns in a colony and 5 work types use dedicated workers, then 2 dedicated workers will be assigned to each of these 5 types of work. (6 / 5 = 1.2 ≈ 2) -->
+    <LordKuper.WorkManager.DedicatedWorkerMode.CapablePawnRatio.Tooltip>专职工人数将等于可胜任角色数除以使用专职工人的工作类型数并向上取整。\n 例如，如果殖民地中有6名可胜任角色且5个工作类型使用专职工人，则每个工作类型将分配2名专职工人（6 / 5 = 1.2 ≈ 2）。</LordKuper.WorkManager.DedicatedWorkerMode.CapablePawnRatio.Tooltip>
+    <!-- EN: Pawn count -->
+    <LordKuper.WorkManager.DedicatedWorkerMode.PawnCount.Label>按角色数量</LordKuper.WorkManager.DedicatedWorkerMode.PawnCount.Label>
+    <!-- EN: The number of dedicated workers will be assigned as a multiple of the number of pawns that meet the specified selection criteria. -->
+    <LordKuper.WorkManager.DedicatedWorkerMode.PawnCount.Tooltip>专职工人数量将作为符合指定筛选条件的角色数量的倍数进行分配。</LordKuper.WorkManager.DedicatedWorkerMode.PawnCount.Tooltip>
+    <!-- EN: Enable automatic work type priority assignment system -->
+    <WorkManager.GlobalEnableTooltip>启用自动工作类型优先级分配系统</WorkManager.GlobalEnableTooltip>
+    <!-- EN: Disable automatic work type priority assignment system -->
+    <WorkManager.GlobalDisableTooltip>禁用自动工作类型优先级分配系统</WorkManager.GlobalDisableTooltip>
+    <!-- EN: Enable automatic work type priority assignment for pawn -->
+    <WorkManager.PawnEnableTooltip>为角色启用自动工作类型优先级分配</WorkManager.PawnEnableTooltip>
+    <!-- EN: Disable automatic work type priority assignment for pawn -->
+    <WorkManager.PawnDisableTooltip>为角色禁用自动工作类型优先级分配</WorkManager.PawnDisableTooltip>
+    <!-- EN: Enable automatic priority assignment for work type -->
+    <WorkManager.WorkTypeEnableTooltip>为工作类型启用自动优先级分配</WorkManager.WorkTypeEnableTooltip>
+    <!-- EN: Disable automatic priority assignment for work type -->
+    <WorkManager.WorkTypeDisableTooltip>为工作类型禁用自动优先级分配</WorkManager.WorkTypeDisableTooltip>
+    <!-- EN: Enable automatic schedule management for pawn -->
+    <WorkManager.PawnScheduleEnableTooltip>为角色启用自动日程管理</WorkManager.PawnScheduleEnableTooltip>
+    <!-- EN: Disable automatic schedule management for pawn -->
+    <WorkManager.PawnScheduleDisableTooltip>为角色禁用自动日程管理</WorkManager.PawnScheduleDisableTooltip>
+    <!-- EN: Schedule -->
+    <WorkManager.Settings_Schedule_Title>日程</WorkManager.Settings_Schedule_Title>
+    <!-- EN: Manage work schedule -->
+    <WorkManager.Settings_Schedule_ManageWorkSchedule>管理工作日程</WorkManager.Settings_Schedule_ManageWorkSchedule>
+    <!-- EN: Automatic colonists' work shift management -->
+    <WorkManager.Settings_Schedule_ManageWorkScheduleTooltip>自动殖民者的工作时间管理</WorkManager.Settings_Schedule_ManageWorkScheduleTooltip>
+    <!-- EN: Update frequency -->
+    <WorkManager.Settings_Schedule_UpdateFrequency>更新频率</WorkManager.Settings_Schedule_UpdateFrequency>
+    <!-- EN: How many times to update schedules per in-game day -->
+    <WorkManager.Settings_Schedule_UpdateFrequencyTooltip>每个游戏日更新日程的次数</WorkManager.Settings_Schedule_UpdateFrequencyTooltip>
+    <!-- EN: Colonist work shifts -->
+    <WorkManager.Settings_Schedule_ColonistWorkShifts>殖民者工作班次</WorkManager.Settings_Schedule_ColonistWorkShifts>
+    <!-- EN: Generic work shifts for colonists -->
+    <WorkManager.Settings_Schedule_ColonistWorkShiftsTooltip>殖民者的常规工作班次</WorkManager.Settings_Schedule_ColonistWorkShiftsTooltip>
+    <!-- EN: Add -->
+    <WorkManager.Settings_Schedule_AddWorkShift>添加</WorkManager.Settings_Schedule_AddWorkShift>
+    <!-- EN: Delete... -->
+    <WorkManager.Settings_Schedule_DeleteWorkShift>删除...</WorkManager.Settings_Schedule_DeleteWorkShift>
+    <!-- EN: Reset to defaults -->
+    <WorkManager.Settings_Schedule_ResetWorkShifts>重置为默认值</WorkManager.Settings_Schedule_ResetWorkShifts>
+    <!-- EN: # -->
+    <WorkManager.Settings_Schedule_WorkShiftNumberColumnHeader>#</WorkManager.Settings_Schedule_WorkShiftNumberColumnHeader>
+    <!-- EN: Work shift -->
+    <WorkManager.Settings_Schedule_WorkShiftColumnHeader>工作班次</WorkManager.Settings_Schedule_WorkShiftColumnHeader>
+    <!-- EN: Customize work shift time assignment -->
+    <WorkManager.Settings_Schedule_WorkShiftColumnHeaderTooltip>自定义工作班次时间分配</WorkManager.Settings_Schedule_WorkShiftColumnHeaderTooltip>
+    <!-- EN: Pawn threshold -->
+    <WorkManager.Settings_Schedule_WorkShiftThresholdColumnHeader>角色阈值</WorkManager.Settings_Schedule_WorkShiftThresholdColumnHeader>
+    <!-- EN: Pawns will be assigned to a work shift only if number of eligible pawns is equal or higher than this value (always equals 1 for first work shift) -->
+    <WorkManager.Settings_Schedule_WorkShiftThresholdColumnHeaderTooltip>只有当符合条件的角色数量等于或高于此值时，才会分配角色到工作班次（对于第一个工作班次总是等于 1）</WorkManager.Settings_Schedule_WorkShiftThresholdColumnHeaderTooltip>
+    <!-- EN: Night owl work shifts -->
+    <WorkManager.Settings_Schedule_NightOwlWorkShifts>夜猫子工作班次</WorkManager.Settings_Schedule_NightOwlWorkShifts>
+    <!-- EN: Work shifts for colonists with 'Night Owl' trait -->
+    <WorkManager.Settings_Schedule_NightOwlWorkShiftsTooltip>拥有“夜猫子”特征的殖民者的工作班次</WorkManager.Settings_Schedule_NightOwlWorkShiftsTooltip>
+    <!-- EN: Misc -->
+    <WorkManager.Settings_Misc_Title>杂项</WorkManager.Settings_Misc_Title>
+    <!-- EN: Verbose logging -->
+    <WorkManager.Settings_Misc_VerboseLogging>详细日志记录</WorkManager.Settings_Misc_VerboseLogging>
+    <!-- EN: Show mod execution details in log (only works when development mode is enabled) -->
+    <WorkManager.Settings_Misc_VerboseLoggingTooltip>在日志中显示模组执行详细信息（仅在开发模式启用时有效）</WorkManager.Settings_Misc_VerboseLoggingTooltip>
+</LanguageData>
