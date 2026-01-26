@@ -99,8 +99,6 @@ public class WorkManagerGameComponent : GameComponent
     /// </summary>
     public IReadOnlyDictionary<Pawn, List<WorkTypeDef>> DisabledPawnWorkTypes => _disabledPawnWorkTypes;
 
-
-
     /// <summary>
     ///     Gets the list of disabled work types.
     /// </summary>
@@ -189,10 +187,8 @@ public class WorkManagerGameComponent : GameComponent
         if (pawn == null) throw new ArgumentNullException(nameof(pawn));
         if (workType == null) throw new ArgumentNullException(nameof(workType));
         _disabledPawnWorkTypes ??= [];
-
         return !_disabledPawnWorkTypes.TryGetValue(pawn, out var workTypes)
                || !workTypes.Contains(workType);
-
     }
 
     /// <summary>
@@ -270,7 +266,6 @@ public class WorkManagerGameComponent : GameComponent
         if (pawn == null) throw new ArgumentNullException(nameof(pawn));
         if (workType == null) throw new ArgumentNullException(nameof(workType));
         _disabledPawnWorkTypes ??= [];
-
         if (enabled)
         {
             if (_disabledPawnWorkTypes.TryGetValue(pawn, out var workTypes))
@@ -292,8 +287,6 @@ public class WorkManagerGameComponent : GameComponent
             if (!workTypes.Contains(workType))
                 workTypes.Add(workType);
         }
-
-
     }
 
     /// <summary>
@@ -455,7 +448,5 @@ public class WorkManagerGameComponent : GameComponent
                     !DefDatabase<WorkTypeDef>.AllDefsListForReading.Contains(workType));
             }
         }
-
-
     }
 }
