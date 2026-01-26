@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -38,7 +38,11 @@ public class WorkManagerGameComponent : GameComponent
     /// <summary>
     ///     Dictionary of pawns and their disabled work types.
     /// </summary>
-    private Dictionary<Pawn, WorkTypeDef> _disabledPawnWorkTypes = [];
+    private Dictionary<Pawn, List<WorkTypeDef>> _disabledPawnWorkTypes = [];
+
+    // Used only by Scribe to load/save _disabledPawnWorkTypes
+    private List<Pawn> _disabledPawnWorkTypesKeys;
+    private List<List<WorkTypeDef>> _disabledPawnWorkTypesValues;
 
     /// <summary>
     ///     List of disabled work types.
@@ -93,7 +97,9 @@ public class WorkManagerGameComponent : GameComponent
     /// <summary>
     ///     Gets the dictionary of pawns and their disabled work types.
     /// </summary>
-    public IReadOnlyDictionary<Pawn, WorkTypeDef> DisabledPawnWorkTypes => _disabledPawnWorkTypes;
+    public IReadOnlyDictionary<Pawn, List<WorkTypeDef>> DisabledPawnWorkTypes => _disabledPawnWorkTypes;
+
+
 
     /// <summary>
     ///     Gets the list of disabled work types.
@@ -121,7 +127,7 @@ public class WorkManagerGameComponent : GameComponent
         Scribe_Values.Look(ref ScheduleManagementEnabled, nameof(ScheduleManagementEnabled), true);
         Scribe_Collections.Look(ref _disabledWorkTypes, nameof(DisabledWorkTypes), LookMode.Def);
         Scribe_Collections.Look(ref _disabledPawns, nameof(DisabledPawns), LookMode.Reference);
-        Scribe_Collections.Look(ref _disabledPawnWorkTypes, nameof(DisabledPawnWorkTypes), LookMode.Deep);
+        Scribe_Collections.Look(ref _disabledPawnWorkTypes, nameof(DisabledPawnWorkTypes), LookMode.Reference, LookMode.Def, ref _disabledPawnWorkTypesKeys, ref _disabledPawnWorkTypesValues);
         Scribe_Collections.Look(ref _disabledPawnSchedules, nameof(DisabledPawnSchedules), LookMode.Reference);
     }
 
@@ -183,7 +189,10 @@ public class WorkManagerGameComponent : GameComponent
         if (pawn == null) throw new ArgumentNullException(nameof(pawn));
         if (workType == null) throw new ArgumentNullException(nameof(workType));
         _disabledPawnWorkTypes ??= [];
-        return !_disabledPawnWorkTypes.Any(pwt => pwt.Key == pawn && pwt.Value == workType);
+
+        return !_disabledPawnWorkTypes.TryGetValue(pawn, out var workTypes)
+               || !workTypes.Contains(workType);
+
     }
 
     /// <summary>
@@ -261,15 +270,30 @@ public class WorkManagerGameComponent : GameComponent
         if (pawn == null) throw new ArgumentNullException(nameof(pawn));
         if (workType == null) throw new ArgumentNullException(nameof(workType));
         _disabledPawnWorkTypes ??= [];
+
         if (enabled)
         {
-            _ = _disabledPawnWorkTypes.RemoveAll(pwt => pwt.Key == pawn && pwt.Value == workType);
+            if (_disabledPawnWorkTypes.TryGetValue(pawn, out var workTypes))
+            {
+                workTypes.Remove(workType);
+
+                if (workTypes.Count == 0)
+                    _disabledPawnWorkTypes.Remove(pawn);
+            }
         }
         else
         {
-            if (!_disabledPawnWorkTypes.Any(pwt => pwt.Key == pawn && pwt.Value == workType))
-                _disabledPawnWorkTypes.Add(pawn, workType);
+            if (!_disabledPawnWorkTypes.TryGetValue(pawn, out var workTypes))
+            {
+                workTypes = new List<WorkTypeDef>();
+                _disabledPawnWorkTypes[pawn] = workTypes;
+            }
+
+            if (!workTypes.Contains(workType))
+                workTypes.Add(workType);
         }
+
+
     }
 
     /// <summary>
@@ -414,5 +438,24 @@ public class WorkManagerGameComponent : GameComponent
         _ = _disabledPawnSchedules?.RemoveAll(pawn => pawn?.Destroyed ?? true);
         _ = _disabledWorkTypes?.RemoveAll(workType =>
             !DefDatabase<WorkTypeDef>.AllDefsListForReading.Contains(workType));
+
+        if (_disabledPawnWorkTypes != null)
+        {
+            var pawnsToRemove = _disabledPawnWorkTypes
+                .Where(kv => kv.Key?.Destroyed ?? true)
+                .Select(kv => kv.Key)
+                .ToList();
+
+            foreach (var pawn in pawnsToRemove)
+                _disabledPawnWorkTypes.Remove(pawn);
+
+            foreach (var kv in _disabledPawnWorkTypes)
+            {
+                kv.Value.RemoveAll(workType =>
+                    !DefDatabase<WorkTypeDef>.AllDefsListForReading.Contains(workType));
+            }
+        }
+
+
     }
 }
