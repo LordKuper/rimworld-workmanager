@@ -40,6 +40,7 @@ internal class PawnSkillCache(Pawn pawn) : TimedCache(1f)
     private float GetSkillLearningRate([NotNull] SkillDef skill)
     {
         if (skill == null) throw new ArgumentNullException(nameof(skill));
+        if (pawn.skills == null) return 0f;
         if (_skillLearningRates.TryGetValue(skill, out var rate)) return rate;
         var value = pawn.skills.GetSkill(skill).LearnRateFactor();
         _skillLearningRates.Add(skill, value);
@@ -82,6 +83,7 @@ internal class PawnSkillCache(Pawn pawn) : TimedCache(1f)
     public int GetWorkSkillLevel([NotNull] WorkTypeDef workType)
     {
         if (workType == null) throw new ArgumentNullException(nameof(workType));
+        if (pawn.skills == null) return 0;
         if (_workSkillLevels.TryGetValue(workType, out var level)) return level;
         var relevantSkills = workType.relevantSkills;
         if (relevantSkills == null || relevantSkills.Count == 0)

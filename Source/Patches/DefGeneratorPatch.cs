@@ -21,10 +21,12 @@ public static class DefGeneratorPatch
     public static void Postfix()
     {
         PawnTableDefOf.Work.columns.Insert(
-            PawnTableDefOf.Work.columns.FindIndex(x => x.defName.Equals("Label", StringComparison.Ordinal)) + 1,
+            PawnTableDefOf.Work.columns.FindIndex(x =>
+                x.defName.Equals("Label", StringComparison.Ordinal)) + 1,
             PawnColumnDefOf.AutoWorkPriorities);
         PawnTableDefOf.Restrict.columns.Insert(
-            PawnTableDefOf.Restrict.columns.FindIndex(x => x.defName.Equals("Label", StringComparison.Ordinal)) + 1,
+            PawnTableDefOf.Restrict.columns.FindIndex(x =>
+                x.defName.Equals("Label", StringComparison.Ordinal)) + 1,
             PawnColumnDefOf.AutoWorkSchedule);
     }
 }

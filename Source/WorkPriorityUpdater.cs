@@ -386,7 +386,9 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
                 var passionCache =
                     Common.Helpers.PassionHelper.GetPassionCache(pc.GetWorkPassion(workType)) ??
                     throw new NullReferenceException("Passion cache is null.");
-                var priority = WorkManagerMod.Settings.PassionPriorities[passionCache.DefName];
+                if (!WorkManagerMod.Settings.PassionPriorities.TryGetValue(passionCache.DefName,
+                        out var priority))
+                    continue;
                 if (priority <= 0) continue;
 #if DEBUG
                 Logger.LogMessage(
@@ -658,8 +660,8 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
         var hoursPassed = time - _workUpdateTime;
         if (hoursPassed < WorkManagerMod.Settings.WorkPrioritiesUpdateFrequency *
             RimWorldTime.HoursInDay) return;
-        Update();
         _workUpdateTime = time;
+        Update();
     }
 
     /// <summary>
@@ -733,6 +735,8 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
         _allPawns.Clear();
         foreach (var pawn in map.mapPawns.FreeColonistsSpawned)
         {
+            if (pawn.workSettings is not { EverWork: true } || pawn.skills == null)
+                continue;
             _allPawns.Add(pawn);
         }
         var pawnCacheToRemove = new List<Pawn>();

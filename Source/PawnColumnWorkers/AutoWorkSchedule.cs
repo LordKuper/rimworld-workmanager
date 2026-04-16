@@ -18,8 +18,10 @@ public class AutoWorkSchedule : PawnColumnWorker
         {
             Buttons.DoIconButtonToggle(buttonRect, () => component.GetPawnScheduleEnabled(pawn),
                 newValue => component.SetPawnScheduleEnabled(pawn, newValue),
-                Resources.Strings.PawnScheduleDisableTooltip, Resources.Textures.ScheduleToggleButtonEnabled,
-                Resources.Strings.PawnScheduleEnableTooltip, Resources.Textures.ScheduleToggleButtonDisabled);
+                Resources.Strings.PawnScheduleDisableTooltip,
+                Resources.Textures.ScheduleToggleButtonEnabled,
+                Resources.Strings.PawnScheduleEnableTooltip,
+                Resources.Textures.ScheduleToggleButtonDisabled);
         }
         else
         {

@@ -18,6 +18,8 @@ internal static class WorkTypePriorityHelper
     /// <returns>The priority value for the specified work type.</returns>
     internal static int GetPriority(Pawn pawn, WorkTypeDef workType)
     {
+        if (pawn.workSettings is not { EverWork: true })
+            return 0;
         return WorkTab.WorkTabActive
             ? WorkTab.GetPriority(pawn, workType, -1)
             : pawn.workSettings.GetPriority(workType);
@@ -32,6 +34,8 @@ internal static class WorkTypePriorityHelper
     /// <param name="priority">The priority value to set.</param>
     internal static void SetPriority(Pawn pawn, WorkTypeDef workType, int priority)
     {
+        if (pawn.workSettings is not { EverWork: true })
+            return;
         if (WorkTab.WorkTabActive)
         {
             WorkTab.SetPriority(pawn, workType, priority, null);

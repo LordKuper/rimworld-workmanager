@@ -70,7 +70,8 @@ public partial class Settings
     /// <summary>
     ///     Maximum allowed threshold for major learning rate, depending on mod compatibility.
     /// </summary>
-    private static readonly float MajorLearningRateThresholdMax = Vse.VanillaSkillsExpandedActive ? 3f : 2f;
+    private static readonly float MajorLearningRateThresholdMax =
+        Vse.VanillaSkillsExpandedActive ? 3f : 2f;
 
     /// <summary>Cached height of the work priorities content for UI layout.</summary>
     private float _workPrioritiesContentHeight;
@@ -82,7 +83,8 @@ public partial class Settings
     public bool AssignWorkToIdlePawns = true;
 
     /// <summary>Score factor for learning rate of dedicated workers.</summary>
-    public float DedicatedWorkerLearningRateScoreFactor = DedicatedWorkerLearningRateScoreFactorDefault;
+    public float DedicatedWorkerLearningRateScoreFactor =
+        DedicatedWorkerLearningRateScoreFactorDefault;
 
     /// <summary>Score factor for passion of dedicated workers.</summary>
     public float DedicatedWorkerPassionScoreFactor = DedicatedWorkerPassionScoreFactorDefault;
@@ -146,11 +148,15 @@ public partial class Settings
         Vse.VanillaSkillsExpandedActive
             ? new Dictionary<string, int>
             {
-                { nameof(Passion.None), 0 }, { nameof(Passion.Minor), 3 }, { nameof(Passion.Major), 2 },
+                { nameof(Passion.None), 0 }, { nameof(Passion.Minor), 3 },
+                { nameof(Passion.Major), 2 },
                 { "VSE_Apathy", 0 }, { "VSE_Natural", 2 }, { "VSE_Critical", 1 }
             }
             : new Dictionary<string, int>
-                { { nameof(Passion.None), 0 }, { nameof(Passion.Minor), 3 }, { nameof(Passion.Major), 2 } };
+            {
+                { nameof(Passion.None), 0 }, { nameof(Passion.Minor), 3 },
+                { nameof(Passion.Major), 2 }
+            };
 
     /// <summary>
     ///     Draws the work priorities tab in the settings UI.
@@ -158,8 +164,8 @@ public partial class Settings
     /// <param name="rect">The rectangle area to draw the tab in.</param>
     private void DoWorkPrioritiesTab(Rect rect)
     {
-        Tabs.DoTab(rect, 0, null, _workPrioritiesContentHeight, ref _scrollPosition, DoWorkPrioritiesTabContent, 0,
-            null);
+        Tabs.DoTab(rect, 0, null, _workPrioritiesContentHeight, ref _scrollPosition,
+            DoWorkPrioritiesTabContent, 0, null);
     }
 
     /// <summary>
@@ -169,74 +175,87 @@ public partial class Settings
     private void DoWorkPrioritiesTabContent(Rect rect)
     {
         var y = 0f;
-        y += Fields.DoLabeledFrequencySlider(rect, 0, null, Strings.UpdateFrequency, Strings.UpdateFrequencyTooltip,
-            ref WorkPrioritiesUpdateFrequency, WorkPrioritiesUpdateFrequencyMin, WorkPrioritiesUpdateFrequencyMax, true,
-            null, out var remRect);
-        y += Fields.DoLabeledCheckbox(remRect, 0, null, ref UseDedicatedWorkers, Strings.UseDedicatedWorkers,
-            Strings.UseDedicatedWorkersTooltip, null, out remRect);
+        y += Fields.DoLabeledFrequencySlider(rect, 0, null, Strings.UpdateFrequency,
+            Strings.UpdateFrequencyTooltip, ref WorkPrioritiesUpdateFrequency,
+            WorkPrioritiesUpdateFrequencyMin, WorkPrioritiesUpdateFrequencyMax, true, null,
+            out var remRect);
+        y += Fields.DoLabeledCheckbox(remRect, 0, null, ref UseDedicatedWorkers,
+            Strings.UseDedicatedWorkers, Strings.UseDedicatedWorkersTooltip, null, out remRect);
         if (UseDedicatedWorkers)
         {
             y += Fields.DoLabeledIntegerSlider(remRect, 1, null, Strings.DedicatedWorkerPriority,
-                Strings.DedicatedWorkerPriorityTooltip, ref DedicatedWorkerPriority, 1, MaxWorkTypePriority, 1, null,
+                Strings.DedicatedWorkerPriorityTooltip, ref DedicatedWorkerPriority, 1,
+                MaxWorkTypePriority, 1, null, out remRect);
+            y += Fields.DoLabeledFloatSlider(remRect, 1, null,
+                Strings.DedicatedWorkerSkillScoreFactor,
+                Strings.DedicatedWorkerSkillScoreFactorTooltip, ref DedicatedWorkerSkillScoreFactor,
+                ScoreFactorMin, ScoreFactorMax, 0.1f, null, out remRect);
+            y += Fields.DoLabeledFloatSlider(remRect, 1, null,
+                Strings.DedicatedWorkerPassionScoreFactor,
+                Strings.DedicatedWorkerPassionScoreFactorTooltip,
+                ref DedicatedWorkerPassionScoreFactor, ScoreFactorMin, ScoreFactorMax, 0.1f, null,
                 out remRect);
-            y += Fields.DoLabeledFloatSlider(remRect, 1, null, Strings.DedicatedWorkerSkillScoreFactor,
-                Strings.DedicatedWorkerSkillScoreFactorTooltip, ref DedicatedWorkerSkillScoreFactor, ScoreFactorMin,
-                ScoreFactorMax, 0.1f, null, out remRect);
-            y += Fields.DoLabeledFloatSlider(remRect, 1, null, Strings.DedicatedWorkerPassionScoreFactor,
-                Strings.DedicatedWorkerPassionScoreFactorTooltip, ref DedicatedWorkerPassionScoreFactor, ScoreFactorMin,
-                ScoreFactorMax, 0.1f, null, out remRect);
-            y += Fields.DoLabeledFloatSlider(remRect, 1, null, Strings.DedicatedWorkerLearningRateScoreFactor,
-                Strings.DedicatedWorkerLearningRateScoreFactorTooltip, ref DedicatedWorkerLearningRateScoreFactor,
-                ScoreFactorMin, ScoreFactorMax, 0.1f, null, out remRect);
-            y += Fields.DoLabeledFloatSlider(remRect, 1, null, Strings.DedicatedWorkerWorkCountScoreFactor,
-                Strings.DedicatedWorkerWorkCountScoreFactorTooltip, ref DedicatedWorkerWorkCountScoreFactor,
-                ScoreFactorMin, ScoreFactorMax, 0.1f, null, out remRect);
+            y += Fields.DoLabeledFloatSlider(remRect, 1, null,
+                Strings.DedicatedWorkerLearningRateScoreFactor,
+                Strings.DedicatedWorkerLearningRateScoreFactorTooltip,
+                ref DedicatedWorkerLearningRateScoreFactor, ScoreFactorMin, ScoreFactorMax, 0.1f,
+                null, out remRect);
+            y += Fields.DoLabeledFloatSlider(remRect, 1, null,
+                Strings.DedicatedWorkerWorkCountScoreFactor,
+                Strings.DedicatedWorkerWorkCountScoreFactorTooltip,
+                ref DedicatedWorkerWorkCountScoreFactor, ScoreFactorMin, ScoreFactorMax, 0.1f, null,
+                out remRect);
         }
         else
         {
             y += Fields.DoLabeledIntegerSlider(remRect, 1, null, Strings.HighestSkillPriority,
-                Strings.HighestSkillPriorityTooltip, ref HighestSkillPriority, 1, MaxWorkTypePriority, 1, null,
-                out remRect);
+                Strings.HighestSkillPriorityTooltip, ref HighestSkillPriority, 1,
+                MaxWorkTypePriority, 1, null, out remRect);
         }
-        y += Fields.DoLabeledCheckbox(remRect, 0, null, ref AssignAllWorkTypes, Strings.AssignAllWorkTypes,
-            Strings.AssignAllWorkTypesTooltip, null, out remRect);
+        y += Fields.DoLabeledCheckbox(remRect, 0, null, ref AssignAllWorkTypes,
+            Strings.AssignAllWorkTypes, Strings.AssignAllWorkTypesTooltip, null, out remRect);
         if (AssignAllWorkTypes)
             y += Fields.DoLabeledIntegerSlider(remRect, 1, null, Strings.LeftoverPriority,
-                Strings.LeftoverPriorityTooltip, ref LeftoverPriority, 1, MaxWorkTypePriority, 1, null, out remRect);
-        y += Fields.DoLabeledCheckbox(remRect, 0, null, ref AssignWorkToIdlePawns, Strings.AssignWorkToIdlePawns,
-            Strings.AssignWorkToIdlePawnsTooltip, null, out remRect);
+                Strings.LeftoverPriorityTooltip, ref LeftoverPriority, 1, MaxWorkTypePriority, 1,
+                null, out remRect);
+        y += Fields.DoLabeledCheckbox(remRect, 0, null, ref AssignWorkToIdlePawns,
+            Strings.AssignWorkToIdlePawns, Strings.AssignWorkToIdlePawnsTooltip, null, out remRect);
         if (AssignWorkToIdlePawns)
-            y += Fields.DoLabeledIntegerSlider(remRect, 1, null, Strings.IdlePriority, Strings.IdlePriorityTooltip,
-                ref IdlePriority, 1, MaxWorkTypePriority, 1, null, out remRect);
-        y += Fields.DoLabeledCheckbox(remRect, 0, null, ref UsePassionPriorities, Strings.UsePassionPriorities,
-            Strings.UsePassionPrioritiesTooltip, null, out remRect);
+            y += Fields.DoLabeledIntegerSlider(remRect, 1, null, Strings.IdlePriority,
+                Strings.IdlePriorityTooltip, ref IdlePriority, 1, MaxWorkTypePriority, 1, null,
+                out remRect);
+        y += Fields.DoLabeledCheckbox(remRect, 0, null, ref UsePassionPriorities,
+            Strings.UsePassionPriorities, Strings.UsePassionPrioritiesTooltip, null, out remRect);
         if (UsePassionPriorities)
             foreach (var pc in PassionHelper.Passions)
             {
                 if (!PassionPriorities.TryGetValue(pc.DefName, out var priority)) continue;
-                y += Fields.DoLabeledIntegerSlider(remRect, 1, null, pc.Label, pc.Description, ref priority, 0,
-                    MaxWorkTypePriority, 1, pc.Icon, out remRect);
+                y += Fields.DoLabeledIntegerSlider(remRect, 1, null, pc.Label, pc.Description,
+                    ref priority, 0, MaxWorkTypePriority, 1, pc.Icon, out remRect);
                 PassionPriorities[pc.DefName] = priority;
             }
         y += Fields.DoLabeledCheckbox(remRect, 0, null, ref UseLearningRatesPriorities,
-            Strings.UseLearningRatesPriorities, Strings.UseLearningRatesPrioritiesTooltip, null, out remRect);
+            Strings.UseLearningRatesPriorities, Strings.UseLearningRatesPrioritiesTooltip, null,
+            out remRect);
         if (UseLearningRatesPriorities)
         {
             y += Fields.DoLabeledCheckbox(remRect, 1, null, ref UsePawnLearningRateThresholds,
-                Strings.UsePawnLearningRateThresholds, Strings.UsePawnLearningRateThresholdsTooltip, null, out remRect);
+                Strings.UsePawnLearningRateThresholds, Strings.UsePawnLearningRateThresholdsTooltip,
+                null, out remRect);
             y += Fields.DoLabeledPercentSlider(remRect, 1, null, Strings.MinorLearningRateThreshold,
                 Strings.MinorLearningRateThresholdTooltip, ref MinorLearningRateThreshold, 0.1f,
                 MajorLearningRateThreshold - 0.1f, 0.1f, null, out remRect);
             y += Fields.DoLabeledIntegerSlider(remRect, 1, null, Strings.MinorLearningRatePriority,
-                Strings.MinorLearningRatePriorityTooltip, ref MinorLearningRatePriority, 1, MaxWorkTypePriority, 1,
-                null, out remRect);
+                Strings.MinorLearningRatePriorityTooltip, ref MinorLearningRatePriority, 1,
+                MaxWorkTypePriority, 1, null, out remRect);
             y += Fields.DoLabeledPercentSlider(remRect, 1, null, Strings.MajorLearningRateThreshold,
                 Strings.MajorLearningRateThresholdTooltip, ref MajorLearningRateThreshold,
-                MinorLearningRateThreshold + 0.1f, UsePawnLearningRateThresholds ? 1f : MajorLearningRateThresholdMax,
-                0.1f, null, out remRect);
+                MinorLearningRateThreshold + 0.1f,
+                UsePawnLearningRateThresholds ? 1f : MajorLearningRateThresholdMax, 0.1f, null,
+                out remRect);
             y += Fields.DoLabeledIntegerSlider(remRect, 1, null, Strings.MajorLearningRatePriority,
-                Strings.MajorLearningRatePriorityTooltip, ref MajorLearningRatePriority, 1, MaxWorkTypePriority, 1,
-                null, out _);
+                Strings.MajorLearningRatePriorityTooltip, ref MajorLearningRatePriority, 1,
+                MaxWorkTypePriority, 1, null, out _);
         }
         if (Event.current.type == EventType.Layout) _workPrioritiesContentHeight = y;
     }
@@ -252,23 +271,28 @@ public partial class Settings
         Scribe_Values.Look(ref UseDedicatedWorkers, nameof(UseDedicatedWorkers), true);
         Scribe_Values.Look(ref DedicatedWorkerPriority, nameof(DedicatedWorkerPriority),
             DedicatedWorkerPriorityDefault);
-        Scribe_Values.Look(ref DedicatedWorkerSkillScoreFactor, nameof(DedicatedWorkerSkillScoreFactor),
-            DedicatedWorkerSkillScoreFactorDefault);
-        Scribe_Values.Look(ref DedicatedWorkerPassionScoreFactor, nameof(DedicatedWorkerPassionScoreFactor),
-            DedicatedWorkerPassionScoreFactorDefault);
-        Scribe_Values.Look(ref DedicatedWorkerLearningRateScoreFactor, nameof(DedicatedWorkerLearningRateScoreFactor),
+        Scribe_Values.Look(ref DedicatedWorkerSkillScoreFactor,
+            nameof(DedicatedWorkerSkillScoreFactor), DedicatedWorkerSkillScoreFactorDefault);
+        Scribe_Values.Look(ref DedicatedWorkerPassionScoreFactor,
+            nameof(DedicatedWorkerPassionScoreFactor), DedicatedWorkerPassionScoreFactorDefault);
+        Scribe_Values.Look(ref DedicatedWorkerLearningRateScoreFactor,
+            nameof(DedicatedWorkerLearningRateScoreFactor),
             DedicatedWorkerLearningRateScoreFactorDefault);
-        Scribe_Values.Look(ref DedicatedWorkerWorkCountScoreFactor, nameof(DedicatedWorkerWorkCountScoreFactor),
+        Scribe_Values.Look(ref DedicatedWorkerWorkCountScoreFactor,
+            nameof(DedicatedWorkerWorkCountScoreFactor),
             DedicatedWorkerWorkCountScoreFactorDefault);
-        Scribe_Values.Look(ref HighestSkillPriority, nameof(HighestSkillPriority), HighestSkillPriorityDefault);
+        Scribe_Values.Look(ref HighestSkillPriority, nameof(HighestSkillPriority),
+            HighestSkillPriorityDefault);
         Scribe_Values.Look(ref AssignAllWorkTypes, nameof(AssignAllWorkTypes));
         Scribe_Values.Look(ref LeftoverPriority, nameof(LeftoverPriority), LeftoverPriorityDefault);
         Scribe_Values.Look(ref AssignWorkToIdlePawns, nameof(AssignWorkToIdlePawns), true);
         Scribe_Values.Look(ref IdlePriority, nameof(IdlePriority), 4);
         Scribe_Values.Look(ref UsePassionPriorities, nameof(UsePassionPriorities), true);
-        Scribe_Collections.Look(ref PassionPriorities, nameof(PassionPriorities), LookMode.Value, LookMode.Value);
+        Scribe_Collections.Look(ref PassionPriorities, nameof(PassionPriorities), LookMode.Value,
+            LookMode.Value);
         Scribe_Values.Look(ref UseLearningRatesPriorities, nameof(UseLearningRatesPriorities));
-        Scribe_Values.Look(ref UsePawnLearningRateThresholds, nameof(UsePawnLearningRateThresholds));
+        Scribe_Values.Look(ref UsePawnLearningRateThresholds,
+            nameof(UsePawnLearningRateThresholds));
         Scribe_Values.Look(ref MinorLearningRateThreshold, nameof(MinorLearningRateThreshold),
             MinorLearningRateThresholdDefault);
         Scribe_Values.Look(ref MinorLearningRatePriority, nameof(MinorLearningRatePriority),
@@ -325,18 +349,21 @@ public partial class Settings
         DedicatedWorkerPriority = DedicatedWorkerPriority == 0
             ? DedicatedWorkerPriorityDefault
             : Mathf.Clamp(DedicatedWorkerPriority, 1, MaxWorkTypePriority);
-        DedicatedWorkerSkillScoreFactor = Mathf.Clamp(DedicatedWorkerSkillScoreFactor, ScoreFactorMin, ScoreFactorMax);
-        DedicatedWorkerPassionScoreFactor =
-            Mathf.Clamp(DedicatedWorkerPassionScoreFactor, ScoreFactorMin, ScoreFactorMax);
-        DedicatedWorkerLearningRateScoreFactor =
-            Mathf.Clamp(DedicatedWorkerLearningRateScoreFactor, ScoreFactorMin, ScoreFactorMax);
+        DedicatedWorkerSkillScoreFactor = Mathf.Clamp(DedicatedWorkerSkillScoreFactor,
+            ScoreFactorMin, ScoreFactorMax);
+        DedicatedWorkerPassionScoreFactor = Mathf.Clamp(DedicatedWorkerPassionScoreFactor,
+            ScoreFactorMin, ScoreFactorMax);
+        DedicatedWorkerLearningRateScoreFactor = Mathf.Clamp(DedicatedWorkerLearningRateScoreFactor,
+            ScoreFactorMin, ScoreFactorMax);
         HighestSkillPriority = HighestSkillPriority == 0
             ? HighestSkillPriorityDefault
             : Mathf.Clamp(HighestSkillPriority, 1, MaxWorkTypePriority);
         LeftoverPriority = LeftoverPriority == 0
             ? LeftoverPriorityDefault
             : Mathf.Clamp(LeftoverPriority, 1, MaxWorkTypePriority);
-        IdlePriority = IdlePriority == 0 ? IdlePriorityDefault : Mathf.Clamp(IdlePriority, 1, MaxWorkTypePriority);
+        IdlePriority = IdlePriority == 0
+            ? IdlePriorityDefault
+            : Mathf.Clamp(IdlePriority, 1, MaxWorkTypePriority);
         if (PassionPriorities == null || PassionPriorities.Count == 0)
             PassionPriorities = PassionPrioritiesDefault;
         foreach (var passion in PassionHelper.Passions)
@@ -348,7 +375,8 @@ public partial class Settings
         }
         MajorLearningRateThreshold = MajorLearningRateThreshold == 0
             ? MajorLearningRateThresholdDefault
-            : Mathf.Clamp(MajorLearningRateThreshold, MinorLearningRateThreshold + 0.1f, MajorLearningRateThresholdMax);
+            : Mathf.Clamp(MajorLearningRateThreshold, MinorLearningRateThreshold + 0.1f,
+                MajorLearningRateThresholdMax);
         MajorLearningRatePriority = MajorLearningRatePriority == 0
             ? MajorLearningRatePriorityDefault
             : Mathf.Clamp(MajorLearningRatePriority, 1, MaxWorkTypePriority);

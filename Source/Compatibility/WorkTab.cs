@@ -49,18 +49,25 @@ internal static class WorkTab
         {
             WorkTabPatch.Apply(harmony);
             var pawnExtensions = AccessTools.TypeByName("WorkTab.Pawn_Extensions") ??
-                                 throw new InvalidOperationException("Could not find 'Pawn_Extensions' type.");
-            GetPriority = AccessTools.MethodDelegate<GetPriorityDelegate>(AccessTools.Method(pawnExtensions,
-                "GetPriority", [typeof(Pawn), typeof(WorkTypeDef), typeof(int)]));
+                                 throw new InvalidOperationException(
+                                     "Could not find 'Pawn_Extensions' type.");
+            GetPriority = AccessTools.MethodDelegate<GetPriorityDelegate>(
+                AccessTools.Method(pawnExtensions, "GetPriority",
+                    [typeof(Pawn), typeof(WorkTypeDef), typeof(int)]));
             if (GetPriority == null)
-                throw new InvalidOperationException("Could not create 'GetPriority' method delegate.");
-            SetPriority = AccessTools.MethodDelegate<SetPriorityDelegate>(AccessTools.Method(pawnExtensions,
-                "SetPriority", [typeof(Pawn), typeof(WorkTypeDef), typeof(int), typeof(List<int>)]));
+                throw new InvalidOperationException(
+                    "Could not create 'GetPriority' method delegate.");
+            SetPriority = AccessTools.MethodDelegate<SetPriorityDelegate>(
+                AccessTools.Method(pawnExtensions, "SetPriority",
+                    [typeof(Pawn), typeof(WorkTypeDef), typeof(int), typeof(List<int>)]));
             if (SetPriority == null)
-                throw new InvalidOperationException("Could not create 'SetPriority' method delegate.");
+                throw new InvalidOperationException(
+                    "Could not create 'SetPriority' method delegate.");
             var settingsType = AccessTools.TypeByName("WorkTab.Settings") ??
-                               throw new InvalidOperationException("Could not find 'WorkTab.Settings' type.");
-            WorkManagerMod.Settings.MaxWorkTypePriority = Traverse.Create(settingsType).Field<int>("maxPriority").Value;
+                               throw new InvalidOperationException(
+                                   "Could not find 'WorkTab.Settings' type.");
+            WorkManagerMod.Settings.MaxWorkTypePriority =
+                Traverse.Create(settingsType).Field<int>("maxPriority").Value;
             if (WorkManagerMod.Settings.MaxWorkTypePriority <= 0)
                 throw new InvalidOperationException("Invalid max priority.");
         }
@@ -89,5 +96,6 @@ internal static class WorkTab
     /// <param name="workType">The work type definition.</param>
     /// <param name="priority">The priority value to set.</param>
     /// <param name="hours">The list of hours for which to set the priority.</param>
-    internal delegate void SetPriorityDelegate(Pawn pawn, WorkTypeDef workType, int priority, List<int> hours);
+    internal delegate void SetPriorityDelegate(Pawn pawn, WorkTypeDef workType, int priority,
+        List<int> hours);
 }

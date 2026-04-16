@@ -22,16 +22,20 @@ public static class MainTabWindowWorkPatch
     private static void Postfix(Rect rect)
     {
         var component = WorkManagerGameComponent.Instance;
-        var buttonRow = new Rect(rect.xMin + Layout.ElementGapTiny, rect.yMin + Layout.ElementGapTiny,
+        var buttonRow = new Rect(rect.xMin + Layout.ElementGapTiny,
+            rect.yMin + Layout.ElementGapTiny,
             rect.width - Layout.ElementGap - Layout.ElementGapTiny * 2, Buttons.IconButtonSize);
-        var buttonRect = Layout.GetRightColumnRect(buttonRow, Buttons.IconButtonSize, out buttonRow);
+        var buttonRect =
+            Layout.GetRightColumnRect(buttonRow, Buttons.IconButtonSize, out buttonRow);
         Buttons.DoIconButtonToggle(buttonRect, ref component.PriorityManagementEnabled,
-            Resources.Strings.GlobalDisableTooltip, Resources.Textures.PrioritiesToggleButtonEnabled,
-            Resources.Strings.GlobalEnableTooltip, Resources.Textures.PrioritiesToggleButtonDisabled);
+            Resources.Strings.GlobalDisableTooltip,
+            Resources.Textures.PrioritiesToggleButtonEnabled, Resources.Strings.GlobalEnableTooltip,
+            Resources.Textures.PrioritiesToggleButtonDisabled);
         Layout.GetRightColumnRect(buttonRow, Layout.ElementGapSmall, out buttonRow);
         buttonRect = Layout.GetRightColumnRect(buttonRow, Buttons.IconButtonSize, out buttonRow);
         Buttons.DoIconButton(buttonRect,
-            new IconButton(Resources.Textures.RefreshButton, WorkManagerGameComponent.ForceUpdateAssignments,
+            new IconButton(Resources.Textures.RefreshButton,
+                WorkManagerGameComponent.ForceUpdateAssignments,
                 Resources.Strings.UpdateNowTooltip));
         Layout.GetRightColumnRect(buttonRow, Layout.ElementGapSmall, out buttonRow);
         buttonRect = Layout.GetRightColumnRect(buttonRow, Buttons.IconButtonSize, out buttonRow);

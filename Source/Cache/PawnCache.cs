@@ -139,7 +139,8 @@ internal class PawnCache(Pawn pawn)
         }
         else
         {
-            var rule = WorkManagerGameComponent.Instance.CombinedRules.First(r => r.Def == workType);
+            var rule =
+                WorkManagerGameComponent.Instance.CombinedRules.First(r => r.Def == workType);
             allowed = rule.IsAllowedWorker(Pawn);
         }
         _allowedWorkTypes.Add(workType, allowed);

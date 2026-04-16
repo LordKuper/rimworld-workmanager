@@ -52,14 +52,16 @@ public static class WidgetsWorkPatch
     [UsedImplicitly]
     [HarmonyPatch(nameof(WidgetsWork.DrawWorkBoxFor))]
     [HarmonyPrefix]
-    private static void DrawWorkBoxForPrefix(float x, float y, [CanBeNull] Pawn p, [CanBeNull] WorkTypeDef wType)
+    private static void DrawWorkBoxForPrefix(float x, float y, [CanBeNull] Pawn p,
+        [CanBeNull] WorkTypeDef wType)
     {
         if (p == null || wType == null) return;
         var component = Current.Game.GetComponent<WorkManagerGameComponent>();
         if (!component.PriorityManagementEnabled || !Find.PlaySettings.useWorkPriorities) return;
         Rect rect = new(x, y, 25f, 25f);
         var enabled = component.GetPawnWorkTypeEnabled(p, wType);
-        if (Event.current.type == EventType.MouseDown && Mouse.IsOver(rect) && Event.current.button == 2)
+        if (Event.current.type == EventType.MouseDown && Mouse.IsOver(rect) &&
+            Event.current.button == 2)
             component.SetPawnWorkTypeEnabled(p, wType, !enabled);
     }
 }

@@ -24,9 +24,11 @@ public class WorkShift : IExposable
     {
         _hours = [.. assignments];
         if (_hours.Count != 24)
-            throw new ArgumentException("Invalid schedule for creating work shift", nameof(assignments));
+            throw new ArgumentException("Invalid schedule for creating work shift",
+                nameof(assignments));
         if (pawnThreshold < 1)
-            throw new ArgumentException("Invalid pawn threshold for creating work shift", nameof(pawnThreshold));
+            throw new ArgumentException("Invalid pawn threshold for creating work shift",
+                nameof(pawnThreshold));
         PawnThreshold = pawnThreshold;
     }
 

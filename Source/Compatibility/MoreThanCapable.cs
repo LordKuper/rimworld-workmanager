@@ -34,7 +34,8 @@ internal static class MoreThanCapable
         _isInitialized = true;
         MoreThanCapableActive =
             LoadedModManager.RunningModsListForReading.Any(m =>
-                "notfood.MoreThanCapable".Equals(m.PackageId, StringComparison.OrdinalIgnoreCase)) ||
+                "notfood.MoreThanCapable".Equals(m.PackageId,
+                    StringComparison.OrdinalIgnoreCase)) ||
             LoadedModManager.RunningModsListForReading.Any(m =>
                 "void.MoreThanCapable".Equals(m.PackageId, StringComparison.OrdinalIgnoreCase));
         if (!MoreThanCapableActive) return;
@@ -44,8 +45,11 @@ internal static class MoreThanCapable
         try
         {
             IsBadWork = AccessTools.MethodDelegate<IsBadWorkDelegate>(
-                AccessTools.Method(AccessTools.TypeByName("MoreThanCapable.MoreThanCapableMod"), "IsBadWork"));
-            if (IsBadWork == null) throw new InvalidOperationException("Could not create 'IsBadWork' method delegate.");
+                AccessTools.Method(AccessTools.TypeByName("MoreThanCapable.MoreThanCapableMod"),
+                    "IsBadWork"));
+            if (IsBadWork == null)
+                throw new InvalidOperationException(
+                    "Could not create 'IsBadWork' method delegate.");
         }
         catch (Exception e)
         {
