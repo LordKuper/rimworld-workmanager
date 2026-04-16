@@ -1,4 +1,5 @@
-﻿using LordKuper.WorkManager.Compatibility;
+﻿using JetBrains.Annotations;
+using LordKuper.WorkManager.Compatibility;
 using Verse;
 
 namespace LordKuper.WorkManager.Helpers;
@@ -16,7 +17,7 @@ internal static class WorkTypePriorityHelper
     /// <param name="pawn">The pawn whose work priority is being queried.</param>
     /// <param name="workType">The work type definition.</param>
     /// <returns>The priority value for the specified work type.</returns>
-    internal static int GetPriority(Pawn pawn, WorkTypeDef workType)
+    internal static int GetPriority([NotNull] Pawn pawn, WorkTypeDef workType)
     {
         if (pawn.workSettings is not { EverWork: true })
             return 0;
@@ -32,7 +33,7 @@ internal static class WorkTypePriorityHelper
     /// <param name="pawn">The pawn whose work priority is being set.</param>
     /// <param name="workType">The work type definition.</param>
     /// <param name="priority">The priority value to set.</param>
-    internal static void SetPriority(Pawn pawn, WorkTypeDef workType, int priority)
+    internal static void SetPriority([NotNull] Pawn pawn, WorkTypeDef workType, int priority)
     {
         if (pawn.workSettings is not { EverWork: true })
             return;
