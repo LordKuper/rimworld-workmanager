@@ -82,6 +82,7 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
     /// <summary>
     ///     Gets the default set of work type assignment rules.
     /// </summary>
+    [NotNull]
     internal static IEnumerable<WorkTypeAssignmentRule> DefaultRules =>
     [
         new(null)
@@ -120,10 +121,12 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
             {
                 TriStateMode = true,
                 ForbiddenPawnTypes = [..AllowedWorkersForbiddenPawnTypes],
-                ForbiddenPawnHealthStates = AllowedWorkersForbiddenPawnHealthStates, FilterPawnHealthStates = true,
+                ForbiddenPawnHealthStates = AllowedWorkersForbiddenPawnHealthStates,
+                FilterPawnHealthStates = true,
                 AllowedPawnHealthStates = PawnHealthState.Healthy | PawnHealthState.Resting
             },
-            DedicatedWorkerSettings = new DedicatedWorkerSettings { TriStateMode = true, AllowDedicated = false },
+            DedicatedWorkerSettings = new DedicatedWorkerSettings
+                { TriStateMode = true, AllowDedicated = false },
             AssignEveryone = true,
             AssignEveryonePriority = 1, EnsureWorkerAssigned = false,
             MinWorkerNumber = 0
@@ -134,11 +137,14 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
             {
                 TriStateMode = true,
                 ForbiddenPawnTypes = [..AllowedWorkersForbiddenPawnTypes],
-                ForbiddenPawnHealthStates = AllowedWorkersForbiddenPawnHealthStates, FilterPawnHealthStates = true,
+                ForbiddenPawnHealthStates = AllowedWorkersForbiddenPawnHealthStates,
+                FilterPawnHealthStates = true,
                 AllowedPawnHealthStates = PawnHealthState.Healthy | PawnHealthState.Resting |
-                                          PawnHealthState.NeedsTending | PawnHealthState.Downed | PawnHealthState.Mental
+                                          PawnHealthState.NeedsTending | PawnHealthState.Downed |
+                                          PawnHealthState.Mental
             },
-            DedicatedWorkerSettings = new DedicatedWorkerSettings { TriStateMode = true, AllowDedicated = false },
+            DedicatedWorkerSettings = new DedicatedWorkerSettings
+                { TriStateMode = true, AllowDedicated = false },
             AssignEveryone = true,
             AssignEveryonePriority = 1, EnsureWorkerAssigned = false,
             MinWorkerNumber = 0
@@ -149,11 +155,14 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
             {
                 TriStateMode = true,
                 ForbiddenPawnTypes = [..AllowedWorkersForbiddenPawnTypes],
-                ForbiddenPawnHealthStates = AllowedWorkersForbiddenPawnHealthStates, FilterPawnHealthStates = true,
+                ForbiddenPawnHealthStates = AllowedWorkersForbiddenPawnHealthStates,
+                FilterPawnHealthStates = true,
                 AllowedPawnHealthStates = PawnHealthState.Healthy | PawnHealthState.Resting |
-                                          PawnHealthState.NeedsTending | PawnHealthState.Downed | PawnHealthState.Mental
+                                          PawnHealthState.NeedsTending | PawnHealthState.Downed |
+                                          PawnHealthState.Mental
             },
-            DedicatedWorkerSettings = new DedicatedWorkerSettings { TriStateMode = true, AllowDedicated = false },
+            DedicatedWorkerSettings = new DedicatedWorkerSettings
+                { TriStateMode = true, AllowDedicated = false },
             AssignEveryone = true,
             AssignEveryonePriority = 1, EnsureWorkerAssigned = false,
             MinWorkerNumber = 0
@@ -166,7 +175,8 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
                 ForbiddenPawnTypes = [..AllowedWorkersForbiddenPawnTypes],
                 ForbiddenPawnHealthStates = AllowedWorkersForbiddenPawnHealthStates
             },
-            DedicatedWorkerSettings = new DedicatedWorkerSettings { TriStateMode = true, AllowDedicated = false },
+            DedicatedWorkerSettings = new DedicatedWorkerSettings
+                { TriStateMode = true, AllowDedicated = false },
             AssignEveryone = true,
             AssignEveryonePriority = 1, EnsureWorkerAssigned = false,
             MinWorkerNumber = 0
@@ -179,7 +189,8 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
                 ForbiddenPawnTypes = [..AllowedWorkersForbiddenPawnTypes],
                 ForbiddenPawnHealthStates = AllowedWorkersForbiddenPawnHealthStates
             },
-            DedicatedWorkerSettings = new DedicatedWorkerSettings { TriStateMode = true, AllowDedicated = true },
+            DedicatedWorkerSettings = new DedicatedWorkerSettings
+                { TriStateMode = true, AllowDedicated = true },
             AssignEveryone = true,
             AssignEveryonePriority = 4, EnsureWorkerAssigned = true,
             MinWorkerNumber = 1
@@ -192,7 +203,8 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
                 ForbiddenPawnTypes = [..AllowedWorkersForbiddenPawnTypes],
                 ForbiddenPawnHealthStates = AllowedWorkersForbiddenPawnHealthStates
             },
-            DedicatedWorkerSettings = new DedicatedWorkerSettings { TriStateMode = true, AllowDedicated = true },
+            DedicatedWorkerSettings = new DedicatedWorkerSettings
+                { TriStateMode = true, AllowDedicated = true },
             AssignEveryone = true,
             AssignEveryonePriority = 4, EnsureWorkerAssigned = true,
             MinWorkerNumber = 1
@@ -203,7 +215,8 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
             {
                 TriStateMode = true,
                 ForbiddenPawnTypes = [..AllowedWorkersForbiddenPawnTypes],
-                ForbiddenPawnHealthStates = AllowedWorkersForbiddenPawnHealthStates, FilterPawnHealthStates = true,
+                ForbiddenPawnHealthStates = AllowedWorkersForbiddenPawnHealthStates,
+                FilterPawnHealthStates = true,
                 AllowedPawnHealthStates = PawnHealthState.Healthy | PawnHealthState.Resting
             },
             DedicatedWorkerSettings = new DedicatedWorkerSettings
@@ -218,7 +231,8 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
                     FilterPawnTypes = true,
                     AllowedPawnTypes =
                     [
-                        PawnType.Colonist, PawnType.Guest, PawnType.Slave, PawnType.Prisoner, PawnType.Animal
+                        PawnType.Colonist, PawnType.Guest, PawnType.Slave, PawnType.Prisoner,
+                        PawnType.Animal
                     ],
                     FilterPawnHealthStates = true,
                     AllowedPawnHealthStates = PawnHealthState.NeedsTending
@@ -234,7 +248,8 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
                 TriStateMode = true,
                 ForbiddenPawnTypes = [..AllowedWorkersForbiddenPawnTypes],
                 ForbiddenPawnHealthStates = AllowedWorkersForbiddenPawnHealthStates,
-                FilterPawnPrimaryWeaponTypes = true, AllowedPawnPrimaryWeaponTypes = [PawnPrimaryWeaponType.Ranged]
+                FilterPawnPrimaryWeaponTypes = true,
+                AllowedPawnPrimaryWeaponTypes = [PawnPrimaryWeaponType.Ranged]
             },
             DedicatedWorkerSettings = new DedicatedWorkerSettings
             {
@@ -264,21 +279,23 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
                 if (EnsureWorkerAssigned == true)
                 {
                     stringBuilder.AppendIndented(
-                        $"{Strings.MinWorkerNumberLabel}: ".Colorize(ColoredText.ExpectationsColor), 2);
+                        $"{Strings.MinWorkerNumberLabel}: ".Colorize(ColoredText.ExpectationsColor),
+                        2);
                     stringBuilder.AppendLine(MinWorkerNumber.ToString("N0"));
                 }
                 else
                 {
                     stringBuilder.AppendIndented(
-                        $"{Strings.AllowDedicatedWorkerLabel}: ".Colorize(ColoredText.ExpectationsColor), 2);
+                        $"{Strings.AllowDedicatedWorkerLabel}: ".Colorize(ColoredText
+                            .ExpectationsColor), 2);
                     stringBuilder.AppendLine(Strings.WorkTypeRuleDisabledSettingTooltip);
                 }
             }
             if (AssignEveryone.HasValue)
             {
                 anyValue = true;
-                stringBuilder.AppendIndented($"{Strings.AssignEveryoneLabel}: ".Colorize(ColoredText.ExpectationsColor),
-                    2);
+                stringBuilder.AppendIndented(
+                    $"{Strings.AssignEveryoneLabel}: ".Colorize(ColoredText.ExpectationsColor), 2);
                 stringBuilder.AppendLine(AssignEveryone.Value
                     ? AssignEveryonePriority.ToString("N0")
                     : Strings.WorkTypeRuleDisabledSettingTooltip);
@@ -289,46 +306,57 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
             {
                 anyValue = false;
                 stringBuilder.AppendLineIndented(
-                    $"{Strings.DedicatedWorkerSettingsLabel}".Colorize(ColoredText.ColonistCountColor), 1);
+                    $"{Strings.DedicatedWorkerSettingsLabel}".Colorize(ColoredText
+                        .ColonistCountColor), 1);
                 var dedicated = DedicatedWorkerSettings;
                 if (dedicated.AllowDedicated.HasValue)
                 {
                     anyValue = true;
                     stringBuilder.AppendIndented(
-                        $"{Strings.AllowDedicatedWorkerLabel}: ".Colorize(ColoredText.ExpectationsColor), 2);
+                        $"{Strings.AllowDedicatedWorkerLabel}: ".Colorize(ColoredText
+                            .ExpectationsColor), 2);
                     stringBuilder.AppendLine(dedicated.AllowDedicated.Value
                         ? Strings.WorkTypeRuleEnabledSettingTooltip
                         : Strings.WorkTypeRuleDisabledSettingTooltip);
                     if (dedicated.AllowDedicated.Value && dedicated.Mode.HasValue)
                     {
                         stringBuilder.AppendIndented(
-                            $"{Strings.DedicatedWorkerModeLabel}: ".Colorize(ColoredText.ExpectationsColor), 2);
+                            $"{Strings.DedicatedWorkerModeLabel}: ".Colorize(ColoredText
+                                .ExpectationsColor), 2);
                         stringBuilder.AppendLine(
-                            Resources.Strings.DedicatedWorkerMode.GetDedicatedWorkerModeLabel(dedicated.Mode));
+                            Resources.Strings.DedicatedWorkerMode.GetDedicatedWorkerModeLabel(
+                                dedicated.Mode));
                         switch (dedicated.Mode)
                         {
                             case DedicatedWorkerMode.Constant:
                                 stringBuilder.AppendIndented(
-                                    $"{Strings.ConstantWorkerCountLabel}: ".Colorize(ColoredText.ExpectationsColor), 2);
-                                stringBuilder.AppendLine(dedicated.ConstantWorkerCount.ToString("N0"));
+                                    $"{Strings.ConstantWorkerCountLabel}: ".Colorize(ColoredText
+                                        .ExpectationsColor), 2);
+                                stringBuilder.AppendLine(
+                                    dedicated.ConstantWorkerCount.ToString("N0"));
                                 break;
                             case DedicatedWorkerMode.WorkTypeCount:
                                 stringBuilder.AppendIndented(
-                                    $"{Strings.WorkTypeCountFactorLabel}: ".Colorize(ColoredText.ExpectationsColor), 2);
-                                stringBuilder.AppendLine(dedicated.WorkTypeCountFactor.ToString("F2"));
+                                    $"{Strings.WorkTypeCountFactorLabel}: ".Colorize(ColoredText
+                                        .ExpectationsColor), 2);
+                                stringBuilder.AppendLine(
+                                    dedicated.WorkTypeCountFactor.ToString("F2"));
                                 break;
                             case DedicatedWorkerMode.CapablePawnRatio:
                                 stringBuilder.AppendIndented(
-                                    $"{Strings.CapablePawnRatioFactorLabel}: ".Colorize(ColoredText.ExpectationsColor),
-                                    2);
-                                stringBuilder.AppendLine(dedicated.CapablePawnRatioFactor.ToString("F1"));
+                                    $"{Strings.CapablePawnRatioFactorLabel}: ".Colorize(ColoredText
+                                        .ExpectationsColor), 2);
+                                stringBuilder.AppendLine(
+                                    dedicated.CapablePawnRatioFactor.ToString("F1"));
                                 break;
                             case DedicatedWorkerMode.PawnCount:
                                 stringBuilder.AppendIndented(
-                                    $"{Strings.PawnCountFactorLabel}: ".Colorize(ColoredText.ExpectationsColor), 2);
+                                    $"{Strings.PawnCountFactorLabel}: ".Colorize(ColoredText
+                                        .ExpectationsColor), 2);
                                 stringBuilder.AppendLine(dedicated.PawnCountFactor.ToString("F1"));
                                 if (dedicated.PawnCountFilter != null)
-                                    stringBuilder.AppendLine(dedicated.PawnCountFilter.GetSummary(2));
+                                    stringBuilder.AppendLine(
+                                        dedicated.PawnCountFilter.GetSummary(2));
                                 break;
                             case null:
                                 break;
@@ -338,10 +366,11 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
                     }
                 }
                 if (!anyValue)
-                    stringBuilder.AppendLineIndented(Strings.WorkTypeRuleUndefinedSectionTooltip, 2);
+                    stringBuilder.AppendLineIndented(Strings.WorkTypeRuleUndefinedSectionTooltip,
+                        2);
             }
-            stringBuilder.AppendLineIndented($"{Strings.AllowedWorkersLabel}".Colorize(ColoredText.ColonistCountColor),
-                1);
+            stringBuilder.AppendLineIndented(
+                $"{Strings.AllowedWorkersLabel}".Colorize(ColoredText.ColonistCountColor), 1);
             if (AllowedWorkers != null)
                 stringBuilder.AppendLine(AllowedWorkers.GetSummary(2));
             return stringBuilder.ToString();
@@ -362,7 +391,8 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
         base.ExposeData();
         Scribe_Deep.Look(ref AllowedWorkers, nameof(AllowedWorkers));
         Scribe_Values.Look(ref AssignEveryone, nameof(AssignEveryone));
-        Scribe_Values.Look(ref AssignEveryonePriority, nameof(AssignEveryonePriority), AssignEveryonePriorityDefault);
+        Scribe_Values.Look(ref AssignEveryonePriority, nameof(AssignEveryonePriority),
+            AssignEveryonePriorityDefault);
         Scribe_Values.Look(ref EnsureWorkerAssigned, nameof(EnsureWorkerAssigned));
         Scribe_Values.Look(ref MinWorkerNumber, nameof(MinWorkerNumber));
         Scribe_Deep.Look(ref DedicatedWorkerSettings, nameof(DedicatedWorkerSettings));
@@ -396,13 +426,15 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
         return new WorkTypeAssignmentRule(main.DefName)
         {
             EnsureWorkerAssigned = main.EnsureWorkerAssigned ?? fallback.EnsureWorkerAssigned,
-            MinWorkerNumber = main.EnsureWorkerAssigned.HasValue ? main.MinWorkerNumber : fallback.MinWorkerNumber,
+            MinWorkerNumber = main.EnsureWorkerAssigned.HasValue
+                ? main.MinWorkerNumber
+                : fallback.MinWorkerNumber,
             AssignEveryone = main.AssignEveryone ?? fallback.AssignEveryone,
             AssignEveryonePriority = main.AssignEveryone.HasValue
                 ? main.AssignEveryonePriority
                 : fallback.AssignEveryonePriority,
-            DedicatedWorkerSettings =
-                DedicatedWorkerSettings.Combine(main.DedicatedWorkerSettings, fallback.DedicatedWorkerSettings),
+            DedicatedWorkerSettings = DedicatedWorkerSettings.Combine(main.DedicatedWorkerSettings,
+                fallback.DedicatedWorkerSettings),
             AllowedWorkers = PawnFilter.Combine(main.AllowedWorkers, fallback.AllowedWorkers)
         };
     }
@@ -451,17 +483,20 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
             case DedicatedWorkerMode.Constant:
                 return DedicatedWorkerSettings.ConstantWorkerCount;
             case DedicatedWorkerMode.WorkTypeCount:
-                return Mathf.CeilToInt(DedicatedWorkerSettings.WorkTypeCountFactor * dedicatedWorkTypesCount);
+                return Mathf.CeilToInt(DedicatedWorkerSettings.WorkTypeCountFactor *
+                                       dedicatedWorkTypesCount);
             case DedicatedWorkerMode.CapablePawnRatio:
                 return Mathf.CeilToInt(DedicatedWorkerSettings.CapablePawnRatioFactor *
                                        ((float)capablePawnCount / dedicatedWorkTypesCount));
             case DedicatedWorkerMode.PawnCount:
-                var filteredPawns = DedicatedWorkerSettings.PawnCountFilter.GetFilteredPawns([map], null);
+                var filteredPawns =
+                    DedicatedWorkerSettings.PawnCountFilter.GetFilteredPawns([map], null);
 #if DEBUG
                 Logger.LogMessage(
                     $"Pawns eligible for target worker count: {string.Join(", ", filteredPawns.Select(p => p.LabelShort))}");
 #endif
-                return Mathf.CeilToInt(DedicatedWorkerSettings.PawnCountFactor * filteredPawns.Count);
+                return Mathf.CeilToInt(
+                    DedicatedWorkerSettings.PawnCountFactor * filteredPawns.Count);
             default:
                 throw new ArgumentOutOfRangeException();
         }
@@ -496,13 +531,15 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
         AllowedWorkers.ForbiddenPawnHealthStates = AllowedWorkersForbiddenPawnHealthStates;
         if (AllowedWorkers.FilterPawnHealthStates == true &&
             AllowedWorkers.AllowedPawnHealthStates == PawnHealthState.None)
-            AllowedWorkers.AllowedPawnHealthStates = defaultRule.AllowedWorkers.AllowedPawnHealthStates;
+            AllowedWorkers.AllowedPawnHealthStates =
+                defaultRule.AllowedWorkers.AllowedPawnHealthStates;
         if (AllowedWorkers.FilterPawnPrimaryWeaponTypes == true &&
             (AllowedWorkers.AllowedPawnPrimaryWeaponTypes == null ||
              AllowedWorkers.AllowedPawnPrimaryWeaponTypes.Count == 0))
             AllowedWorkers.AllowedPawnPrimaryWeaponTypes =
                 [.. defaultRule.AllowedWorkers.AllowedPawnPrimaryWeaponTypes];
-        AssignEveryonePriority = Mathf.Clamp(AssignEveryonePriority, 0, WorkManagerMod.Settings.MaxWorkTypePriority);
+        AssignEveryonePriority = Mathf.Clamp(AssignEveryonePriority, 0,
+            WorkManagerMod.Settings.MaxWorkTypePriority);
         if (DefName == null)
         {
             AllowedWorkers.TriStateMode = false;

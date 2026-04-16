@@ -76,7 +76,8 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
             $"Assigning common work types ({string.Join(", ", WorkManagerGameComponent.Instance.AssignEveryoneWorkTypes.Select(workType => $"{workType.Key.defName}[{workType.Value}]"))})");
 #endif
         var relevantWorkTypes =
-            new HashSet<WorkTypeDef>(WorkManagerGameComponent.Instance.AssignEveryoneWorkTypes.Keys);
+            new HashSet<WorkTypeDef>(WorkManagerGameComponent.Instance.AssignEveryoneWorkTypes
+                .Keys);
         relevantWorkTypes.IntersectWith(_managedWorkTypeRules.Keys);
         var priorities = WorkManagerGameComponent.Instance.AssignEveryoneWorkTypes;
         foreach (var pawnCache in _pawnCache.Values)
@@ -111,13 +112,14 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
         var relevantRules = new List<WorkTypeAssignmentRule>();
         foreach (var workType in WorkManagerGameComponent.Instance.DedicatedWorkTypes)
         {
-            relevantRules.Add(_managedWorkTypeRules[workType]);
+            if (_managedWorkTypeRules.TryGetValue(workType, out var rule)) relevantRules.Add(rule);
         }
         if (relevantRules.Count == 0) return;
         relevantRules.Sort(WorkManagerGameComponent.WorkTypeAssignmentRuleComparer);
         foreach (var rule in relevantRules)
         {
-            var targetWorkersCount = rule.GetTargetWorkersCount(map, _capablePawns.Count, relevantRules.Count);
+            var targetWorkersCount =
+                rule.GetTargetWorkersCount(map, _capablePawns.Count, relevantRules.Count);
             if (rule.EnsureWorkerAssigned == true)
                 targetWorkersCount = Math.Max(targetWorkersCount, rule.MinWorkerNumber);
 #if DEBUG
@@ -142,8 +144,8 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
             var workerCount = 0;
             foreach (var pc in _capablePawns)
             {
-                if (pc.IsActiveWork(rule.Def) &&
-                    pc.GetWorkPriority(rule.Def) <= WorkManagerMod.Settings.DedicatedWorkerPriority)
+                if (pc.IsActiveWork(rule.Def) && pc.GetWorkPriority(rule.Def) <=
+                    WorkManagerMod.Settings.DedicatedWorkerPriority)
                     workerCount++;
             }
             if (workerCount >= targetWorkersCount) continue;
@@ -164,7 +166,8 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
 #if DEBUG
                 Logger.LogMessage($"Assigning '{bestWorker.Pawn.LabelShort}' as dedicated worker for '{rule.Label}'");
 #endif
-                bestWorker.SetWorkPriority(rule.Def, WorkManagerMod.Settings.DedicatedWorkerPriority);
+                bestWorker.SetWorkPriority(rule.Def,
+                    WorkManagerMod.Settings.DedicatedWorkerPriority);
                 workerCount++;
                 pawnScores.Remove(bestWorker);
             }
@@ -193,7 +196,8 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
                     Logger.LogMessage(
                         $"Assigning '{bestWorker.Pawn.LabelShort}' as dedicated worker for '{rule.Label}' (fail-safe)");
 #endif
-                    bestWorker.SetWorkPriority(rule.Def, WorkManagerMod.Settings.DedicatedWorkerPriority);
+                    bestWorker.SetWorkPriority(rule.Def,
+                        WorkManagerMod.Settings.DedicatedWorkerPriority);
                     workerCount++;
                     pawnScores.Remove(bestWorker);
                 }
@@ -215,7 +219,8 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
             .Except(WorkManagerGameComponent.Instance.AssignEveryoneWorkTypes.Keys).ToArray();
         if (!WorkManagerMod.Settings.UseDedicatedWorkers)
         {
-            var activeWorkMatrix = new Dictionary<PawnCache, HashSet<WorkTypeDef>>(_capablePawns.Count);
+            var activeWorkMatrix =
+                new Dictionary<PawnCache, HashSet<WorkTypeDef>>(_capablePawns.Count);
             foreach (var pc in _capablePawns)
             {
                 var activeSet = new HashSet<WorkTypeDef>();
@@ -240,8 +245,9 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
                 var minActiveCount = int.MaxValue;
                 foreach (var pc in _capablePawns)
                 {
-                    if (!pc.IsManaged || !pc.IsManagedWork(workType) || !pc.IsAllowedWorker(workType) ||
-                        pc.IsBadWork(workType) || pc.IsDangerousWork(workType)) continue;
+                    if (!pc.IsManaged || !pc.IsManagedWork(workType) ||
+                        !pc.IsAllowedWorker(workType) || pc.IsBadWork(workType) ||
+                        pc.IsDangerousWork(workType)) continue;
                     var activeCount = activeWorkMatrix[pc].Count;
                     if (activeCount >= minActiveCount) continue;
                     minActiveCount = activeCount;
@@ -288,8 +294,9 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
                 if (!pc.IsManaged) continue;
                 foreach (var workType in workTypes)
                 {
-                    if (!pc.IsManagedWork(workType) || pc.IsBadWork(workType) || pc.IsDangerousWork(workType) ||
-                        !pc.IsAllowedWorker(workType) || pc.IsActiveWork(workType)) continue;
+                    if (!pc.IsManagedWork(workType) || pc.IsBadWork(workType) ||
+                        pc.IsDangerousWork(workType) || !pc.IsAllowedWorker(workType) ||
+                        pc.IsActiveWork(workType)) continue;
 #if DEBUG
                     Logger.LogMessage(
                         $"Setting {pc.Pawn.LabelShort}'s priority of '{workType.labelShort}' to {WorkManagerMod.Settings.LeftoverPriority}");
@@ -323,9 +330,11 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
             if (!pc.IsManaged) continue;
             foreach (var workType in _managedWorkTypeRules.Keys.ToArray())
             {
-                if (WorkManagerGameComponent.Instance.AssignEveryoneWorkTypes.ContainsKey(workType)) continue;
-                if (!pc.IsManagedWork(workType) || !pc.IsAllowedWorker(workType) || pc.IsBadWork(workType) ||
-                    pc.IsDangerousWork(workType) || pc.IsActiveWork(workType))
+                if (WorkManagerGameComponent.Instance.AssignEveryoneWorkTypes.ContainsKey(workType))
+                    continue;
+                if (!pc.IsManagedWork(workType) || !pc.IsAllowedWorker(workType) ||
+                    pc.IsBadWork(workType) || pc.IsDangerousWork(workType) ||
+                    pc.IsActiveWork(workType))
                     continue;
                 var learningRate = pc.GetLearningRate(workType);
                 var priority = 0;
@@ -368,12 +377,15 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
             if (!pc.IsManaged) continue;
             foreach (var workType in _managedWorkTypeRules.Keys)
             {
-                if (WorkManagerGameComponent.Instance.AssignEveryoneWorkTypes.ContainsKey(workType)) continue;
-                if (!pc.IsManagedWork(workType) || !pc.IsAllowedWorker(workType) || pc.IsBadWork(workType) ||
-                    pc.IsDangerousWork(workType) || pc.IsActiveWork(workType))
+                if (WorkManagerGameComponent.Instance.AssignEveryoneWorkTypes.ContainsKey(workType))
                     continue;
-                var passionCache = Common.Helpers.PassionHelper.GetPassionCache(pc.GetWorkPassion(workType)) ??
-                                   throw new NullReferenceException("Passion cache is null.");
+                if (!pc.IsManagedWork(workType) || !pc.IsAllowedWorker(workType) ||
+                    pc.IsBadWork(workType) || pc.IsDangerousWork(workType) ||
+                    pc.IsActiveWork(workType))
+                    continue;
+                var passionCache =
+                    Common.Helpers.PassionHelper.GetPassionCache(pc.GetWorkPassion(workType)) ??
+                    throw new NullReferenceException("Passion cache is null.");
                 var priority = WorkManagerMod.Settings.PassionPriorities[passionCache.DefName];
                 if (priority <= 0) continue;
 #if DEBUG
@@ -428,7 +440,8 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
             {
                 if (pc.IsActiveWork(rule.Def)) activeWorkerCount++;
             }
-            allowedWorkers.Sort((a, b) => b.GetWorkSkillLevel(rule.Def).CompareTo(a.GetWorkSkillLevel(rule.Def)));
+            allowedWorkers.Sort((a, b) =>
+                b.GetWorkSkillLevel(rule.Def).CompareTo(a.GetWorkSkillLevel(rule.Def)));
             foreach (var pc in allowedWorkers)
             {
                 if (!pc.IsManaged || !pc.IsManagedWork(rule.Def) || pc.IsBadWork(rule.Def) ||
@@ -475,7 +488,8 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
         List<PawnCache> idlePawns = null;
         foreach (var pc in _capablePawns)
         {
-            if (!pc.IsManaged || (pc.IdleSince == null && (pc.Pawn.Drafted || !pc.Pawn.mindState.IsIdle))) continue;
+            if (!pc.IsManaged ||
+                (pc.IdleSince == null && (pc.Pawn.Drafted || !pc.Pawn.mindState.IsIdle))) continue;
             idlePawns ??= [];
             idlePawns.Add(pc);
         }
@@ -490,8 +504,9 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
         {
             foreach (var workType in workTypes)
             {
-                if (!pc.IsManagedWork(workType) || !pc.IsAllowedWorker(workType) || pc.IsBadWork(workType) ||
-                    pc.IsDangerousWork(workType) || pc.IsActiveWork(workType)) continue;
+                if (!pc.IsManagedWork(workType) || !pc.IsAllowedWorker(workType) ||
+                    pc.IsBadWork(workType) || pc.IsDangerousWork(workType) ||
+                    pc.IsActiveWork(workType)) continue;
 #if DEBUG
                 Logger.LogMessage(
                     $"Setting {pc.Pawn.LabelShort}'s priority of '{workType.defName}' to {WorkManagerMod.Settings.IdlePriority}");
@@ -577,8 +592,8 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
             var dedications = 0;
             foreach (var rule in rules)
             {
-                if (pc.IsActiveWork(rule.Def) &&
-                    pc.GetWorkPriority(rule.Def) <= WorkManagerMod.Settings.DedicatedWorkerPriority)
+                if (pc.IsActiveWork(rule.Def) && pc.GetWorkPriority(rule.Def) <=
+                    WorkManagerMod.Settings.DedicatedWorkerPriority)
                     dedications++;
             }
             pawnDedicationsCounts[pc] = dedications;
@@ -597,12 +612,17 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
             if (!pc.IsManagedWork(workType)) continue;
             var normalizedSkill = MathHelper.NormalizeValue(pawnSkills[pc], skillRange);
             var normalizedPassion = PassionHelper.GetPassionScore(pc.GetWorkPassion(workType));
-            var normalizedLearningRate = MathHelper.NormalizeValue(pawnLearningRates[pc], learningRange);
-            var normalizedDedications = MathHelper.NormalizeValue(pawnDedicationsCounts[pc], dedicationsRange);
+            var normalizedLearningRate =
+                MathHelper.NormalizeValue(pawnLearningRates[pc], learningRange);
+            var normalizedDedications =
+                MathHelper.NormalizeValue(pawnDedicationsCounts[pc], dedicationsRange);
             var score = WorkManagerMod.Settings.DedicatedWorkerSkillScoreFactor * normalizedSkill +
-                        WorkManagerMod.Settings.DedicatedWorkerPassionScoreFactor * normalizedPassion +
-                        WorkManagerMod.Settings.DedicatedWorkerLearningRateScoreFactor * normalizedLearningRate -
-                        WorkManagerMod.Settings.DedicatedWorkerWorkCountScoreFactor * normalizedDedications;
+                        WorkManagerMod.Settings.DedicatedWorkerPassionScoreFactor *
+                        normalizedPassion +
+                        WorkManagerMod.Settings.DedicatedWorkerLearningRateScoreFactor *
+                        normalizedLearningRate -
+                        WorkManagerMod.Settings.DedicatedWorkerWorkCountScoreFactor *
+                        normalizedDedications;
             if (pc.IsDangerousWork(workType)) score -= 50f;
             pawnScores.Add(pc, score);
 #if DEBUG
@@ -632,10 +652,12 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
     {
         base.MapComponentTick();
         if (!WorkManagerGameComponent.Instance.PriorityManagementEnabled) return;
-        if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused || (Find.TickManager.TicksGame & 0x3F) != 0) return;
+        if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused ||
+            (Find.TickManager.TicksGame & 0x3F) != 0) return;
         var time = RimWorldTime.GetHomeTime();
         var hoursPassed = time - _workUpdateTime;
-        if (hoursPassed < WorkManagerMod.Settings.WorkPrioritiesUpdateFrequency * RimWorldTime.HoursInDay) return;
+        if (hoursPassed < WorkManagerMod.Settings.WorkPrioritiesUpdateFrequency *
+            RimWorldTime.HoursInDay) return;
         Update();
         _workUpdateTime = time;
     }
@@ -659,7 +681,8 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
             for (var i = 0; i < count; i++)
             {
                 var pawn = pawns[i];
-                if (pawn.Faction == Faction.OfPlayer) pawn.workSettings?.Notify_UseWorkPrioritiesChanged();
+                if (pawn.Faction == Faction.OfPlayer)
+                    pawn.workSettings?.Notify_UseWorkPrioritiesChanged();
             }
         }
 #if DEBUG
