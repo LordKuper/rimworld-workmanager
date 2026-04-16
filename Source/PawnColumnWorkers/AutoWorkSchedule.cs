@@ -14,7 +14,7 @@ public class AutoWorkSchedule : PawnColumnWorker
         if (pawn.Dead) return;
         var component = WorkManagerGameComponent.Instance;
         var buttonRect = new Rect(rect.center.x - 8, rect.center.y - 8, 16, 16);
-        if (component.PriorityManagementEnabled)
+        if (component.ScheduleManagementEnabled)
         {
             Buttons.DoIconButtonToggle(buttonRect, () => component.GetPawnScheduleEnabled(pawn),
                 newValue => component.SetPawnScheduleEnabled(pawn, newValue),
