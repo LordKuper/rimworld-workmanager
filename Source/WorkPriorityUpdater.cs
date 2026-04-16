@@ -31,6 +31,18 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
     private readonly Dictionary<Pawn, PawnCache> _pawnCache = [];
     private RimWorldTime _workUpdateTime = new(0);
 
+    private static void AddActiveWork(
+        [NotNull] Dictionary<PawnCache, HashSet<WorkTypeDef>> activeWorkMatrix,
+        [NotNull] PawnCache pawnCache, WorkTypeDef workType)
+    {
+        if (!activeWorkMatrix.TryGetValue(pawnCache, out var activeSet))
+        {
+            activeSet = [];
+            activeWorkMatrix[pawnCache] = activeSet;
+        }
+        activeSet.Add(workType);
+    }
+
     /// <summary>
     ///     Applies the calculated work priorities to all managed pawns.
     /// </summary>
@@ -259,7 +271,7 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
                     $"Setting {bestPc.Pawn.LabelShort}'s priority of '{workType.labelShort}' to {WorkManagerMod.Settings.HighestSkillPriority}");
 #endif
                 bestPc.SetWorkPriority(workType, WorkManagerMod.Settings.HighestSkillPriority);
-                break;
+                AddActiveWork(activeWorkMatrix, bestPc, workType);
             }
             foreach (var pc in _capablePawns)
             {
@@ -286,6 +298,7 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
                     $"Setting {pc.Pawn.LabelShort}'s priority of '{bestWorkType.labelShort}' to {WorkManagerMod.Settings.HighestSkillPriority}");
 #endif
                 pc.SetWorkPriority(bestWorkType, WorkManagerMod.Settings.HighestSkillPriority);
+                AddActiveWork(activeWorkMatrix, pc, bestWorkType);
             }
         }
         if (WorkManagerMod.Settings.AssignAllWorkTypes)
@@ -733,9 +746,10 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
                 _managedWorkTypeRules.Add(rule.Def, rule);
         }
         _allPawns.Clear();
-        foreach (var pawn in map.mapPawns.FreeColonistsSpawned)
+        foreach (var pawn in map.mapPawns.AllPawnsSpawned)
         {
-            if (pawn.workSettings is not { EverWork: true } || pawn.skills == null)
+            if (pawn.Faction != Faction.OfPlayer || pawn.workSettings is not { EverWork: true } ||
+                pawn.skills == null)
                 continue;
             _allPawns.Add(pawn);
         }

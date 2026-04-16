@@ -14,14 +14,11 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
     private readonly Dictionary<Pawn, WorkShift> _workers = [];
     private RimWorldTime _scheduleUpdateTime = new(0);
 
-    private static WorkManagerGameComponent WorkManager { get; } =
-        Current.Game.GetComponent<WorkManagerGameComponent>();
-
     public override void MapComponentTick()
     {
         base.MapComponentTick();
         if (!WorkManagerMod.Settings.ManageWorkSchedule) return;
-        if (!WorkManager.ScheduleManagementEnabled) return;
+        if (!WorkManagerGameComponent.Instance.ScheduleManagementEnabled) return;
         if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused ||
             Find.TickManager.TicksGame % 60 != 0) return;
         var year = GenLocalDate.Year(map);
@@ -34,18 +31,29 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
         UpdateSchedule();
     }
 
+    internal void UpdateNow()
+    {
+        if (WorkManagerGameComponent.Instance == null || !WorkManagerMod.Settings.ManageWorkSchedule ||
+            !WorkManagerGameComponent.Instance.ScheduleManagementEnabled) return;
+        _scheduleUpdateTime = new RimWorldTime(GenLocalDate.Year(map), GenLocalDate.DayOfYear(map),
+            GenLocalDate.HourFloat(map));
+        UpdateSchedule();
+    }
+
     private void UpdateSchedule()
     {
 #if DEBUG
         Logger.LogMessage("Updating work schedule...");
 #endif
         _workers.Clear();
-        var allPawns = map.mapPawns.FreeColonistsSpawned;
+        var allPawns = map.mapPawns.AllPawnsSpawned.Where(pawn =>
+            pawn.Faction == Faction.OfPlayer && pawn.story != null && pawn.timetable != null).ToList();
         var colonists =
             allPawns.Where(pawn => !pawn.story.traits.HasTrait(TraitDef.Named("NightOwl")));
         var nightOwls =
             allPawns.Where(pawn => pawn.story.traits.HasTrait(TraitDef.Named("NightOwl")));
-        foreach (var pawn in allPawns.Where(pawn => WorkManager.GetPawnScheduleEnabled(pawn)))
+        foreach (var pawn in allPawns.Where(pawn =>
+                     WorkManagerGameComponent.Instance.GetPawnScheduleEnabled(pawn)))
         {
             var lovers = pawn.relations.DirectRelations.Where(relation =>
                     new[]

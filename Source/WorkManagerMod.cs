@@ -92,5 +92,7 @@ public class WorkManagerMod : Mod
         base.WriteSettings();
         Settings.Validate();
         WorkManagerGameComponent.Instance?.UpdateSettingsCache();
+        WorkManagerGameComponent.ForceUpdateAssignments();
+        WorkManagerGameComponent.ForceUpdateSchedules();
     }
 }

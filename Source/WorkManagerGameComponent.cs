@@ -140,19 +140,63 @@ public class WorkManagerGameComponent : GameComponent
     /// </summary>
     internal static void ForceUpdateAssignments()
     {
-        var map = Find.CurrentMap;
-#if DEBUG
-        if (map == null) Logger.LogMessage("Can not force update assignments (map = null).");
-        Logger.LogMessage($"Force updating assignments for {map}");
-#endif
-        if (map == null) return;
-        var priorityUpdater = map.GetComponent<WorkPriorityUpdater>();
-        if (priorityUpdater == null)
+        if (Current.Game == null) return;
+        foreach (var map in Find.Maps)
         {
-            Logger.LogError("Could not get work priority updater component for current map.");
-            return;
+            if (map == null) continue;
+#if DEBUG
+            Logger.LogMessage($"Force updating assignments for {map}");
+#endif
+            var priorityUpdater = map.GetComponent<WorkPriorityUpdater>();
+            if (priorityUpdater == null)
+            {
+                Logger.LogError($"Could not get work priority updater component for map {map}.");
+                continue;
+            }
+            priorityUpdater.Update();
         }
-        priorityUpdater.Update();
+    }
+
+    /// <summary>
+    ///     Forces an update of work schedules for all loaded maps.
+    /// </summary>
+    internal static void ForceUpdateSchedules()
+    {
+        if (Current.Game == null) return;
+        foreach (var map in Find.Maps)
+        {
+            if (map == null) continue;
+#if DEBUG
+            Logger.LogMessage($"Force updating schedules for {map}");
+#endif
+            var scheduleUpdater = map.GetComponent<ScheduleUpdater>();
+            if (scheduleUpdater == null)
+            {
+                Logger.LogError($"Could not get schedule updater component for map {map}.");
+                continue;
+            }
+            scheduleUpdater.UpdateNow();
+        }
+    }
+
+    /// <summary>
+    ///     Enables or disables automatic priority management and updates assignments when enabled.
+    /// </summary>
+    internal void SetPriorityManagementEnabled(bool enabled)
+    {
+        if (PriorityManagementEnabled == enabled) return;
+        PriorityManagementEnabled = enabled;
+        if (enabled) ForceUpdateAssignments();
+    }
+
+    /// <summary>
+    ///     Enables or disables automatic schedule management and updates schedules when enabled.
+    /// </summary>
+    internal void SetScheduleManagementEnabled(bool enabled)
+    {
+        if (ScheduleManagementEnabled == enabled) return;
+        ScheduleManagementEnabled = enabled;
+        if (enabled) ForceUpdateSchedules();
     }
 
     /// <summary>
@@ -238,6 +282,7 @@ public class WorkManagerGameComponent : GameComponent
         {
             if (!_disabledPawns.Contains(pawn)) _disabledPawns.Add(pawn);
         }
+        ForceUpdateAssignments();
     }
 
     /// <summary>
@@ -258,6 +303,7 @@ public class WorkManagerGameComponent : GameComponent
         {
             if (!_disabledPawnSchedules.Contains(pawn)) _disabledPawnSchedules.Add(pawn);
         }
+        ForceUpdateSchedules();
     }
 
     /// <summary>
@@ -292,6 +338,7 @@ public class WorkManagerGameComponent : GameComponent
             if (!workTypes.Contains(workType))
                 workTypes.Add(workType);
         }
+        ForceUpdateAssignments();
     }
 
     /// <summary>
@@ -312,6 +359,7 @@ public class WorkManagerGameComponent : GameComponent
         {
             if (!_disabledWorkTypes.Contains(workType)) _disabledWorkTypes.Add(workType);
         }
+        ForceUpdateAssignments();
     }
 
     /// <summary>
