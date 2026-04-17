@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
 using LordKuper.Common;
 using LordKuper.WorkManager.Helpers;
@@ -117,7 +116,7 @@ internal class PawnCache(Pawn pawn)
     public bool IsActiveWork([NotNull] WorkTypeDef workType)
     {
         if (workType == null) throw new ArgumentNullException(nameof(workType));
-        return _workPriorities[workType] > 0;
+        return _workPriorities.TryGetValue(workType, out var priority) && priority > 0;
     }
 
     /// <summary>
@@ -134,15 +133,12 @@ internal class PawnCache(Pawn pawn)
         if (workType == null) throw new ArgumentNullException(nameof(workType));
         if (_allowedWorkTypes.TryGetValue(workType, out var allowed)) return allowed;
         if (Pawn.WorkTypeIsDisabled(workType))
-        {
             allowed = false;
-        }
-        else
-        {
-            var rule =
-                WorkManagerGameComponent.Instance.CombinedRules.First(r => r.Def == workType);
+        else if (WorkManagerGameComponent.Instance.CombinedRulesDict.TryGetValue(workType,
+                     out var rule))
             allowed = rule.IsAllowedWorker(Pawn);
-        }
+        else
+            allowed = false;
         _allowedWorkTypes.Add(workType, allowed);
         return allowed;
     }

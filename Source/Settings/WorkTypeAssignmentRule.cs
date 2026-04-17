@@ -497,6 +497,8 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
 #endif
                 return Mathf.CeilToInt(
                     DedicatedWorkerSettings.PawnCountFactor * filteredPawns.Count);
+            case null:
+                return 0;
             default:
                 throw new ArgumentOutOfRangeException();
         }

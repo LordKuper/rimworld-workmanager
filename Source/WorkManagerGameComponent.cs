@@ -27,6 +27,11 @@ public class WorkManagerGameComponent : GameComponent
         new(WorkTypeAssignmentRuleComparer);
 
     /// <summary>
+    ///     Dictionary for O(1) lookup of combined rules by work type definition.
+    /// </summary>
+    internal readonly Dictionary<WorkTypeDef, WorkTypeAssignmentRule> CombinedRulesDict = [];
+
+    /// <summary>
     ///     List of pawns with disabled work assignments.
     /// </summary>
     private List<Pawn> _disabledPawns = [];
@@ -257,13 +262,9 @@ public class WorkManagerGameComponent : GameComponent
         var wasEnabled = !_disabledPawns.Contains(pawn);
         if (wasEnabled == enabled) return;
         if (enabled)
-        {
             _ = _disabledPawns.RemoveAll(p => p == pawn);
-        }
         else
-        {
-            if (!_disabledPawns.Contains(pawn)) _disabledPawns.Add(pawn);
-        }
+            _disabledPawns.Add(pawn);
         if (PriorityManagementEnabled) ForceUpdateAssignments();
     }
 
@@ -280,13 +281,9 @@ public class WorkManagerGameComponent : GameComponent
         var wasEnabled = !_disabledPawnSchedules.Contains(pawn);
         if (wasEnabled == enabled) return;
         if (enabled)
-        {
             _ = _disabledPawnSchedules.RemoveAll(p => p == pawn);
-        }
         else
-        {
-            if (!_disabledPawnSchedules.Contains(pawn)) _disabledPawnSchedules.Add(pawn);
-        }
+            _disabledPawnSchedules.Add(pawn);
         if (ScheduleManagementEnabled) ForceUpdateSchedules();
     }
 
@@ -339,16 +336,6 @@ public class WorkManagerGameComponent : GameComponent
     }
 
     /// <summary>
-    ///     Enables or disables automatic schedule management and updates schedules when enabled.
-    /// </summary>
-    internal void SetScheduleManagementEnabled(bool enabled)
-    {
-        if (ScheduleManagementEnabled == enabled) return;
-        ScheduleManagementEnabled = enabled;
-        if (enabled) ForceUpdateSchedules();
-    }
-
-    /// <summary>
     ///     Enables or disables a work type.
     /// </summary>
     /// <param name="workType">The work type to modify.</param>
@@ -361,13 +348,9 @@ public class WorkManagerGameComponent : GameComponent
         var wasEnabled = !_disabledWorkTypes.Contains(workType);
         if (wasEnabled == enabled) return;
         if (enabled)
-        {
             _ = _disabledWorkTypes.RemoveAll(wt => wt == workType);
-        }
         else
-        {
-            if (!_disabledWorkTypes.Contains(workType)) _disabledWorkTypes.Add(workType);
-        }
+            _disabledWorkTypes.Add(workType);
         if (PriorityManagementEnabled) ForceUpdateAssignments();
     }
 
@@ -417,6 +400,7 @@ public class WorkManagerGameComponent : GameComponent
     private void UpdateCombinedRules()
     {
         CombinedRules.Clear();
+        CombinedRulesDict.Clear();
         var rules = WorkManagerMod.Settings.WorkTypeRules;
         WorkTypeAssignmentRule defaultRule = null;
         var rulesCount = rules.Count;
@@ -441,6 +425,7 @@ public class WorkManagerGameComponent : GameComponent
                 specialRule = WorkTypeAssignmentRule.CreateRule(def.defName);
             var combinedRule = WorkTypeAssignmentRule.Combine(specialRule, defaultRule);
             CombinedRules.Add(combinedRule);
+            CombinedRulesDict[def] = combinedRule;
         }
 #if DEBUG
         Logger.LogMessage(

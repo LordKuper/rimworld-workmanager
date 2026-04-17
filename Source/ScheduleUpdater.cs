@@ -20,23 +20,20 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
         if (!WorkManagerMod.Settings.ManageWorkSchedule) return;
         if (!WorkManagerGameComponent.Instance.ScheduleManagementEnabled) return;
         if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused ||
-            Find.TickManager.TicksGame % 60 != 0) return;
-        var year = GenLocalDate.Year(map);
-        var day = GenLocalDate.DayOfYear(map);
-        var hourFloat = GenLocalDate.HourFloat(map);
-        var hoursPassed = (year - _scheduleUpdateTime.Year) * 60 * 24 +
-            (day - _scheduleUpdateTime.Day) * 24 + hourFloat - _scheduleUpdateTime.Hour;
+            (Find.TickManager.TicksGame & 0x3F) != 0) return;
+        var time = RimWorldTime.GetHomeTime();
+        var hoursPassed = time - _scheduleUpdateTime;
         if (hoursPassed < 24f / WorkManagerMod.Settings.ScheduleUpdateFrequency) return;
-        _scheduleUpdateTime = new RimWorldTime(year, day, hourFloat);
+        _scheduleUpdateTime = time;
         UpdateSchedule();
     }
 
     internal void UpdateNow()
     {
-        if (WorkManagerGameComponent.Instance == null || !WorkManagerMod.Settings.ManageWorkSchedule ||
+        if (WorkManagerGameComponent.Instance == null ||
+            !WorkManagerMod.Settings.ManageWorkSchedule ||
             !WorkManagerGameComponent.Instance.ScheduleManagementEnabled) return;
-        _scheduleUpdateTime = new RimWorldTime(GenLocalDate.Year(map), GenLocalDate.DayOfYear(map),
-            GenLocalDate.HourFloat(map));
+        _scheduleUpdateTime = RimWorldTime.GetHomeTime();
         UpdateSchedule();
     }
 
@@ -47,20 +44,22 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
 #endif
         _workers.Clear();
         var allPawns = map.mapPawns.AllPawnsSpawned.Where(pawn =>
-            pawn.Faction == Faction.OfPlayer && pawn.story != null && pawn.timetable != null).ToList();
-        var colonists =
-            allPawns.Where(pawn => !pawn.story.traits.HasTrait(TraitDef.Named("NightOwl")));
-        var nightOwls =
-            allPawns.Where(pawn => pawn.story.traits.HasTrait(TraitDef.Named("NightOwl")));
+                pawn.Faction == Faction.OfPlayer && pawn.story != null && pawn.timetable != null)
+            .ToList();
+        var colonists = allPawns
+            .Where(pawn => !pawn.story.traits.HasTrait(TraitDef.Named("NightOwl"))).ToList();
+        var nightOwls = allPawns
+            .Where(pawn => pawn.story.traits.HasTrait(TraitDef.Named("NightOwl"))).ToList();
         foreach (var pawn in allPawns.Where(pawn =>
                      WorkManagerGameComponent.Instance.GetPawnScheduleEnabled(pawn)))
         {
-            var lovers = pawn.relations.DirectRelations.Where(relation =>
-                    new[]
-                    {
-                        PawnRelationDefOf.Fiance, PawnRelationDefOf.Lover, PawnRelationDefOf.Spouse
-                    }.Contains(relation.def)).Select(relation => relation.otherPawn).Distinct()
-                .ToList();
+            var lovers = pawn.relations?.DirectRelations.Where(relation => new[]
+                         {
+                             PawnRelationDefOf.Fiance, PawnRelationDefOf.Lover,
+                             PawnRelationDefOf.Spouse
+                         }.Contains(relation.def)).Select(relation => relation.otherPawn).Distinct()
+                         .ToList() ??
+                         [];
             var workShifts = (pawn.story.traits.HasTrait(TraitDef.Named("NightOwl"))
                 ? WorkManagerMod.Settings.NightOwlWorkShifts.Where(shift =>
                     shift.PawnThreshold <= nightOwls.Count())

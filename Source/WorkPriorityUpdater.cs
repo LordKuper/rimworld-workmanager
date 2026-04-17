@@ -341,7 +341,7 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
         foreach (var pc in _capablePawns)
         {
             if (!pc.IsManaged) continue;
-            foreach (var workType in _managedWorkTypeRules.Keys.ToArray())
+            foreach (var workType in _managedWorkTypeRules.Keys)
             {
                 if (WorkManagerGameComponent.Instance.AssignEveryoneWorkTypes.ContainsKey(workType))
                     continue;
@@ -397,8 +397,8 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
                     pc.IsActiveWork(workType))
                     continue;
                 var passionCache =
-                    Common.Helpers.PassionHelper.GetPassionCache(pc.GetWorkPassion(workType)) ??
-                    throw new NullReferenceException("Passion cache is null.");
+                    Common.Helpers.PassionHelper.GetPassionCache(pc.GetWorkPassion(workType));
+                if (passionCache == null) continue;
                 if (!WorkManagerMod.Settings.PassionPriorities.TryGetValue(passionCache.DefName,
                         out var priority))
                     continue;
