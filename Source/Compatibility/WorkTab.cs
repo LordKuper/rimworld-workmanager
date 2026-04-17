@@ -74,6 +74,9 @@ internal static class WorkTab
         catch (Exception e)
         {
             Logger.LogError("Failed to initialize WorkTab compatibility.", e);
+            WorkTabActive = false;
+            GetPriority = null;
+            SetPriority = null;
         }
 #if DEBUG
         Logger.LogMessage($"Max priority is {WorkManagerMod.Settings.MaxWorkTypePriority}.");

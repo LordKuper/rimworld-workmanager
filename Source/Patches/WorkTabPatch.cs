@@ -85,10 +85,8 @@ public static class WorkTabPatch
             rect.yMin + Layout.ElementGapTiny, rect.width - Layout.ElementGapTiny * 2,
             Buttons.IconButtonSize);
         var buttonRect = Layout.GetLeftColumnRect(buttonRow, Buttons.IconButtonSize, out buttonRow);
-        Buttons.DoIconButtonToggle(buttonRect,
-            () => component.PriorityManagementEnabled,
-            component.SetPriorityManagementEnabled,
-            Resources.Strings.GlobalDisableTooltip,
+        Buttons.DoIconButtonToggle(buttonRect, () => component.PriorityManagementEnabled,
+            component.SetPriorityManagementEnabled, Resources.Strings.GlobalDisableTooltip,
             Resources.Textures.PrioritiesToggleButtonEnabled, Resources.Strings.GlobalEnableTooltip,
             Resources.Textures.PrioritiesToggleButtonDisabled);
         Layout.GetLeftColumnRect(buttonRow, Layout.ElementGapSmall, out buttonRow);
