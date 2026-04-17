@@ -180,26 +180,6 @@ public class WorkManagerGameComponent : GameComponent
     }
 
     /// <summary>
-    ///     Enables or disables automatic priority management and updates assignments when enabled.
-    /// </summary>
-    internal void SetPriorityManagementEnabled(bool enabled)
-    {
-        if (PriorityManagementEnabled == enabled) return;
-        PriorityManagementEnabled = enabled;
-        if (enabled) ForceUpdateAssignments();
-    }
-
-    /// <summary>
-    ///     Enables or disables automatic schedule management and updates schedules when enabled.
-    /// </summary>
-    internal void SetScheduleManagementEnabled(bool enabled)
-    {
-        if (ScheduleManagementEnabled == enabled) return;
-        ScheduleManagementEnabled = enabled;
-        if (enabled) ForceUpdateSchedules();
-    }
-
-    /// <summary>
     ///     Determines if a pawn is enabled for work assignments.
     /// </summary>
     /// <param name="pawn">The pawn to check.</param>
@@ -274,6 +254,8 @@ public class WorkManagerGameComponent : GameComponent
     {
         if (pawn == null) throw new ArgumentNullException(nameof(pawn));
         _disabledPawns ??= [];
+        var wasEnabled = !_disabledPawns.Contains(pawn);
+        if (wasEnabled == enabled) return;
         if (enabled)
         {
             _ = _disabledPawns.RemoveAll(p => p == pawn);
@@ -282,7 +264,7 @@ public class WorkManagerGameComponent : GameComponent
         {
             if (!_disabledPawns.Contains(pawn)) _disabledPawns.Add(pawn);
         }
-        ForceUpdateAssignments();
+        if (PriorityManagementEnabled) ForceUpdateAssignments();
     }
 
     /// <summary>
@@ -295,6 +277,8 @@ public class WorkManagerGameComponent : GameComponent
     {
         if (pawn == null) throw new ArgumentNullException(nameof(pawn));
         _disabledPawnSchedules ??= [];
+        var wasEnabled = !_disabledPawnSchedules.Contains(pawn);
+        if (wasEnabled == enabled) return;
         if (enabled)
         {
             _ = _disabledPawnSchedules.RemoveAll(p => p == pawn);
@@ -303,7 +287,7 @@ public class WorkManagerGameComponent : GameComponent
         {
             if (!_disabledPawnSchedules.Contains(pawn)) _disabledPawnSchedules.Add(pawn);
         }
-        ForceUpdateSchedules();
+        if (ScheduleManagementEnabled) ForceUpdateSchedules();
     }
 
     /// <summary>
@@ -319,6 +303,9 @@ public class WorkManagerGameComponent : GameComponent
         if (pawn == null) throw new ArgumentNullException(nameof(pawn));
         if (workType == null) throw new ArgumentNullException(nameof(workType));
         _disabledPawnWorkTypes ??= [];
+        var wasEnabled = !_disabledPawnWorkTypes.TryGetValue(pawn, out var existingWorkTypes) ||
+                         !existingWorkTypes.Contains(workType);
+        if (wasEnabled == enabled) return;
         if (enabled)
         {
             if (_disabledPawnWorkTypes.TryGetValue(pawn, out var workTypes))
@@ -338,7 +325,27 @@ public class WorkManagerGameComponent : GameComponent
             if (!workTypes.Contains(workType))
                 workTypes.Add(workType);
         }
-        ForceUpdateAssignments();
+        if (PriorityManagementEnabled) ForceUpdateAssignments();
+    }
+
+    /// <summary>
+    ///     Enables or disables automatic priority management and updates assignments when enabled.
+    /// </summary>
+    internal void SetPriorityManagementEnabled(bool enabled)
+    {
+        if (PriorityManagementEnabled == enabled) return;
+        PriorityManagementEnabled = enabled;
+        if (enabled) ForceUpdateAssignments();
+    }
+
+    /// <summary>
+    ///     Enables or disables automatic schedule management and updates schedules when enabled.
+    /// </summary>
+    internal void SetScheduleManagementEnabled(bool enabled)
+    {
+        if (ScheduleManagementEnabled == enabled) return;
+        ScheduleManagementEnabled = enabled;
+        if (enabled) ForceUpdateSchedules();
     }
 
     /// <summary>
@@ -351,6 +358,8 @@ public class WorkManagerGameComponent : GameComponent
     {
         if (workType == null) throw new ArgumentNullException(nameof(workType));
         _disabledWorkTypes ??= [];
+        var wasEnabled = !_disabledWorkTypes.Contains(workType);
+        if (wasEnabled == enabled) return;
         if (enabled)
         {
             _ = _disabledWorkTypes.RemoveAll(wt => wt == workType);
@@ -359,7 +368,7 @@ public class WorkManagerGameComponent : GameComponent
         {
             if (!_disabledWorkTypes.Contains(workType)) _disabledWorkTypes.Add(workType);
         }
-        ForceUpdateAssignments();
+        if (PriorityManagementEnabled) ForceUpdateAssignments();
     }
 
     /// <summary>
