@@ -92,7 +92,8 @@ public class WorkManagerMod : Mod
         base.WriteSettings();
         Settings.Validate();
         WorkManagerGameComponent.Instance?.UpdateSettingsCache();
-        WorkManagerGameComponent.ForceUpdateAssignments();
+        if (WorkManagerGameComponent.Instance?.PriorityManagementEnabled == true)
+            WorkManagerGameComponent.ForceUpdateAssignments();
         WorkManagerGameComponent.ForceUpdateSchedules();
     }
 }
