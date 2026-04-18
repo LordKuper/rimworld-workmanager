@@ -32,14 +32,14 @@ public class WorkManagerGameComponent : GameComponent
     internal readonly Dictionary<WorkTypeDef, WorkTypeAssignmentRule> CombinedRulesDict = [];
 
     /// <summary>
-    ///     List of pawns with disabled work assignments.
+    ///     Set of pawns with disabled work assignments.
     /// </summary>
-    private List<Pawn> _disabledPawns = [];
+    private HashSet<Pawn> _disabledPawns = [];
 
     /// <summary>
-    ///     List of pawns with disabled schedules.
+    ///     Set of pawns with disabled schedules.
     /// </summary>
-    private List<Pawn> _disabledPawnSchedules = [];
+    private HashSet<Pawn> _disabledPawnSchedules = [];
 
     /// <summary>
     ///     Dictionary of pawns and their disabled work types.
@@ -51,9 +51,9 @@ public class WorkManagerGameComponent : GameComponent
     private List<List<WorkTypeDef>> _disabledPawnWorkTypesValues;
 
     /// <summary>
-    ///     List of disabled work types.
+    ///     Set of disabled work types.
     /// </summary>
-    private List<WorkTypeDef> _disabledWorkTypes = [];
+    private HashSet<WorkTypeDef> _disabledWorkTypes = [];
 
     /// <summary>
     ///     Indicates if priority management is enabled.
@@ -92,14 +92,14 @@ public class WorkManagerGameComponent : GameComponent
     internal HashSet<WorkTypeDef> DedicatedWorkTypes { get; } = [];
 
     /// <summary>
-    ///     Gets the list of pawns with disabled work assignments.
+    ///     Gets the set of pawns with disabled work assignments.
     /// </summary>
-    public IReadOnlyList<Pawn> DisabledPawns => _disabledPawns;
+    public IReadOnlyCollection<Pawn> DisabledPawns => _disabledPawns;
 
     /// <summary>
-    ///     Gets the list of pawns with disabled schedules.
+    ///     Gets the set of pawns with disabled schedules.
     /// </summary>
-    public IReadOnlyList<Pawn> DisabledPawnSchedules => _disabledPawnSchedules;
+    public IReadOnlyCollection<Pawn> DisabledPawnSchedules => _disabledPawnSchedules;
 
     /// <summary>
     ///     Gets the dictionary of pawns and their disabled work types.
@@ -108,9 +108,9 @@ public class WorkManagerGameComponent : GameComponent
         _disabledPawnWorkTypes;
 
     /// <summary>
-    ///     Gets the list of disabled work types.
+    ///     Gets the set of disabled work types.
     /// </summary>
-    public IReadOnlyList<WorkTypeDef> DisabledWorkTypes => _disabledWorkTypes;
+    public IReadOnlyCollection<WorkTypeDef> DisabledWorkTypes => _disabledWorkTypes;
 
     /// <summary>
     ///     Gets the singleton instance of the <see cref="WorkManagerGameComponent" /> class.
@@ -262,7 +262,7 @@ public class WorkManagerGameComponent : GameComponent
         var wasEnabled = !_disabledPawns.Contains(pawn);
         if (wasEnabled == enabled) return;
         if (enabled)
-            _ = _disabledPawns.RemoveAll(p => p == pawn);
+            _disabledPawns.Remove(pawn);
         else
             _disabledPawns.Add(pawn);
         if (PriorityManagementEnabled) ForceUpdateAssignments();
@@ -281,7 +281,7 @@ public class WorkManagerGameComponent : GameComponent
         var wasEnabled = !_disabledPawnSchedules.Contains(pawn);
         if (wasEnabled == enabled) return;
         if (enabled)
-            _ = _disabledPawnSchedules.RemoveAll(p => p == pawn);
+            _disabledPawnSchedules.Remove(pawn);
         else
             _disabledPawnSchedules.Add(pawn);
         if (ScheduleManagementEnabled) ForceUpdateSchedules();
@@ -348,7 +348,7 @@ public class WorkManagerGameComponent : GameComponent
         var wasEnabled = !_disabledWorkTypes.Contains(workType);
         if (wasEnabled == enabled) return;
         if (enabled)
-            _ = _disabledWorkTypes.RemoveAll(wt => wt == workType);
+            _disabledWorkTypes.Remove(workType);
         else
             _disabledWorkTypes.Add(workType);
         if (PriorityManagementEnabled) ForceUpdateAssignments();
@@ -475,9 +475,9 @@ public class WorkManagerGameComponent : GameComponent
     /// </remarks>
     private void Validate()
     {
-        _ = _disabledPawns?.RemoveAll(pawn => pawn?.Destroyed ?? true);
-        _ = _disabledPawnSchedules?.RemoveAll(pawn => pawn?.Destroyed ?? true);
-        _ = _disabledWorkTypes?.RemoveAll(workType =>
+        _disabledPawns?.RemoveWhere(pawn => pawn?.Destroyed ?? true);
+        _disabledPawnSchedules?.RemoveWhere(pawn => pawn?.Destroyed ?? true);
+        _disabledWorkTypes?.RemoveWhere(workType =>
             !DefDatabase<WorkTypeDef>.AllDefsListForReading.Contains(workType));
         if (_disabledPawnWorkTypes != null)
         {

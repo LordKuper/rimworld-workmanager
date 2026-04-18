@@ -19,6 +19,8 @@ public class WorkManagerMod : Mod
     /// </summary>
     internal const string ModId = "LordKuper.WorkManager";
 
+    private static bool _isPatched;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="WorkManagerMod" /> class.
     ///     Sets up logging, settings, Harmony patches, and compatibility integrations.
@@ -29,10 +31,14 @@ public class WorkManagerMod : Mod
         Logger.LogMessage(
             $"Initializing (v.{Assembly.GetExecutingAssembly().GetName().Version})...");
         Settings = GetSettings<Settings>();
-        Harmony harmony = new(ModId);
-        harmony.PatchAll(Assembly.GetExecutingAssembly());
-        WorkTab.Initialize(harmony);
-        MoreThanCapable.Initialize();
+        if (!_isPatched)
+        {
+            _isPatched = true;
+            Harmony harmony = new(ModId);
+            harmony.PatchAll(Assembly.GetExecutingAssembly());
+            WorkTab.Initialize(harmony);
+            MoreThanCapable.Initialize();
+        }
     }
 
     /// <summary>
