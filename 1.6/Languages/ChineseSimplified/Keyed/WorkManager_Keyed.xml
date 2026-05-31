@@ -16,6 +16,10 @@
     <LordKuper.WorkManager.Settings.WorkPriorities.UseDedicatedWorkers>分配专职工人</LordKuper.WorkManager.Settings.WorkPriorities.UseDedicatedWorkers>
     <!-- EN: If enabled, the mod will assign dedicated workers to work types according to the settings of the specific work type.\nIf disabled, the mod will assign work types to pawns with the highest skill level. -->
     <LordKuper.WorkManager.Settings.WorkPriorities.UseDedicatedWorkersTooltip>启用时，模组将根据各工作类型的设置为其分配专职工人。\n 禁用时，模组会将工作类型分配给技能等级最高的角色。</LordKuper.WorkManager.Settings.WorkPriorities.UseDedicatedWorkersTooltip>
+    <!-- EN: Account for schedules -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.UseScheduleForDedicatedWorkers>考虑作息时间</LordKuper.WorkManager.Settings.WorkPriorities.UseScheduleForDedicatedWorkers>
+    <!-- EN: If enabled, dedicated workers are chosen per hour from the pawns actually working that hour (according to their schedule), so every working hour is covered by the most suitable available workers. If disabled, dedicated workers are selected once for the whole day. -->
+    <LordKuper.WorkManager.Settings.WorkPriorities.UseScheduleForDedicatedWorkersTooltip>启用时，将按每个小时从该时段实际在工作的小人（依据其作息时间表）中选择专职工人，从而让每个工作时段都由当时可用的最合适工人来覆盖。\n禁用时，则在一整天内一次性选择专职工人。</LordKuper.WorkManager.Settings.WorkPriorities.UseScheduleForDedicatedWorkersTooltip>
     <!-- EN: Dedicated worker priority -->
     <LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerPriority>专职工人优先级</LordKuper.WorkManager.Settings.WorkPriorities.DedicatedWorkerPriority>
     <!-- EN: Default dedicated work type priority. Can be overriden in work type's settings. -->

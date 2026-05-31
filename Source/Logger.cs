@@ -23,4 +23,14 @@ internal static class Logger
     {
         Common.Logger.LogMessage(WorkManagerMod.ModId, message);
     }
+
+    /// <summary>
+    ///     Logs a warning message with optional exception details.
+    /// </summary>
+    /// <param name="message">The warning message to log.</param>
+    /// <param name="exception">The exception associated with the warning, or <c>null</c> if none.</param>
+    internal static void LogWarning(string message, [CanBeNull] Exception exception = null)
+    {
+        Common.Logger.LogWarning(WorkManagerMod.ModId, message, exception);
+    }
 }

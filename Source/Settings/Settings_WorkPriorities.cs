@@ -58,6 +58,9 @@ public partial class Settings
     /// <summary>Minimum allowed score factor.</summary>
     private const float ScoreFactorMin = 0f;
 
+    /// <summary>Default value for using pawn schedules when selecting dedicated workers.</summary>
+    private const bool UseScheduleForDedicatedWorkersDefault = true;
+
     /// <summary>Default update frequency for work priorities.</summary>
     private const float WorkPrioritiesUpdateFrequencyDefault = 1f / 24f;
 
@@ -137,6 +140,12 @@ public partial class Settings
     /// <summary>If true, use pawn-specific learning rate thresholds.</summary>
     public bool UsePawnLearningRateThresholds;
 
+    /// <summary>
+    ///     If true, dedicated workers are selected per hour from the pawns actually working that hour
+    ///     (based on their schedule), instead of one selection for the whole day.
+    /// </summary>
+    public bool UseScheduleForDedicatedWorkers = UseScheduleForDedicatedWorkersDefault;
+
     /// <summary>Frequency at which work priorities are updated.</summary>
     public float WorkPrioritiesUpdateFrequency = WorkPrioritiesUpdateFrequencyDefault;
 
@@ -183,6 +192,9 @@ public partial class Settings
             Strings.UseDedicatedWorkers, Strings.UseDedicatedWorkersTooltip, null, out remRect);
         if (UseDedicatedWorkers)
         {
+            y += Fields.DoLabeledCheckbox(remRect, 1, null, ref UseScheduleForDedicatedWorkers,
+                Strings.UseScheduleForDedicatedWorkers,
+                Strings.UseScheduleForDedicatedWorkersTooltip, null, out remRect);
             y += Fields.DoLabeledIntegerSlider(remRect, 1, null, Strings.DedicatedWorkerPriority,
                 Strings.DedicatedWorkerPriorityTooltip, ref DedicatedWorkerPriority, 1,
                 MaxWorkTypePriority, 1, null, out remRect);
@@ -269,6 +281,8 @@ public partial class Settings
         Scribe_Values.Look(ref WorkPrioritiesUpdateFrequency, nameof(WorkPrioritiesUpdateFrequency),
             WorkPrioritiesUpdateFrequencyDefault);
         Scribe_Values.Look(ref UseDedicatedWorkers, nameof(UseDedicatedWorkers), true);
+        Scribe_Values.Look(ref UseScheduleForDedicatedWorkers,
+            nameof(UseScheduleForDedicatedWorkers), UseScheduleForDedicatedWorkersDefault);
         Scribe_Values.Look(ref DedicatedWorkerPriority, nameof(DedicatedWorkerPriority),
             DedicatedWorkerPriorityDefault);
         Scribe_Values.Look(ref DedicatedWorkerSkillScoreFactor,
@@ -310,6 +324,7 @@ public partial class Settings
     {
         WorkPrioritiesUpdateFrequency = WorkPrioritiesUpdateFrequencyDefault;
         UseDedicatedWorkers = true;
+        UseScheduleForDedicatedWorkers = UseScheduleForDedicatedWorkersDefault;
         DedicatedWorkerPriority = DedicatedWorkerPriorityDefault;
         DedicatedWorkerSkillScoreFactor = DedicatedWorkerSkillScoreFactorDefault;
         DedicatedWorkerPassionScoreFactor = DedicatedWorkerPassionScoreFactorDefault;

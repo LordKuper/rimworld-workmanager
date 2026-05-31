@@ -15,18 +15,32 @@ namespace LordKuper.WorkManager.Patches;
 public static class DefGeneratorPatch
 {
     /// <summary>
+    ///     Inserts <paramref name="column" /> immediately after the "Label" column of <paramref name="table" />.
+    ///     If no "Label" column exists, the column is appended to the end instead of the start.
+    /// </summary>
+    /// <param name="table">The pawn table to modify.</param>
+    /// <param name="column">The column to insert.</param>
+    private static void InsertAfterLabel([NotNull] PawnTableDef table, PawnColumnDef column)
+    {
+        var labelIndex = table.columns.FindIndex(x =>
+            x.defName.Equals("Label", StringComparison.Ordinal));
+        if (labelIndex < 0)
+        {
+            Logger.LogWarning(
+                $"'Label' column not found in '{table.defName}' table; appending '{column.defName}' to the end.");
+            table.columns.Add(column);
+            return;
+        }
+        table.columns.Insert(labelIndex + 1, column);
+    }
+
+    /// <summary>
     ///     Postfix method that inserts custom pawn columns into the Work and Restrict tables after the "Label" column.
     /// </summary>
     [UsedImplicitly]
     public static void Postfix()
     {
-        PawnTableDefOf.Work.columns.Insert(
-            PawnTableDefOf.Work.columns.FindIndex(x =>
-                x.defName.Equals("Label", StringComparison.Ordinal)) + 1,
-            PawnColumnDefOf.AutoWorkPriorities);
-        PawnTableDefOf.Restrict.columns.Insert(
-            PawnTableDefOf.Restrict.columns.FindIndex(x =>
-                x.defName.Equals("Label", StringComparison.Ordinal)) + 1,
-            PawnColumnDefOf.AutoWorkSchedule);
+        InsertAfterLabel(PawnTableDefOf.Work, PawnColumnDefOf.AutoWorkPriorities);
+        InsertAfterLabel(PawnTableDefOf.Restrict, PawnColumnDefOf.AutoWorkSchedule);
     }
 }

@@ -335,6 +335,14 @@ internal static class Resources
                 internal static readonly string UsePawnLearningRateThresholdsTooltip =
                     $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkPriorities)}.{nameof(UsePawnLearningRateThresholdsTooltip)}"
                         .Translate();
+
+                internal static readonly string UseScheduleForDedicatedWorkers =
+                    $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkPriorities)}.{nameof(UseScheduleForDedicatedWorkers)}"
+                        .Translate();
+
+                internal static readonly string UseScheduleForDedicatedWorkersTooltip =
+                    $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkPriorities)}.{nameof(UseScheduleForDedicatedWorkersTooltip)}"
+                        .Translate();
             }
 
             internal static class WorkTypes

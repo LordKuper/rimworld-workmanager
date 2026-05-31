@@ -28,6 +28,11 @@ internal class PawnCache(Pawn pawn)
     private readonly Dictionary<WorkTypeDef, bool> _managedWorkTypes = [];
 
     /// <summary>
+    ///     For each hour of the day (0-23), indicates whether the pawn's timetable assigns it to work.
+    /// </summary>
+    private readonly bool[] _workHours = new bool[24];
+
+    /// <summary>
     ///     Stores the priority for each work type for the pawn.
     ///     The key is the <see cref="WorkTypeDef" />, and the value is the priority.
     /// </summary>
@@ -191,6 +196,19 @@ internal class PawnCache(Pawn pawn)
     }
 
     /// <summary>
+    ///     Determines whether the pawn's timetable assigns it to work at the specified hour.
+    /// </summary>
+    /// <param name="hour">The hour of the day (0-23).</param>
+    /// <returns>
+    ///     <c>true</c> if the pawn's timetable assignment for the hour is <see cref="TimeAssignmentDefOf.Work" />;
+    ///     otherwise, <c>false</c>.
+    /// </returns>
+    public bool IsWorkingHour(int hour)
+    {
+        return hour is >= 0 and < 24 && _workHours[hour];
+    }
+
+    /// <summary>
     ///     Sets the priority level for the specified type of work.
     /// </summary>
     /// <remarks>
@@ -227,6 +245,12 @@ internal class PawnCache(Pawn pawn)
         {
             _workPriorities.Add(workType,
                 IsManagedWork(workType) ? 0 : WorkTypePriorityHelper.GetPriority(Pawn, workType));
+        }
+        var timetable = Pawn.timetable;
+        for (var hour = 0; hour < 24; hour++)
+        {
+            _workHours[hour] = timetable != null &&
+                               timetable.GetAssignment(hour) == TimeAssignmentDefOf.Work;
         }
         Work.Update(time);
         Skill.Update(time);

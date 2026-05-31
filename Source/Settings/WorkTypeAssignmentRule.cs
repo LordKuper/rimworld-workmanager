@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
 using LordKuper.Common.Cache;
@@ -28,6 +27,16 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
     ///     The default priority value for <see cref="AssignEveryonePriority" />.
     /// </summary>
     private const int AssignEveryonePriorityDefault = 1;
+
+    /// <summary>
+    ///     Cached default rule (the one with a <c>null</c> <see cref="DefCache{T}.DefName" />).
+    /// </summary>
+    private static WorkTypeAssignmentRule _defaultRule;
+
+    /// <summary>
+    ///     Cached default rules keyed by work type def name, built once from <see cref="DefaultRules" />.
+    /// </summary>
+    private static Dictionary<string, WorkTypeAssignmentRule> _defaultRulesByName;
 
     /// <summary>
     ///     The forbidden pawn types for allowed workers.
@@ -463,6 +472,30 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
     }
 
     /// <summary>
+    ///     Returns the cached default rule matching <paramref name="defName" />, or the fallback default rule
+    ///     (the one with a <c>null</c> def name) if no specific default exists.
+    /// </summary>
+    /// <param name="defName">The work type def name, or <c>null</c> for the fallback default rule.</param>
+    [NotNull]
+    private static WorkTypeAssignmentRule GetDefaultRule([CanBeNull] string defName)
+    {
+        if (_defaultRulesByName == null)
+        {
+            _defaultRulesByName = new Dictionary<string, WorkTypeAssignmentRule>();
+            foreach (var rule in DefaultRules)
+            {
+                if (rule.DefName == null)
+                    _defaultRule = rule;
+                else
+                    _defaultRulesByName[rule.DefName] = rule;
+            }
+        }
+        return defName != null && _defaultRulesByName.TryGetValue(defName, out var specific)
+            ? specific
+            : _defaultRule;
+    }
+
+    /// <summary>
     ///     Calculates the target number of workers based on the current dedicated worker mode and relevant parameters.
     /// </summary>
     /// <param name="map">The map context used to filter pawns when calculating the worker count in certain modes.</param>
@@ -524,8 +557,7 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
     /// </summary>
     private void Validate()
     {
-        var defaultRule = DefaultRules.FirstOrDefault(r => r.DefName == DefName) ??
-                          DefaultRules.First(r => r.DefName == null);
+        var defaultRule = GetDefaultRule(DefName);
         DedicatedWorkerSettings ??= new DedicatedWorkerSettings();
         AllowedWorkers ??= new PawnFilter();
         AllowedWorkers.Validate();

@@ -7,6 +7,7 @@ using LordKuper.Common.Helpers;
 using LordKuper.WorkManager.Cache;
 using LordKuper.WorkManager.Helpers;
 using RimWorld;
+using UnityEngine;
 using Verse;
 using PassionHelper = LordKuper.WorkManager.Helpers.PassionHelper;
 
@@ -25,6 +26,21 @@ namespace LordKuper.WorkManager;
 [UsedImplicitly]
 public class WorkPriorityUpdater(Map map) : MapComponent(map)
 {
+    /// <summary>
+    ///     Score penalty applied to a pawn for a work type considered dangerous by its ideology.
+    /// </summary>
+    private const float DangerousWorkScorePenalty = 50f;
+
+    /// <summary>
+    ///     Hours a pawn must remain idle before idle work assignment is cleared.
+    /// </summary>
+    private const float IdleHoursThreshold = 12f;
+
+    /// <summary>
+    ///     Bitmask gating updates to once every 64 game ticks.
+    /// </summary>
+    private const int UpdateTickMask = 0x3F;
+
     private readonly HashSet<Pawn> _allPawns = [];
     private readonly HashSet<PawnCache> _capablePawns = [];
     private readonly Dictionary<WorkTypeDef, WorkTypeAssignmentRule> _managedWorkTypeRules = [];
@@ -70,6 +86,75 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
                 WorkTypePriorityHelper.SetPriority(pawnCache.Pawn, workType, priority);
             }
         }
+    }
+
+    /// <summary>
+    ///     Repeatedly assigns the highest-scoring pawn as a dedicated worker for the rule's work type until the
+    ///     target worker count is reached or no candidates remain.
+    /// </summary>
+    /// <param name="pawnScores">Candidate pawns mapped to their suitability scores. Assigned pawns are removed.</param>
+    /// <param name="rule">The work type assignment rule being satisfied.</param>
+    /// <param name="workerCount">The current number of assigned dedicated workers.</param>
+    /// <param name="targetWorkersCount">The desired number of dedicated workers.</param>
+    /// <returns>The updated worker count after assignments.</returns>
+    private static int AssignBestDedicatedWorkers([NotNull] Dictionary<PawnCache, float> pawnScores,
+        [NotNull] WorkTypeAssignmentRule rule, int workerCount, int targetWorkersCount)
+    {
+        while (workerCount < targetWorkersCount && pawnScores.Count > 0)
+        {
+            PawnCache bestWorker = null;
+            var bestScore = float.MinValue;
+            foreach (var pair in pawnScores)
+            {
+                if (bestWorker == null || pair.Value > bestScore ||
+                    (Mathf.Approximately(pair.Value, bestScore) && pair.Key.Pawn.thingIDNumber <
+                        bestWorker.Pawn.thingIDNumber))
+                {
+                    bestScore = pair.Value;
+                    bestWorker = pair.Key;
+                }
+            }
+            if (bestWorker == null) break;
+            bestWorker.SetWorkPriority(rule.Def, WorkManagerMod.Settings.DedicatedWorkerPriority);
+            workerCount++;
+            pawnScores.Remove(bestWorker);
+        }
+        return workerCount;
+    }
+
+    /// <summary>
+    ///     Adds the highest-scoring workers on the clock at the given hour to the dedicated set until the
+    ///     hour's target count is reached or no further candidates remain.
+    /// </summary>
+    /// <param name="pawnScores">Candidate pawns mapped to their suitability scores.</param>
+    /// <param name="hour">The hour of the day (0-23) being covered.</param>
+    /// <param name="targetWorkersCount">The number of dedicated workers wanted for the hour.</param>
+    /// <param name="dedicatedSet">The accumulating set of dedicated workers (mutated).</param>
+    /// <param name="alreadyPicked">Workers already counted toward the hour from a previous pass.</param>
+    /// <returns>The number of workers covering the hour after this pass.</returns>
+    private static int AssignBestDedicatedWorkersForHour(
+        [NotNull] Dictionary<PawnCache, float> pawnScores, int hour, int targetWorkersCount,
+        [NotNull] HashSet<PawnCache> dedicatedSet, int alreadyPicked = 0)
+    {
+        var candidates = new List<PawnCache>(pawnScores.Count);
+        foreach (var pair in pawnScores)
+        {
+            if (pair.Key.IsWorkingHour(hour)) candidates.Add(pair.Key);
+        }
+        candidates.Sort((a, b) =>
+        {
+            var comparison = pawnScores[b].CompareTo(pawnScores[a]);
+            return comparison != 0
+                ? comparison
+                : a.Pawn.thingIDNumber.CompareTo(b.Pawn.thingIDNumber);
+        });
+        var picked = alreadyPicked;
+        for (var i = 0; i < candidates.Count && picked < targetWorkersCount; i++)
+        {
+            dedicatedSet.Add(candidates[i]);
+            picked++;
+        }
+        return picked;
     }
 
     /// <summary>
@@ -128,92 +213,70 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
         }
         if (relevantRules.Count == 0) return;
         relevantRules.Sort(WorkManagerGameComponent.WorkTypeAssignmentRuleComparer);
+        var useSchedule = WorkManagerMod.Settings.UseScheduleForDedicatedWorkers;
         foreach (var rule in relevantRules)
         {
-            var targetWorkersCount =
-                rule.GetTargetWorkersCount(map, _capablePawns.Count, relevantRules.Count);
-            if (rule.EnsureWorkerAssigned == true)
-                targetWorkersCount = Math.Max(targetWorkersCount, rule.MinWorkerNumber);
+            // Schedule-aware selection picks, for every working hour, the best-suited workers
+            // who are actually on the clock that hour. It returns false only when no allowed
+            // worker has any Work hour for this work type, in which case we fall back to the
+            // legacy day-level selection so the work type is never left without dedicated workers.
+            if (useSchedule && TryAssignDedicatedWorkersBySchedule(rule, relevantRules))
+                continue;
+            AssignDedicatedWorkersForDay(rule, relevantRules);
+        }
+    }
+
+    /// <summary>
+    ///     Assigns dedicated workers for a single rule using the legacy day-level selection:
+    ///     picks the highest-scoring workers for the whole day, ignoring schedules.
+    /// </summary>
+    /// <param name="rule">The work type assignment rule being satisfied.</param>
+    /// <param name="relevantRules">All dedicated rules, used for scoring (dedication counts).</param>
+    private void AssignDedicatedWorkersForDay([NotNull] WorkTypeAssignmentRule rule,
+        [NotNull] List<WorkTypeAssignmentRule> relevantRules)
+    {
+        var targetWorkersCount =
+            rule.GetTargetWorkersCount(map, _capablePawns.Count, relevantRules.Count);
+        if (rule.EnsureWorkerAssigned == true)
+            targetWorkersCount = Math.Max(targetWorkersCount, rule.MinWorkerNumber);
 #if DEBUG
-            Logger.LogMessage($"Target dedicated workers for {rule.Label} = {targetWorkersCount}");
-            Logger.LogMessage($"Allowed workers filter for {rule.Label}:\n{rule.AllowedWorkers.GetSummary(0)}");
+        Logger.LogMessage($"Target dedicated workers for {rule.Label} = {targetWorkersCount}");
+        Logger.LogMessage($"Allowed workers filter for {rule.Label}:\n{rule.AllowedWorkers.GetSummary(0)}");
 #endif
-            var allowedWorkers = new List<PawnCache>(_capablePawns.Count);
-            foreach (var pc in _capablePawns)
-            {
-                if (pc.IsAllowedWorker(rule.Def)) allowedWorkers.Add(pc);
-            }
+        var allowedWorkers = new List<PawnCache>(_capablePawns.Count);
+        foreach (var pc in _capablePawns)
+        {
+            if (pc.IsAllowedWorker(rule.Def)) allowedWorkers.Add(pc);
+        }
 #if DEBUG
-            Logger.LogMessage(
-                $"Allowed workers for '{rule.Label}': {string.Join(", ", allowedWorkers.Select(pc => $"{pc.Pawn.LabelShort}"))}");
+        Logger.LogMessage(
+            $"Allowed workers for '{rule.Label}': {string.Join(", ", allowedWorkers.Select(pc => $"{pc.Pawn.LabelShort}"))}");
 #endif
-            if (allowedWorkers.Count == 0) continue;
-            var goodWorkers = new List<PawnCache>(allowedWorkers.Count);
-            foreach (var pc in allowedWorkers)
-            {
-                if (!pc.IsBadWork(rule.Def) && !pc.IsDangerousWork(rule.Def)) goodWorkers.Add(pc);
-            }
-            var workerCount = 0;
-            foreach (var pc in _capablePawns)
-            {
-                if (pc.IsActiveWork(rule.Def) && pc.GetWorkPriority(rule.Def) <=
-                    WorkManagerMod.Settings.DedicatedWorkerPriority)
-                    workerCount++;
-            }
-            if (workerCount >= targetWorkersCount) continue;
-            var pawnScores = GetDedicatedWorkersScores(goodWorkers, rule.Def, relevantRules);
-            while (workerCount < targetWorkersCount && pawnScores.Count > 0)
-            {
-                PawnCache bestWorker = null;
-                var bestScore = float.MinValue;
-                foreach (var pair in pawnScores)
-                {
-                    if (pair.Value > bestScore)
-                    {
-                        bestScore = pair.Value;
-                        bestWorker = pair.Key;
-                    }
-                }
-                if (bestWorker == null) break;
-#if DEBUG
-                Logger.LogMessage($"Assigning '{bestWorker.Pawn.LabelShort}' as dedicated worker for '{rule.Label}'");
-#endif
-                bestWorker.SetWorkPriority(rule.Def,
-                    WorkManagerMod.Settings.DedicatedWorkerPriority);
+        if (allowedWorkers.Count == 0) return;
+        var goodWorkers = new List<PawnCache>(allowedWorkers.Count);
+        foreach (var pc in allowedWorkers)
+        {
+            if (!pc.IsBadWork(rule.Def) && !pc.IsDangerousWork(rule.Def)) goodWorkers.Add(pc);
+        }
+        var workerCount = 0;
+        foreach (var pc in _capablePawns)
+        {
+            if (pc.IsActiveWork(rule.Def) && pc.GetWorkPriority(rule.Def) <=
+                WorkManagerMod.Settings.DedicatedWorkerPriority)
                 workerCount++;
-                pawnScores.Remove(bestWorker);
-            }
-            if (workerCount >= targetWorkersCount) continue;
+        }
+        if (workerCount >= targetWorkersCount) return;
+        var pawnScores = GetDedicatedWorkersScores(goodWorkers, rule.Def, relevantRules);
+        workerCount = AssignBestDedicatedWorkers(pawnScores, rule, workerCount, targetWorkersCount);
+        if (workerCount >= targetWorkersCount) return;
+        {
+            var availableWorkers = new List<PawnCache>(_capablePawns.Count);
+            foreach (var pc in _capablePawns)
             {
-                var availableWorkers = new List<PawnCache>(_capablePawns.Count);
-                foreach (var pc in _capablePawns)
-                {
-                    if (!goodWorkers.Contains(pc)) availableWorkers.Add(pc);
-                }
-                pawnScores = GetDedicatedWorkersScores(availableWorkers, rule.Def, relevantRules);
-                while (workerCount < targetWorkersCount && pawnScores.Count > 0)
-                {
-                    PawnCache bestWorker = null;
-                    var bestScore = float.MinValue;
-                    foreach (var pair in pawnScores)
-                    {
-                        if (pair.Value > bestScore)
-                        {
-                            bestScore = pair.Value;
-                            bestWorker = pair.Key;
-                        }
-                    }
-                    if (bestWorker == null) break;
-#if DEBUG
-                    Logger.LogMessage(
-                        $"Assigning '{bestWorker.Pawn.LabelShort}' as dedicated worker for '{rule.Label}' (fail-safe)");
-#endif
-                    bestWorker.SetWorkPriority(rule.Def,
-                        WorkManagerMod.Settings.DedicatedWorkerPriority);
-                    workerCount++;
-                    pawnScores.Remove(bestWorker);
-                }
+                if (!goodWorkers.Contains(pc)) availableWorkers.Add(pc);
             }
+            pawnScores = GetDedicatedWorkersScores(availableWorkers, rule.Def, relevantRules);
+            AssignBestDedicatedWorkers(pawnScores, rule, workerCount, targetWorkersCount);
         }
     }
 
@@ -261,7 +324,9 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
                         !pc.IsAllowedWorker(workType) || pc.IsBadWork(workType) ||
                         pc.IsDangerousWork(workType)) continue;
                     var activeCount = activeWorkMatrix[pc].Count;
-                    if (activeCount >= minActiveCount) continue;
+                    if (activeCount > minActiveCount) continue;
+                    if (activeCount == minActiveCount && bestPc != null &&
+                        pc.Pawn.thingIDNumber >= bestPc.Pawn.thingIDNumber) continue;
                     minActiveCount = activeCount;
                     bestPc = pc;
                 }
@@ -288,7 +353,10 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
                         if (activeWorkMatrix[otherPc].Contains(wt))
                             activeCount++;
                     }
-                    if (activeCount >= minActiveCount) continue;
+                    if (activeCount > minActiveCount) continue;
+                    if (activeCount == minActiveCount && bestWorkType != null &&
+                        string.Compare(wt.defName, bestWorkType.defName,
+                            StringComparison.Ordinal) >= 0) continue;
                     minActiveCount = activeCount;
                     bestWorkType = wt;
                 }
@@ -375,10 +443,6 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
     ///     for a work type meets the criteria and a priority is defined for that passion, the worker's priority for the
     ///     work type is updated accordingly.
     /// </remarks>
-    /// <exception cref="NullReferenceException">
-    ///     Thrown if a work type rule or passion cache is null during the assignment
-    ///     process.
-    /// </exception>
     private void AssignWorkersByPassion()
     {
         if (_capablePawns.Count == 0) return;
@@ -490,7 +554,8 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
         List<PawnCache> noLongerIdlePawns = null;
         foreach (var pc in _pawnCache.Values)
         {
-            if (pc.IdleSince == null || !(_workUpdateTime - pc.IdleSince.Value > 12)) continue;
+            if (pc.IdleSince == null ||
+                !(_workUpdateTime - pc.IdleSince.Value > IdleHoursThreshold)) continue;
             noLongerIdlePawns ??= [];
             pc.IdleSince = null;
             noLongerIdlePawns.Add(pc);
@@ -638,7 +703,7 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
                         normalizedLearningRate -
                         WorkManagerMod.Settings.DedicatedWorkerWorkCountScoreFactor *
                         normalizedDedications;
-            if (pc.IsDangerousWork(workType)) score -= 50f;
+            if (pc.IsDangerousWork(workType)) score -= DangerousWorkScorePenalty;
             pawnScores.Add(pc, score);
 #if DEBUG
             Logger.LogMessage($"{workType.defName} score of {pc.Pawn.LabelShortCap} =" +
@@ -668,13 +733,98 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
         base.MapComponentTick();
         if (!WorkManagerGameComponent.Instance.PriorityManagementEnabled) return;
         if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused ||
-            (Find.TickManager.TicksGame & 0x3F) != 0) return;
+            (Find.TickManager.TicksGame & UpdateTickMask) != 0) return;
         var time = RimWorldTime.GetHomeTime();
         var hoursPassed = time - _workUpdateTime;
         if (hoursPassed < WorkManagerMod.Settings.WorkPrioritiesUpdateFrequency *
             RimWorldTime.HoursInDay) return;
         _workUpdateTime = time;
         Update();
+    }
+
+    /// <summary>
+    ///     Assigns dedicated workers for a single rule taking pawn schedules into account.
+    /// </summary>
+    /// <remarks>
+    ///     For every hour of the day the target worker count is recomputed from the number of capable
+    ///     pawns actually working that hour, and the best-scoring workers on the clock that hour are
+    ///     selected. The union of those workers receives the (whole-day) dedicated worker priority, so
+    ///     each working hour is covered by the most suitable workers available at that time. When fewer
+    ///     than the target good workers are on the clock, allowed-but-bad workers of that hour are used
+    ///     as a fail-safe.
+    /// </remarks>
+    /// <param name="rule">The work type assignment rule being satisfied.</param>
+    /// <param name="relevantRules">All dedicated rules, used for scoring (dedication counts).</param>
+    /// <returns>
+    ///     <c>true</c> if the schedule-aware selection was applied (including when there are no allowed
+    ///     workers); <c>false</c> when no allowed worker has any working hour, signalling the caller to
+    ///     fall back to the legacy day-level selection.
+    /// </returns>
+    private bool TryAssignDedicatedWorkersBySchedule([NotNull] WorkTypeAssignmentRule rule,
+        [NotNull] List<WorkTypeAssignmentRule> relevantRules)
+    {
+        var allowedWorkers = new List<PawnCache>(_capablePawns.Count);
+        foreach (var pc in _capablePawns)
+        {
+            if (pc.IsAllowedWorker(rule.Def)) allowedWorkers.Add(pc);
+        }
+        if (allowedWorkers.Count == 0) return true;
+        var anyWorkHour = false;
+        foreach (var pc in allowedWorkers)
+        {
+            for (var hour = 0; hour < 24; hour++)
+            {
+                if (!pc.IsWorkingHour(hour)) continue;
+                anyWorkHour = true;
+                break;
+            }
+            if (anyWorkHour) break;
+        }
+        if (!anyWorkHour) return false;
+        var goodWorkers = new List<PawnCache>(allowedWorkers.Count);
+        foreach (var pc in allowedWorkers)
+        {
+            if (!pc.IsBadWork(rule.Def) && !pc.IsDangerousWork(rule.Def)) goodWorkers.Add(pc);
+        }
+        var goodScores = GetDedicatedWorkersScores(goodWorkers, rule.Def, relevantRules);
+        Dictionary<PawnCache, float> availableScores = null;
+        var dedicatedSet = new HashSet<PawnCache>();
+        for (var hour = 0; hour < 24; hour++)
+        {
+            var capableAtHour = 0;
+            foreach (var pc in _capablePawns)
+            {
+                if (pc.IsWorkingHour(hour)) capableAtHour++;
+            }
+            if (capableAtHour == 0) continue;
+            var targetWorkersCount =
+                rule.GetTargetWorkersCount(map, capableAtHour, relevantRules.Count);
+            if (rule.EnsureWorkerAssigned == true)
+                targetWorkersCount = Math.Max(targetWorkersCount, rule.MinWorkerNumber);
+            if (targetWorkersCount <= 0) continue;
+            var picked = AssignBestDedicatedWorkersForHour(goodScores, hour, targetWorkersCount,
+                dedicatedSet);
+            if (picked < targetWorkersCount)
+            {
+                if (availableScores == null)
+                {
+                    var availableWorkers = new List<PawnCache>(allowedWorkers.Count);
+                    foreach (var pc in allowedWorkers)
+                    {
+                        if (!goodWorkers.Contains(pc)) availableWorkers.Add(pc);
+                    }
+                    availableScores =
+                        GetDedicatedWorkersScores(availableWorkers, rule.Def, relevantRules);
+                }
+                AssignBestDedicatedWorkersForHour(availableScores, hour, targetWorkersCount,
+                    dedicatedSet, picked);
+            }
+        }
+        foreach (var pc in dedicatedSet)
+        {
+            pc.SetWorkPriority(rule.Def, WorkManagerMod.Settings.DedicatedWorkerPriority);
+        }
+        return true;
     }
 
     /// <summary>
@@ -688,24 +838,31 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
     /// </remarks>
     internal void Update()
     {
-        if (!Current.Game.playSettings.useWorkPriorities)
+        try
         {
-            Current.Game.playSettings.useWorkPriorities = true;
-            var pawns = PawnsFinder.AllMapsWorldAndTemporary_Alive;
-            var count = pawns.Count;
-            for (var i = 0; i < count; i++)
+            if (!Current.Game.playSettings.useWorkPriorities)
             {
-                var pawn = pawns[i];
-                if (pawn.Faction == Faction.OfPlayer)
-                    pawn.workSettings?.Notify_UseWorkPrioritiesChanged();
+                Current.Game.playSettings.useWorkPriorities = true;
+                var pawns = PawnsFinder.AllMapsWorldAndTemporary_Alive;
+                var count = pawns.Count;
+                for (var i = 0; i < count; i++)
+                {
+                    var pawn = pawns[i];
+                    if (pawn.Faction == Faction.OfPlayer)
+                        pawn.workSettings?.Notify_UseWorkPrioritiesChanged();
+                }
             }
-        }
 #if DEBUG
-        Logger.LogMessage("Updating work priorities...");
+            Logger.LogMessage("Updating work priorities...");
 #endif
-        UpdateCache();
-        UpdateWorkPriorities();
-        ApplyWorkPriorities();
+            UpdateCache();
+            UpdateWorkPriorities();
+            ApplyWorkPriorities();
+        }
+        catch (Exception e)
+        {
+            Logger.LogError($"Failed to update work priorities for map {map}.", e);
+        }
     }
 
     /// <summary>
@@ -749,7 +906,7 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
         foreach (var pawn in map.mapPawns.AllPawnsSpawned)
         {
             if (pawn.Faction != Faction.OfPlayer || pawn.workSettings is not { EverWork: true } ||
-                pawn.skills == null)
+                pawn.skills == null || pawn.RaceProps.IsMechanoid)
                 continue;
             _allPawns.Add(pawn);
         }

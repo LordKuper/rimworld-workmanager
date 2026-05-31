@@ -14,6 +14,11 @@ namespace LordKuper.WorkManager.Patches;
 public static class WorkTabPatch
 {
     /// <summary>
+    ///     Extra header height (pixels) reserved for the work type toggle button.
+    /// </summary>
+    private const int HeaderHeightExtension = 30;
+
+    /// <summary>
     ///     Applies all Harmony patches related to the WorkTab mod.
     /// </summary>
     /// <param name="harmony">The Harmony instance to use for patching.</param>
@@ -54,13 +59,14 @@ public static class WorkTabPatch
         Rect buttonRect = new(rect.center.x - iconSize / 2, rect.yMax - iconSize - 4, iconSize,
             iconSize);
         var component = WorkManagerGameComponent.Instance;
+        if (component == null) return;
         Buttons.DoIconButtonToggle(buttonRect,
             () => component.GetWorkTypeEnabled(__instance.def.workType),
             newValue => component.SetWorkTypeEnabled(__instance.def.workType, newValue),
             Resources.Strings.WorkTypeDisableTooltip,
             Resources.Textures.WorkTypeToggleButtonEnabled, Resources.Strings.WorkTypeEnableTooltip,
             Resources.Textures.WorkTypeToggleButtonDisabled);
-        rect = new Rect(rect.x, rect.y, rect.width, rect.height - 30);
+        rect = new Rect(rect.x, rect.y, rect.width, rect.height - HeaderHeightExtension);
     }
 
     /// <summary>
@@ -68,10 +74,7 @@ public static class WorkTabPatch
     ///     settings and accessing mod settings.
     /// </summary>
     /// <remarks>
-    ///     This method dynamically adds buttons to the UI based on the current state of the priority
-    ///     management system.  - If priority management is enabled, an additional "Update Now" button is displayed to allow
-    ///     immediate updates. - A settings button is always displayed, allowing users to access the mod's configuration
-    ///     window.
+    ///     This method adds a priority-management toggle button, an "Update Now" button, and a settings button to the UI.
     /// </remarks>
     /// <param name="rect">
     ///     The rectangular area within which the UI elements are drawn. This defines the layout space available for the
@@ -81,6 +84,7 @@ public static class WorkTabPatch
     public static void DoWindowContentsPostfix(Rect rect)
     {
         var component = WorkManagerGameComponent.Instance;
+        if (component == null) return;
         var buttonRow = new Rect(rect.xMin + Layout.ElementGapTiny,
             rect.yMin + Layout.ElementGapTiny, rect.width - Layout.ElementGapTiny * 2,
             Buttons.IconButtonSize);
@@ -114,7 +118,8 @@ public static class WorkTabPatch
     public static void DrawWorkTypeBoxForPostfix(Rect box, Pawn pawn, WorkTypeDef worktype)
     {
         var component = WorkManagerGameComponent.Instance;
-        if (!component.PriorityManagementEnabled || !Find.PlaySettings.useWorkPriorities) return;
+        if (component == null || !component.PriorityManagementEnabled ||
+            !Find.PlaySettings.useWorkPriorities) return;
         var enabled = component.GetPawnWorkTypeEnabled(pawn, worktype);
         if (!enabled)
         {
@@ -136,7 +141,7 @@ public static class WorkTabPatch
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public static void GetMinHeaderHeightPostfix(ref int __result)
     {
-        __result += 30;
+        __result += HeaderHeightExtension;
     }
 
     /// <summary>
@@ -152,7 +157,8 @@ public static class WorkTabPatch
         Pawn pawn)
     {
         var component = WorkManagerGameComponent.Instance;
-        if (!component.PriorityManagementEnabled || !Find.PlaySettings.useWorkPriorities) return;
+        if (component == null || !component.PriorityManagementEnabled ||
+            !Find.PlaySettings.useWorkPriorities) return;
         var workType = __instance.def.workType;
         var enabled = component.GetPawnWorkTypeEnabled(pawn, workType);
         if (Event.current.type == EventType.MouseDown && Mouse.IsOver(rect) &&

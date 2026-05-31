@@ -37,7 +37,7 @@ internal class WorkTypeAssignmentRuleComparer : IComparer<WorkTypeAssignmentRule
     ///             <description>Natural priority (descending).</description>
     ///         </item>
     ///         <item>
-    ///             <description>Definition name (culture-sensitive string comparison).</description>
+    ///             <description>Definition name (ordinal string comparison).</description>
     ///         </item>
     ///     </list>
     /// </returns>
@@ -58,6 +58,6 @@ internal class WorkTypeAssignmentRuleComparer : IComparer<WorkTypeAssignmentRule
             if (priorityComparison != 0)
                 return priorityComparison;
         }
-        return string.Compare(x.DefName, y.DefName, StringComparison.CurrentCulture);
+        return string.Compare(x.DefName, y.DefName, StringComparison.Ordinal);
     }
 }

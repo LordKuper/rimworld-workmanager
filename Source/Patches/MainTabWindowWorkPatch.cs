@@ -22,6 +22,7 @@ public static class MainTabWindowWorkPatch
     private static void Postfix(Rect rect)
     {
         var component = WorkManagerGameComponent.Instance;
+        if (component == null) return;
         var buttonRow = new Rect(rect.xMin + Layout.ElementGapTiny,
             rect.yMin + Layout.ElementGapTiny,
             rect.width - Layout.ElementGap - Layout.ElementGapTiny * 2, Buttons.IconButtonSize);
