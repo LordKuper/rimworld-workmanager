@@ -6,10 +6,19 @@ using Verse;
 
 namespace LordKuper.WorkManager.PawnColumnWorkers;
 
+/// <summary>
+///     Pawn table column worker that toggles per-pawn work schedule management.
+/// </summary>
 [UsedImplicitly]
 public class AutoWorkSchedule : PawnColumnWorker
 {
-    public override void DoCell(Rect rect, [NotNull] Pawn pawn, PawnTable table)
+    /// <summary>
+    ///     Draws the toggle button cell for the given pawn.
+    /// </summary>
+    /// <param name="rect">The cell rectangle.</param>
+    /// <param name="pawn">The pawn for the row.</param>
+    /// <param name="table">The owning pawn table.</param>
+    public override void DoCell(Rect rect, Pawn pawn, PawnTable table)
     {
         if (pawn.Dead) return;
         var component = WorkManagerGameComponent.Instance;
@@ -18,10 +27,8 @@ public class AutoWorkSchedule : PawnColumnWorker
         {
             Buttons.DoIconButtonToggle(buttonRect, () => component.GetPawnScheduleEnabled(pawn),
                 newValue => component.SetPawnScheduleEnabled(pawn, newValue),
-                Resources.Strings.PawnScheduleDisableTooltip,
-                Resources.Textures.ScheduleToggleButtonEnabled,
-                Resources.Strings.PawnScheduleEnableTooltip,
-                Resources.Textures.ScheduleToggleButtonDisabled);
+                Resources.Strings.PawnScheduleDisableTooltip, Resources.Textures.ScheduleToggleButtonEnabled,
+                Resources.Strings.PawnScheduleEnableTooltip, Resources.Textures.ScheduleToggleButtonDisabled);
         }
         else
         {
@@ -32,6 +39,11 @@ public class AutoWorkSchedule : PawnColumnWorker
         }
     }
 
+    /// <summary>
+    ///     Gets the minimum width of the column.
+    /// </summary>
+    /// <param name="table">The owning pawn table.</param>
+    /// <returns>The minimum column width.</returns>
     public override int GetMinWidth(PawnTable table)
     {
         return 20;

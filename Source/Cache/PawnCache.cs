@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using LordKuper.Common;
 using LordKuper.WorkManager.Helpers;
 using RimWorld;
@@ -73,7 +72,7 @@ internal class PawnCache(Pawn pawn)
     /// </summary>
     /// <param name="workType">The type of work for which to retrieve the learning rate. This parameter cannot be null.</param>
     /// <returns>The learning rate as a <see cref="float" /> for the specified work type.</returns>
-    public float GetLearningRate([NotNull] WorkTypeDef workType)
+    public float GetLearningRate(WorkTypeDef workType)
     {
         return Skill.GetWorkSkillLearningRate(workType);
     }
@@ -83,7 +82,7 @@ internal class PawnCache(Pawn pawn)
     /// </summary>
     /// <param name="workType">The type of work for which the passion level is being queried. Cannot be null.</param>
     /// <returns>The passion level of the pawn for the specified work type.</returns>
-    public Passion GetWorkPassion([NotNull] WorkTypeDef workType)
+    public Passion GetWorkPassion(WorkTypeDef workType)
     {
         return Work.GetWorkPassion(workType);
     }
@@ -94,7 +93,7 @@ internal class PawnCache(Pawn pawn)
     /// <param name="workType">The work type definition.</param>
     /// <returns>The priority value for the work type, or 0 if not set.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="workType" /> is null.</exception>
-    public int GetWorkPriority([NotNull] WorkTypeDef workType)
+    public int GetWorkPriority(WorkTypeDef workType)
     {
         if (workType == null) throw new ArgumentNullException(nameof(workType));
         return _workPriorities.TryGetValue(workType, out var priority) ? priority : 0;
@@ -105,7 +104,7 @@ internal class PawnCache(Pawn pawn)
     /// </summary>
     /// <param name="workType">The work type definition.</param>
     /// <returns>The average skill level for the work type.</returns>
-    public int GetWorkSkillLevel([NotNull] WorkTypeDef workType)
+    public int GetWorkSkillLevel(WorkTypeDef workType)
     {
         return Skill.GetWorkSkillLevel(workType);
     }
@@ -118,7 +117,7 @@ internal class PawnCache(Pawn pawn)
     ///     <c>true</c> if the work type is active for the pawn; otherwise, <c>false</c>.
     /// </returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="workType" /> is null.</exception>
-    public bool IsActiveWork([NotNull] WorkTypeDef workType)
+    public bool IsActiveWork(WorkTypeDef workType)
     {
         if (workType == null) throw new ArgumentNullException(nameof(workType));
         return _workPriorities.TryGetValue(workType, out var priority) && priority > 0;
@@ -133,14 +132,13 @@ internal class PawnCache(Pawn pawn)
     ///     <c>true</c> if the work type is allowed for the pawn; otherwise, <c>false</c>.
     /// </returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="workType" /> is <c>null</c>.</exception>
-    public bool IsAllowedWorker([NotNull] WorkTypeDef workType)
+    public bool IsAllowedWorker(WorkTypeDef workType)
     {
         if (workType == null) throw new ArgumentNullException(nameof(workType));
         if (_allowedWorkTypes.TryGetValue(workType, out var allowed)) return allowed;
         if (Pawn.WorkTypeIsDisabled(workType))
             allowed = false;
-        else if (WorkManagerGameComponent.Instance.CombinedRulesDict.TryGetValue(workType,
-                     out var rule))
+        else if (WorkManagerGameComponent.Instance.CombinedRulesDict.TryGetValue(workType, out var rule))
             allowed = rule.IsAllowedWorker(Pawn);
         else
             allowed = false;
@@ -155,7 +153,7 @@ internal class PawnCache(Pawn pawn)
     /// <returns>
     ///     <c>true</c> if the work type is bad for the pawn; otherwise, <c>false</c>.
     /// </returns>
-    public bool IsBadWork([NotNull] WorkTypeDef workType)
+    public bool IsBadWork(WorkTypeDef workType)
     {
         return Work.IsBadWork(workType);
     }
@@ -170,7 +168,7 @@ internal class PawnCache(Pawn pawn)
     ///         langword="false" />
     ///     .
     /// </returns>
-    public bool IsDangerousWork([NotNull] WorkTypeDef workType)
+    public bool IsDangerousWork(WorkTypeDef workType)
     {
         return Work.IsDangerousWork(workType);
     }
@@ -184,7 +182,7 @@ internal class PawnCache(Pawn pawn)
     ///     <c>true</c> if the work type is managed for the pawn; otherwise, <c>false</c>.
     /// </returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="workType" /> is null.</exception>
-    public bool IsManagedWork([NotNull] WorkTypeDef workType)
+    public bool IsManagedWork(WorkTypeDef workType)
     {
         if (workType == null) throw new ArgumentNullException(nameof(workType));
         if (_managedWorkTypes.TryGetValue(workType, out var work)) return work;
@@ -222,7 +220,7 @@ internal class PawnCache(Pawn pawn)
     /// <param name="priority">The priority level to assign to the specified work type. Must be a non-negative integer.</param>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="workType" /> is <see langword="null" />.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="priority" /> is less than 0.</exception>
-    public void SetWorkPriority([NotNull] WorkTypeDef workType, int priority)
+    public void SetWorkPriority(WorkTypeDef workType, int priority)
     {
         if (workType == null) throw new ArgumentNullException(nameof(workType));
         if (priority < 0) throw new ArgumentOutOfRangeException(nameof(priority));
@@ -249,8 +247,7 @@ internal class PawnCache(Pawn pawn)
         var timetable = Pawn.timetable;
         for (var hour = 0; hour < 24; hour++)
         {
-            _workHours[hour] = timetable != null &&
-                               timetable.GetAssignment(hour) == TimeAssignmentDefOf.Work;
+            _workHours[hour] = timetable != null && timetable.GetAssignment(hour) == TimeAssignmentDefOf.Work;
         }
         Work.Update(time);
         Skill.Update(time);

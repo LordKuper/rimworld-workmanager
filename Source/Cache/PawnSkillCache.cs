@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using LordKuper.Common;
 using LordKuper.Common.Cache;
 using RimWorld;
@@ -37,7 +36,7 @@ internal class PawnSkillCache(Pawn pawn) : TimedCache(1f)
     /// <param name="skill">The skill definition.</param>
     /// <returns>The learning rate factor for the skill.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="skill" /> is null.</exception>
-    private float GetSkillLearningRate([NotNull] SkillDef skill)
+    private float GetSkillLearningRate(SkillDef skill)
     {
         if (skill == null) throw new ArgumentNullException(nameof(skill));
         if (pawn.skills == null) return 0f;
@@ -53,7 +52,7 @@ internal class PawnSkillCache(Pawn pawn) : TimedCache(1f)
     /// <param name="workType">The work type definition.</param>
     /// <returns>The average learning rate factor for the work type.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="workType" /> is null.</exception>
-    public float GetWorkSkillLearningRate([NotNull] WorkTypeDef workType)
+    public float GetWorkSkillLearningRate(WorkTypeDef workType)
     {
         if (workType == null) throw new ArgumentNullException(nameof(workType));
         if (_workSkillLearningRates.TryGetValue(workType, out var rate)) return rate;
@@ -80,7 +79,7 @@ internal class PawnSkillCache(Pawn pawn) : TimedCache(1f)
     /// <param name="workType">The work type definition.</param>
     /// <returns>The average skill level for the work type, rounded down.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="workType" /> is null.</exception>
-    public int GetWorkSkillLevel([NotNull] WorkTypeDef workType)
+    public int GetWorkSkillLevel(WorkTypeDef workType)
     {
         if (workType == null) throw new ArgumentNullException(nameof(workType));
         if (pawn.skills == null) return 0;

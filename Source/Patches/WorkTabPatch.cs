@@ -22,26 +22,22 @@ public static class WorkTabPatch
     ///     Applies all Harmony patches related to the WorkTab mod.
     /// </summary>
     /// <param name="harmony">The Harmony instance to use for patching.</param>
-    internal static void Apply([NotNull] Harmony harmony)
+    internal static void Apply(Harmony harmony)
     {
         _ = harmony.Patch(
-            AccessTools.Method(AccessTools.TypeByName("WorkTab.MainTabWindow_WorkTab"),
-                "DoWindowContents"),
+            AccessTools.Method(AccessTools.TypeByName("WorkTab.MainTabWindow_WorkTab"), "DoWindowContents"),
             postfix: new HarmonyMethod(typeof(WorkTabPatch), nameof(DoWindowContentsPostfix)));
         _ = harmony.Patch(
-            AccessTools.Method(AccessTools.TypeByName("WorkTab.PawnColumnWorker_WorkType"),
-                "GetMinHeaderHeight"),
+            AccessTools.Method(AccessTools.TypeByName("WorkTab.PawnColumnWorker_WorkType"), "GetMinHeaderHeight"),
             postfix: new HarmonyMethod(typeof(WorkTabPatch), nameof(GetMinHeaderHeightPostfix)));
-        _ = harmony.Patch(
-            AccessTools.Method(AccessTools.TypeByName("WorkTab.PawnColumnWorker_WorkType"),
-                "DoHeader"), new HarmonyMethod(typeof(WorkTabPatch), nameof(DoHeaderPrefix)));
+        _ = harmony.Patch(AccessTools.Method(AccessTools.TypeByName("WorkTab.PawnColumnWorker_WorkType"), "DoHeader"),
+            new HarmonyMethod(typeof(WorkTabPatch), nameof(DoHeaderPrefix)));
         _ = harmony.Patch(
             AccessTools.Method(AccessTools.TypeByName("WorkTab.PawnColumnWorker_WorkType"),
                 "HandleInteractionsDetailed"),
             new HarmonyMethod(typeof(WorkTabPatch), nameof(HandleInteractionsDetailedPrefix)));
         _ = harmony.Patch(
-            AccessTools.Method(AccessTools.TypeByName("WorkTab.PawnColumnWorker_WorkType"),
-                "DrawWorkTypeBoxFor"),
+            AccessTools.Method(AccessTools.TypeByName("WorkTab.PawnColumnWorker_WorkType"), "DrawWorkTypeBoxFor"),
             postfix: new HarmonyMethod(typeof(WorkTabPatch), nameof(DrawWorkTypeBoxForPostfix)));
     }
 
@@ -56,16 +52,13 @@ public static class WorkTabPatch
     public static void DoHeaderPrefix(PawnColumnWorker __instance, ref Rect rect)
     {
         const int iconSize = 16;
-        Rect buttonRect = new(rect.center.x - iconSize / 2, rect.yMax - iconSize - 4, iconSize,
-            iconSize);
+        Rect buttonRect = new(rect.center.x - iconSize / 2, rect.yMax - iconSize - 4, iconSize, iconSize);
         var component = WorkManagerGameComponent.Instance;
         if (component == null) return;
-        Buttons.DoIconButtonToggle(buttonRect,
-            () => component.GetWorkTypeEnabled(__instance.def.workType),
+        Buttons.DoIconButtonToggle(buttonRect, () => component.GetWorkTypeEnabled(__instance.def.workType),
             newValue => component.SetWorkTypeEnabled(__instance.def.workType, newValue),
-            Resources.Strings.WorkTypeDisableTooltip,
-            Resources.Textures.WorkTypeToggleButtonEnabled, Resources.Strings.WorkTypeEnableTooltip,
-            Resources.Textures.WorkTypeToggleButtonDisabled);
+            Resources.Strings.WorkTypeDisableTooltip, Resources.Textures.WorkTypeToggleButtonEnabled,
+            Resources.Strings.WorkTypeEnableTooltip, Resources.Textures.WorkTypeToggleButtonDisabled);
         rect = new Rect(rect.x, rect.y, rect.width, rect.height - HeaderHeightExtension);
     }
 
@@ -85,9 +78,8 @@ public static class WorkTabPatch
     {
         var component = WorkManagerGameComponent.Instance;
         if (component == null) return;
-        var buttonRow = new Rect(rect.xMin + Layout.ElementGapTiny,
-            rect.yMin + Layout.ElementGapTiny, rect.width - Layout.ElementGapTiny * 2,
-            Buttons.IconButtonSize);
+        var buttonRow = new Rect(rect.xMin + Layout.ElementGapTiny, rect.yMin + Layout.ElementGapTiny,
+            rect.width - Layout.ElementGapTiny * 2, Buttons.IconButtonSize);
         var buttonRect = Layout.GetLeftColumnRect(buttonRow, Buttons.IconButtonSize, out buttonRow);
         Buttons.DoIconButtonToggle(buttonRect, () => component.PriorityManagementEnabled,
             component.SetPriorityManagementEnabled, Resources.Strings.GlobalDisableTooltip,
@@ -96,8 +88,7 @@ public static class WorkTabPatch
         Layout.GetLeftColumnRect(buttonRow, Layout.ElementGapSmall, out buttonRow);
         buttonRect = Layout.GetLeftColumnRect(buttonRow, Buttons.IconButtonSize, out buttonRow);
         Buttons.DoIconButton(buttonRect,
-            new IconButton(Resources.Textures.RefreshButton,
-                WorkManagerGameComponent.ForceUpdateAssignments,
+            new IconButton(Resources.Textures.RefreshButton, WorkManagerGameComponent.ForceUpdateAssignments,
                 Resources.Strings.UpdateNowTooltip));
         Layout.GetLeftColumnRect(buttonRow, Layout.ElementGapSmall, out buttonRow);
         buttonRect = Layout.GetLeftColumnRect(buttonRow, Buttons.IconButtonSize, out buttonRow);
@@ -118,8 +109,7 @@ public static class WorkTabPatch
     public static void DrawWorkTypeBoxForPostfix(Rect box, Pawn pawn, WorkTypeDef worktype)
     {
         var component = WorkManagerGameComponent.Instance;
-        if (component == null || !component.PriorityManagementEnabled ||
-            !Find.PlaySettings.useWorkPriorities) return;
+        if (component == null || !component.PriorityManagementEnabled || !Find.PlaySettings.useWorkPriorities) return;
         var enabled = component.GetPawnWorkTypeEnabled(pawn, worktype);
         if (!enabled)
         {
@@ -153,16 +143,13 @@ public static class WorkTabPatch
     /// <param name="pawn">The pawn being interacted with.</param>
     [UsedImplicitly]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public static void HandleInteractionsDetailedPrefix(PawnColumnWorker __instance, Rect rect,
-        Pawn pawn)
+    public static void HandleInteractionsDetailedPrefix(PawnColumnWorker __instance, Rect rect, Pawn pawn)
     {
         var component = WorkManagerGameComponent.Instance;
-        if (component == null || !component.PriorityManagementEnabled ||
-            !Find.PlaySettings.useWorkPriorities) return;
+        if (component == null || !component.PriorityManagementEnabled || !Find.PlaySettings.useWorkPriorities) return;
         var workType = __instance.def.workType;
         var enabled = component.GetPawnWorkTypeEnabled(pawn, workType);
-        if (Event.current.type == EventType.MouseDown && Mouse.IsOver(rect) &&
-            Event.current.button == 2)
+        if (Event.current.type == EventType.MouseDown && Mouse.IsOver(rect) && Event.current.button == 2)
             component.SetPawnWorkTypeEnabled(pawn, workType, !enabled);
     }
 }

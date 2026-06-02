@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using JetBrains.Annotations;
 using UnityEngine;
 using Verse;
 using static LordKuper.Common.Resources.Strings;
@@ -11,38 +10,26 @@ internal static class Resources
 {
     internal static class Strings
     {
-        internal static readonly string GlobalDisableTooltip =
-            "WorkManager.GlobalDisableTooltip".Translate();
-
-        internal static readonly string GlobalEnableTooltip =
-            "WorkManager.GlobalEnableTooltip".Translate();
-
-        internal static readonly string ModTitle =
-            $"{WorkManagerMod.ModId}.{nameof(ModTitle)}".Translate();
+        internal static readonly string GlobalDisableTooltip = "WorkManager.GlobalDisableTooltip".Translate();
+        internal static readonly string GlobalEnableTooltip = "WorkManager.GlobalEnableTooltip".Translate();
+        internal static readonly string ModTitle = $"{WorkManagerMod.ModId}.{nameof(ModTitle)}".Translate();
 
         internal static readonly string OpenSettingsTooltip =
             $"{WorkManagerMod.ModId}.{nameof(OpenSettingsTooltip)}".Translate();
 
-        internal static readonly string PawnDisableTooltip =
-            "WorkManager.PawnDisableTooltip".Translate();
-
-        internal static readonly string PawnEnableTooltip =
-            "WorkManager.PawnEnableTooltip".Translate();
+        internal static readonly string PawnDisableTooltip = "WorkManager.PawnDisableTooltip".Translate();
+        internal static readonly string PawnEnableTooltip = "WorkManager.PawnEnableTooltip".Translate();
 
         internal static readonly string PawnScheduleDisableTooltip =
             "WorkManager.PawnScheduleDisableTooltip".Translate();
 
-        internal static readonly string PawnScheduleEnableTooltip =
-            "WorkManager.PawnScheduleEnableTooltip".Translate();
+        internal static readonly string PawnScheduleEnableTooltip = "WorkManager.PawnScheduleEnableTooltip".Translate();
 
         internal static readonly string UpdateNowTooltip =
             $"{WorkManagerMod.ModId}.{nameof(UpdateNowTooltip)}".Translate();
 
-        internal static readonly string WorkTypeDisableTooltip =
-            "WorkManager.WorkTypeDisableTooltip".Translate();
-
-        internal static readonly string WorkTypeEnableTooltip =
-            "WorkManager.WorkTypeEnableTooltip".Translate();
+        internal static readonly string WorkTypeDisableTooltip = "WorkManager.WorkTypeDisableTooltip".Translate();
+        internal static readonly string WorkTypeEnableTooltip = "WorkManager.WorkTypeEnableTooltip".Translate();
 
         /// <summary>
         ///     Provides localized labels and tooltips for <see cref="WorkManager.DedicatedWorkerMode" /> values.
@@ -52,14 +39,12 @@ internal static class Resources
             /// <summary>
             ///     Caches translated labels for each <see cref="WorkManager.DedicatedWorkerMode" />.
             /// </summary>
-            private static readonly ConcurrentDictionary<WorkManager.DedicatedWorkerMode, string>
-                Labels = new();
+            private static readonly ConcurrentDictionary<WorkManager.DedicatedWorkerMode, string> Labels = new();
 
             /// <summary>
             ///     Caches translated tooltips for each <see cref="WorkManager.DedicatedWorkerMode" />.
             /// </summary>
-            private static readonly ConcurrentDictionary<WorkManager.DedicatedWorkerMode, string>
-                Tooltips = new();
+            private static readonly ConcurrentDictionary<WorkManager.DedicatedWorkerMode, string> Tooltips = new();
 
             /// <summary>
             ///     Gets the localized label for the specified <see cref="WorkManager.DedicatedWorkerMode" />.
@@ -85,8 +70,7 @@ internal static class Resources
             public static string GetDedicatedWorkerModeLabel(WorkManager.DedicatedWorkerMode mode)
             {
                 return Labels.GetOrAdd(mode,
-                    dwm => $"{WorkManagerMod.ModId}.{nameof(DedicatedWorkerMode)}.{dwm}.Label"
-                        .Translate());
+                    dwm => $"{WorkManagerMod.ModId}.{nameof(DedicatedWorkerMode)}.{dwm}.Label".Translate());
             }
 
             /// <summary>
@@ -94,8 +78,7 @@ internal static class Resources
             /// </summary>
             /// <param name="mode">The dedicated worker mode, or <c>null</c> for the undefined setting tooltip.</param>
             /// <returns>The translated tooltip string.</returns>
-            public static string GetDedicatedWorkerModeTooltip(
-                WorkManager.DedicatedWorkerMode? mode)
+            public static string GetDedicatedWorkerModeTooltip(WorkManager.DedicatedWorkerMode? mode)
             {
                 return mode == null
                     ? Settings.WorkTypes.WorkTypeRuleUndefinedSettingTooltip
@@ -116,8 +99,7 @@ internal static class Resources
             public static string GetDedicatedWorkerModeTooltip(WorkManager.DedicatedWorkerMode mode)
             {
                 return Tooltips.GetOrAdd(mode,
-                    dwm => $"{WorkManagerMod.ModId}.{nameof(DedicatedWorkerMode)}.{dwm}.Tooltip"
-                        .Translate());
+                    dwm => $"{WorkManagerMod.ModId}.{nameof(DedicatedWorkerMode)}.{dwm}.Tooltip".Translate());
             }
         }
 
@@ -125,8 +107,7 @@ internal static class Resources
         {
             internal static class Schedule
             {
-                internal static readonly string AddWorkShift =
-                    "WorkManager.Settings_Schedule_AddWorkShift".Translate();
+                internal static readonly string AddWorkShift = "WorkManager.Settings_Schedule_AddWorkShift".Translate();
 
                 internal static readonly string ColonistWorkShifts =
                     "WorkManager.Settings_Schedule_ColonistWorkShifts".Translate();
@@ -152,8 +133,7 @@ internal static class Resources
                 internal static readonly string ResetWorkShifts =
                     "WorkManager.Settings_Schedule_ResetWorkShifts".Translate();
 
-                internal static readonly string Title =
-                    "WorkManager.Settings_Schedule_Title".Translate();
+                internal static readonly string Title = "WorkManager.Settings_Schedule_Title".Translate();
 
                 internal static readonly string UpdateFrequency =
                     "WorkManager.Settings_Schedule_UpdateFrequency".Translate();
@@ -174,8 +154,7 @@ internal static class Resources
                     "WorkManager.Settings_Schedule_WorkShiftThresholdColumnHeader".Translate();
 
                 internal static readonly string WorkShiftThresholdColumnHeaderTooltip =
-                    "WorkManager.Settings_Schedule_WorkShiftThresholdColumnHeaderTooltip"
-                        .Translate();
+                    "WorkManager.Settings_Schedule_WorkShiftThresholdColumnHeaderTooltip".Translate();
             }
 
             internal static class WorkPriorities
@@ -293,8 +272,7 @@ internal static class Resources
                         .Translate();
 
                 internal static readonly string Title =
-                    $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkPriorities)}.{nameof(Title)}"
-                        .Translate();
+                    $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkPriorities)}.{nameof(Title)}".Translate();
 
                 internal static readonly string UpdateFrequency =
                     $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkPriorities)}.{nameof(UpdateFrequency)}"
@@ -347,12 +325,12 @@ internal static class Resources
 
             internal static class WorkTypes
             {
-                private static string _allowDedicatedWorkerTooltip;
-                private static string _allowDedicatedWorkerTriStateTooltip;
-                private static string _assignEveryoneTooltip;
-                private static string _assignEveryoneTriStateTooltip;
-                private static string _ensureWorkerAssignedTooltip;
-                private static string _ensureWorkerAssignedTriStateTooltip;
+                private static string? _allowDedicatedWorkerTooltip;
+                private static string? _allowDedicatedWorkerTriStateTooltip;
+                private static string? _assignEveryoneTooltip;
+                private static string? _assignEveryoneTriStateTooltip;
+                private static string? _ensureWorkerAssignedTooltip;
+                private static string? _ensureWorkerAssignedTriStateTooltip;
 
                 internal static readonly string AddWorkTypeTooltip =
                     $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(AddWorkTypeTooltip)}"
@@ -495,8 +473,7 @@ internal static class Resources
                         .Translate();
 
                 internal static readonly string Title =
-                    $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(Title)}"
-                        .Translate();
+                    $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(Title)}".Translate();
 
                 internal static readonly string WorkTypeCountFactorLabel =
                     $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(WorkTypeCountFactorLabel)}"
@@ -542,36 +519,31 @@ internal static class Resources
                     $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(WorkTypeRuleUndefinedSettingTooltip)}"
                         .Translate();
 
-                [NotNull]
                 private static string AppendUndefinedSettingTooltip(string tooltip)
                 {
                     return
                         $"{tooltip}{Environment.NewLine}{MultiCheckboxStates.Partial}: {WorkTypeRuleUndefinedSettingTooltip}";
                 }
 
-                [NotNull]
                 public static string GetAllowDedicatedWorkerTooltip(bool triState)
                 {
                     if (!triState)
-                        return _allowDedicatedWorkerTooltip ??= string.Concat(
-                            MultiCheckboxStates.On, ": ", AllowDedicatedWorkerOnTooltip,
-                            Environment.NewLine, MultiCheckboxStates.Off, ": ",
+                        return _allowDedicatedWorkerTooltip ??= string.Concat(MultiCheckboxStates.On, ": ",
+                            AllowDedicatedWorkerOnTooltip, Environment.NewLine, MultiCheckboxStates.Off, ": ",
                             AllowDedicatedWorkerOffTooltip);
                     if (_allowDedicatedWorkerTriStateTooltip != null)
                         return _allowDedicatedWorkerTriStateTooltip;
                     var baseTooltip = GetAllowDedicatedWorkerTooltip(false);
-                    _allowDedicatedWorkerTriStateTooltip =
-                        AppendUndefinedSettingTooltip(baseTooltip);
+                    _allowDedicatedWorkerTriStateTooltip = AppendUndefinedSettingTooltip(baseTooltip);
                     return _allowDedicatedWorkerTriStateTooltip;
                 }
 
-                [NotNull]
                 public static string GetAssignEveryoneTooltip(bool triState)
                 {
                     if (!triState)
-                        return _assignEveryoneTooltip ??= string.Concat(MultiCheckboxStates.On,
-                            ": ", AssignEveryoneOnTooltip, Environment.NewLine,
-                            MultiCheckboxStates.Off, ": ", AssignEveryoneOffTooltip);
+                        return _assignEveryoneTooltip ??= string.Concat(MultiCheckboxStates.On, ": ",
+                            AssignEveryoneOnTooltip, Environment.NewLine, MultiCheckboxStates.Off, ": ",
+                            AssignEveryoneOffTooltip);
                     if (_assignEveryoneTriStateTooltip != null)
                         return _assignEveryoneTriStateTooltip;
                     var baseTooltip = GetAssignEveryoneTooltip(false);
@@ -579,19 +551,16 @@ internal static class Resources
                     return _assignEveryoneTriStateTooltip;
                 }
 
-                [NotNull]
                 public static string GetEnsureWorkerAssignedTooltip(bool triState)
                 {
                     if (!triState)
-                        return _ensureWorkerAssignedTooltip ??= string.Concat(
-                            MultiCheckboxStates.On, ": ", EnsureWorkerAssignedOnTooltip,
-                            Environment.NewLine, MultiCheckboxStates.Off, ": ",
+                        return _ensureWorkerAssignedTooltip ??= string.Concat(MultiCheckboxStates.On, ": ",
+                            EnsureWorkerAssignedOnTooltip, Environment.NewLine, MultiCheckboxStates.Off, ": ",
                             EnsureWorkerAssignedOffTooltip);
                     if (_ensureWorkerAssignedTriStateTooltip != null)
                         return _ensureWorkerAssignedTriStateTooltip;
                     var baseTooltip = GetEnsureWorkerAssignedTooltip(false);
-                    _ensureWorkerAssignedTriStateTooltip =
-                        AppendUndefinedSettingTooltip(baseTooltip);
+                    _ensureWorkerAssignedTriStateTooltip = AppendUndefinedSettingTooltip(baseTooltip);
                     return _ensureWorkerAssignedTriStateTooltip;
                 }
             }
@@ -619,8 +588,7 @@ internal static class Resources
         internal static readonly Texture2D PrioritiesToggleButtonEnabled =
             ContentFinder<Texture2D>.Get("work-manager-priorities-on");
 
-        internal static readonly Texture2D RefreshButton =
-            ContentFinder<Texture2D>.Get("work-manager-refresh");
+        internal static readonly Texture2D RefreshButton = ContentFinder<Texture2D>.Get("work-manager-refresh");
 
         internal static readonly Texture2D ScheduleToggleButtonDisabled =
             ContentFinder<Texture2D>.Get("work-manager-schedule-off");
@@ -628,8 +596,7 @@ internal static class Resources
         internal static readonly Texture2D ScheduleToggleButtonEnabled =
             ContentFinder<Texture2D>.Get("work-manager-schedule-on");
 
-        internal static readonly Texture2D SettingsButton =
-            ContentFinder<Texture2D>.Get("work-manager-settings");
+        internal static readonly Texture2D SettingsButton = ContentFinder<Texture2D>.Get("work-manager-settings");
 
         internal static readonly Texture2D WorkTypeToggleButtonDisabled =
             ContentFinder<Texture2D>.Get("work-manager-work-type-off");

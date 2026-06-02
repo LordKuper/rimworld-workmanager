@@ -8,6 +8,10 @@ using Verse;
 
 namespace LordKuper.WorkManager;
 
+/// <summary>
+///     Map component that assigns pawn work schedules based on configured work shifts.
+/// </summary>
+/// <param name="map">The map this component belongs to.</param>
 [UsedImplicitly]
 public class ScheduleUpdater(Map map) : MapComponent(map)
 {
@@ -41,11 +45,11 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
     /// </summary>
     private const int UpdateTickMask = 0x3F;
 
-    private static TraitDef _nightOwlTrait;
+    private static TraitDef? _nightOwlTrait;
     private readonly Dictionary<Pawn, WorkShift> _workers = [];
     private RimWorldTime _scheduleUpdateTime = new(0);
 
-    private static TraitDef NightOwlTrait =>
+    private static TraitDef? NightOwlTrait =>
         _nightOwlTrait ??= DefDatabase<TraitDef>.GetNamedSilentFail("NightOwl");
 
     /// <summary>
@@ -56,8 +60,8 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
     /// <param name="shifts">The eligible shifts for the group.</param>
     /// <param name="relevantSkills">Skills considered for coverage.</param>
     /// <param name="maxLevels">Maximum colony level per skill, used for normalization.</param>
-    private void AssignGroup([NotNull] List<Pawn> pawns, List<WorkShift> shifts,
-        List<SkillDef> relevantSkills, Dictionary<SkillDef, int> maxLevels)
+    private void AssignGroup(List<Pawn> pawns, List<WorkShift> shifts, List<SkillDef> relevantSkills,
+        Dictionary<SkillDef, int> maxLevels)
     {
         if (pawns.Count == 0 || shifts.Count == 0) return;
         var shiftCount = shifts.Count;
@@ -70,9 +74,7 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
             foreach (var skill in relevantSkills)
             {
                 var max = maxLevels[skill];
-                var levelTerm = max > 0
-                    ? LevelWeight * (pawn.skills.GetSkill(skill).Level / (float)max)
-                    : 0f;
+                var levelTerm = max > 0 ? LevelWeight * (pawn.skills.GetSkill(skill).Level / (float)max) : 0f;
                 var learnTerm = LearnRateCoef * pawn.skills.GetSkill(skill).LearnRateFactor();
                 bySkill[skill] = levelTerm + learnTerm;
             }
@@ -83,8 +85,8 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
         var keyPawns = new Dictionary<SkillDef, HashSet<Pawn>>();
         foreach (var skill in relevantSkills)
         {
-            var top = pawns.OrderByDescending(pawn => scores[pawn][skill])
-                .ThenBy(pawn => pawn.thingIDNumber).Take(shiftCount);
+            var top = pawns.OrderByDescending(pawn => scores[pawn][skill]).ThenBy(pawn => pawn.thingIDNumber)
+                .Take(shiftCount);
             keyPawns[skill] = [.. top];
         }
 
@@ -102,9 +104,8 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
         foreach (var pawn in ordered)
         {
             var lovers = GetLovers(pawn);
-            var pawnKeySkills = relevantSkills.Where(skill => keyPawns[skill].Contains(pawn))
-                .ToList();
-            WorkShift bestShift = null;
+            var pawnKeySkills = relevantSkills.Where(skill => keyPawns[skill].Contains(pawn)).ToList();
+            WorkShift? bestShift = null;
             var bestScore = float.MinValue;
             foreach (var shift in shifts)
             {
@@ -159,8 +160,7 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
     /// </summary>
     /// <param name="pawn">The pawn whose lovers to resolve.</param>
     /// <returns>The distinct lover/partner pawns, or an empty list.</returns>
-    [NotNull]
-    private static List<Pawn> GetLovers([NotNull] Pawn pawn)
+    private static List<Pawn> GetLovers(Pawn pawn)
     {
         return pawn.relations?.DirectRelations.Where(relation => new[]
         {
@@ -172,7 +172,6 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
     ///     Gets the skills relevant to active (visible) work types.
     /// </summary>
     /// <returns>The distinct relevant skills.</returns>
-    [NotNull]
     private static List<SkillDef> GetRelevantSkills()
     {
         var skills = new HashSet<SkillDef>();
@@ -189,6 +188,9 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
         return [.. skills];
     }
 
+    /// <summary>
+    ///     Periodically updates pawn work schedules according to the configured update frequency.
+    /// </summary>
     public override void MapComponentTick()
     {
         base.MapComponentTick();
@@ -205,8 +207,7 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
 
     internal void UpdateNow()
     {
-        if (WorkManagerGameComponent.Instance == null ||
-            !WorkManagerMod.Settings.ManageWorkSchedule ||
+        if (WorkManagerGameComponent.Instance == null || !WorkManagerMod.Settings.ManageWorkSchedule ||
             !WorkManagerGameComponent.Instance.ScheduleManagementEnabled) return;
         _scheduleUpdateTime = RimWorldTime.GetHomeTime();
         UpdateSchedule();
@@ -241,19 +242,16 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
             }
             var colonistCount = allPawns.Count(pawn => !pawn.story.traits.HasTrait(NightOwlTrait));
             var nightOwlCount = allPawns.Count - colonistCount;
-            var scheduled = allPawns.Where(pawn =>
-                WorkManagerGameComponent.Instance.GetPawnScheduleEnabled(pawn)).ToList();
+            var scheduled = allPawns.Where(pawn => WorkManagerGameComponent.Instance.GetPawnScheduleEnabled(pawn))
+                .ToList();
 
             // Two independent groups: regular colonists and night owls.
-            AssignGroup(
-                scheduled.Where(pawn => !pawn.story.traits.HasTrait(NightOwlTrait)).ToList(),
-                WorkManagerMod.Settings.ColonistWorkShifts
-                    .Where(shift => shift.PawnThreshold <= colonistCount).ToList(), relevantSkills,
-                maxLevels);
+            AssignGroup(scheduled.Where(pawn => !pawn.story.traits.HasTrait(NightOwlTrait)).ToList(),
+                WorkManagerMod.Settings.ColonistWorkShifts.Where(shift => shift.PawnThreshold <= colonistCount)
+                    .ToList(), relevantSkills, maxLevels);
             AssignGroup(scheduled.Where(pawn => pawn.story.traits.HasTrait(NightOwlTrait)).ToList(),
-                WorkManagerMod.Settings.NightOwlWorkShifts
-                    .Where(shift => shift.PawnThreshold <= nightOwlCount).ToList(), relevantSkills,
-                maxLevels);
+                WorkManagerMod.Settings.NightOwlWorkShifts.Where(shift => shift.PawnThreshold <= nightOwlCount)
+                    .ToList(), relevantSkills, maxLevels);
             foreach (var worker in _workers)
             {
                 for (var hour = 0; hour < 24; hour++)
