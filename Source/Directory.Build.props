@@ -1,0 +1,12 @@
+<Project>
+	<PropertyGroup>
+		<RimWorldDir Condition="'$(RimWorldDir)' == '' AND '$(RIMWORLD_DIR)' != ''">$(RIMWORLD_DIR)</RimWorldDir>
+		<RimWorldDir Condition="'$(RimWorldDir)' == ''">d:\Games\SteamLibrary\steamapps\common\RimWorld</RimWorldDir>
+		<RimWorldManagedDir>$(RimWorldDir)\RimWorldWin64_Data\Managed</RimWorldManagedDir>
+	</PropertyGroup>
+	<PropertyGroup>
+		<LordKuperCommonDir Condition="'$(LordKuperCommonDir)' == '' AND '$(LORDKUPER_COMMON_DIR)' != ''">$(LORDKUPER_COMMON_DIR)</LordKuperCommonDir>
+		<LordKuperCommonDir Condition="'$(LordKuperCommonDir)' == ''">$(MSBuildThisFileDirectory)..\..\rimworld-common</LordKuperCommonDir>
+		<LordKuperCommonAssembliesDir>$(LordKuperCommonDir)\1.6\Assemblies</LordKuperCommonAssembliesDir>
+	</PropertyGroup>
+</Project>

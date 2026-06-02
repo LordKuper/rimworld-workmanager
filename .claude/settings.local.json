@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "PowerShell($ghPath = Get-Item \"C:\\\\Program Files\\\\GitHub CLI\\\\gh.exe\" -ErrorAction SilentlyContinue; if \\($ghPath\\) { $ghPath.FullName } else { \"not found\" })"
-    ]
-  }
-}
