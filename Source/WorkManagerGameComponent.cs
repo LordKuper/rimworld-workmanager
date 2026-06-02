@@ -23,8 +23,7 @@ public class WorkManagerGameComponent : GameComponent
     /// <summary>
     ///     Represents a collection of combined work type assignment rules, sorted according to a specified comparer.
     /// </summary>
-    internal readonly SortedSet<WorkTypeAssignmentRule> CombinedRules =
-        new(WorkTypeAssignmentRuleComparer);
+    internal readonly SortedSet<WorkTypeAssignmentRule> CombinedRules = new(WorkTypeAssignmentRuleComparer);
 
     /// <summary>
     ///     Dictionary for O(1) lookup of combined rules by work type definition.
@@ -47,8 +46,8 @@ public class WorkManagerGameComponent : GameComponent
     private Dictionary<Pawn, List<WorkTypeDef>> _disabledPawnWorkTypes = [];
 
     // Used only by Scribe to load/save _disabledPawnWorkTypes
-    private List<Pawn> _disabledPawnWorkTypesKeys;
-    private List<List<WorkTypeDef>> _disabledPawnWorkTypesValues;
+    private List<Pawn>? _disabledPawnWorkTypesKeys;
+    private List<List<WorkTypeDef>>? _disabledPawnWorkTypesValues;
 
     /// <summary>
     ///     Set of disabled work types.
@@ -115,7 +114,7 @@ public class WorkManagerGameComponent : GameComponent
     /// <summary>
     ///     Gets the singleton instance of the <see cref="WorkManagerGameComponent" /> class.
     /// </summary>
-    internal static WorkManagerGameComponent Instance { get; private set; }
+    internal static WorkManagerGameComponent Instance { get; private set; } = null!;
 
     /// <summary>
     ///     Gets a comparer for evaluating work type assignment rules.
@@ -133,11 +132,9 @@ public class WorkManagerGameComponent : GameComponent
         Scribe_Values.Look(ref ScheduleManagementEnabled, nameof(ScheduleManagementEnabled), true);
         Scribe_Collections.Look(ref _disabledWorkTypes, nameof(DisabledWorkTypes), LookMode.Def);
         Scribe_Collections.Look(ref _disabledPawns, nameof(DisabledPawns), LookMode.Reference);
-        Scribe_Collections.Look(ref _disabledPawnWorkTypes, nameof(DisabledPawnWorkTypes),
-            LookMode.Reference, LookMode.Def, ref _disabledPawnWorkTypesKeys,
-            ref _disabledPawnWorkTypesValues);
-        Scribe_Collections.Look(ref _disabledPawnSchedules, nameof(DisabledPawnSchedules),
-            LookMode.Reference);
+        Scribe_Collections.Look(ref _disabledPawnWorkTypes, nameof(DisabledPawnWorkTypes), LookMode.Reference,
+            LookMode.Def, ref _disabledPawnWorkTypesKeys, ref _disabledPawnWorkTypesValues);
+        Scribe_Collections.Look(ref _disabledPawnSchedules, nameof(DisabledPawnSchedules), LookMode.Reference);
     }
 
     /// <summary>
@@ -190,7 +187,7 @@ public class WorkManagerGameComponent : GameComponent
     /// <param name="pawn">The pawn to check.</param>
     /// <returns>True if enabled; otherwise, false.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="pawn" /> is null.</exception>
-    internal bool GetPawnEnabled([NotNull] Pawn pawn)
+    internal bool GetPawnEnabled(Pawn pawn)
     {
         if (pawn == null) throw new ArgumentNullException(nameof(pawn));
         _disabledPawns ??= [];
@@ -203,7 +200,7 @@ public class WorkManagerGameComponent : GameComponent
     /// <param name="pawn">The pawn to check.</param>
     /// <returns>True if enabled; otherwise, false.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="pawn" /> is null.</exception>
-    internal bool GetPawnScheduleEnabled([NotNull] Pawn pawn)
+    internal bool GetPawnScheduleEnabled(Pawn pawn)
     {
         if (pawn == null) throw new ArgumentNullException(nameof(pawn));
         _disabledPawnSchedules ??= [];
@@ -217,13 +214,12 @@ public class WorkManagerGameComponent : GameComponent
     /// <param name="workType">The work type to check.</param>
     /// <returns>True if enabled; otherwise, false.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="pawn" /> or <paramref name="workType" /> is null.</exception>
-    internal bool GetPawnWorkTypeEnabled([NotNull] Pawn pawn, [NotNull] WorkTypeDef workType)
+    internal bool GetPawnWorkTypeEnabled(Pawn pawn, WorkTypeDef workType)
     {
         if (pawn == null) throw new ArgumentNullException(nameof(pawn));
         if (workType == null) throw new ArgumentNullException(nameof(workType));
         _disabledPawnWorkTypes ??= [];
-        return !_disabledPawnWorkTypes.TryGetValue(pawn, out var workTypes) ||
-               !workTypes.Contains(workType);
+        return !_disabledPawnWorkTypes.TryGetValue(pawn, out var workTypes) || !workTypes.Contains(workType);
     }
 
     /// <summary>
@@ -232,7 +228,7 @@ public class WorkManagerGameComponent : GameComponent
     /// <param name="workType">The work type to check.</param>
     /// <returns>True if enabled; otherwise, false.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="workType" /> is null.</exception>
-    internal bool GetWorkTypeEnabled([NotNull] WorkTypeDef workType)
+    internal bool GetWorkTypeEnabled(WorkTypeDef workType)
     {
         if (workType == null) throw new ArgumentNullException(nameof(workType));
         _disabledWorkTypes ??= [];
@@ -255,7 +251,7 @@ public class WorkManagerGameComponent : GameComponent
     /// <param name="pawn">The pawn to modify.</param>
     /// <param name="enabled">True to enable; false to disable.</param>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="pawn" /> is null.</exception>
-    internal void SetPawnEnabled([NotNull] Pawn pawn, bool enabled)
+    internal void SetPawnEnabled(Pawn pawn, bool enabled)
     {
         if (pawn == null) throw new ArgumentNullException(nameof(pawn));
         _disabledPawns ??= [];
@@ -274,7 +270,7 @@ public class WorkManagerGameComponent : GameComponent
     /// <param name="pawn">The pawn to modify.</param>
     /// <param name="enabled">True to enable; false to disable.</param>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="pawn" /> is null.</exception>
-    internal void SetPawnScheduleEnabled([NotNull] Pawn pawn, bool enabled)
+    internal void SetPawnScheduleEnabled(Pawn pawn, bool enabled)
     {
         if (pawn == null) throw new ArgumentNullException(nameof(pawn));
         _disabledPawnSchedules ??= [];
@@ -294,8 +290,7 @@ public class WorkManagerGameComponent : GameComponent
     /// <param name="workType">The work type to modify.</param>
     /// <param name="enabled">True to enable; false to disable.</param>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="pawn" /> or <paramref name="workType" /> is null.</exception>
-    internal void SetPawnWorkTypeEnabled([NotNull] Pawn pawn, [NotNull] WorkTypeDef workType,
-        bool enabled)
+    internal void SetPawnWorkTypeEnabled(Pawn pawn, WorkTypeDef workType, bool enabled)
     {
         if (pawn == null) throw new ArgumentNullException(nameof(pawn));
         if (workType == null) throw new ArgumentNullException(nameof(workType));
@@ -341,7 +336,7 @@ public class WorkManagerGameComponent : GameComponent
     /// <param name="workType">The work type to modify.</param>
     /// <param name="enabled">True to enable; false to disable.</param>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="workType" /> is null.</exception>
-    internal void SetWorkTypeEnabled([NotNull] WorkTypeDef workType, bool enabled)
+    internal void SetWorkTypeEnabled(WorkTypeDef workType, bool enabled)
     {
         if (workType == null) throw new ArgumentNullException(nameof(workType));
         _disabledWorkTypes ??= [];
@@ -381,7 +376,7 @@ public class WorkManagerGameComponent : GameComponent
         foreach (var rule in CombinedRules)
         {
             if (rule.AssignEveryone == true)
-                _assignEveryoneWorkTypes.Add(rule.Def, rule.AssignEveryonePriority);
+                _assignEveryoneWorkTypes.Add(rule.Def!, rule.AssignEveryonePriority);
         }
     }
 
@@ -402,7 +397,7 @@ public class WorkManagerGameComponent : GameComponent
         CombinedRules.Clear();
         CombinedRulesDict.Clear();
         var rules = WorkManagerMod.Settings.WorkTypeRules;
-        WorkTypeAssignmentRule defaultRule = null;
+        WorkTypeAssignmentRule? defaultRule = null;
         var rulesCount = rules.Count;
         for (var i = 0; i < rulesCount; i++)
         {
@@ -447,7 +442,7 @@ public class WorkManagerGameComponent : GameComponent
         foreach (var rule in CombinedRules)
         {
             if (rule.DedicatedWorkerSettings.AllowDedicated == true)
-                DedicatedWorkTypes.Add(rule.Def);
+                DedicatedWorkTypes.Add(rule.Def!);
         }
     }
 
@@ -477,20 +472,18 @@ public class WorkManagerGameComponent : GameComponent
     {
         _disabledPawns?.RemoveWhere(pawn => pawn?.Destroyed ?? true);
         _disabledPawnSchedules?.RemoveWhere(pawn => pawn?.Destroyed ?? true);
-        _disabledWorkTypes?.RemoveWhere(workType =>
-            !DefDatabase<WorkTypeDef>.AllDefsListForReading.Contains(workType));
+        _disabledWorkTypes?.RemoveWhere(workType => !DefDatabase<WorkTypeDef>.AllDefsListForReading.Contains(workType));
         if (_disabledPawnWorkTypes != null)
         {
-            var pawnsToRemove = _disabledPawnWorkTypes.Where(kv => kv.Key?.Destroyed ?? true)
-                .Select(kv => kv.Key).ToList();
+            var pawnsToRemove = _disabledPawnWorkTypes.Where(kv => kv.Key?.Destroyed ?? true).Select(kv => kv.Key)
+                .ToList();
             foreach (var pawn in pawnsToRemove)
             {
                 _disabledPawnWorkTypes.Remove(pawn);
             }
             foreach (var kv in _disabledPawnWorkTypes)
             {
-                kv.Value.RemoveAll(workType =>
-                    !DefDatabase<WorkTypeDef>.AllDefsListForReading.Contains(workType));
+                kv.Value.RemoveAll(workType => !DefDatabase<WorkTypeDef>.AllDefsListForReading.Contains(workType));
             }
         }
     }

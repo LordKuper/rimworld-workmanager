@@ -1,5 +1,4 @@
 ﻿using System;
-using JetBrains.Annotations;
 
 namespace LordKuper.WorkManager;
 
@@ -10,7 +9,7 @@ internal static class Logger
     /// </summary>
     /// <param name="message">The error message to log.</param>
     /// <param name="exception">The exception associated with the error, or <c>null</c> if none.</param>
-    internal static void LogError(string message, [CanBeNull] Exception exception = null)
+    internal static void LogError(string message, Exception? exception = null)
     {
         Common.Logger.LogError(WorkManagerMod.ModId, message, exception);
     }
@@ -29,7 +28,7 @@ internal static class Logger
     /// </summary>
     /// <param name="message">The warning message to log.</param>
     /// <param name="exception">The exception associated with the warning, or <c>null</c> if none.</param>
-    internal static void LogWarning(string message, [CanBeNull] Exception exception = null)
+    internal static void LogWarning(string message, Exception? exception = null)
     {
         Common.Logger.LogWarning(WorkManagerMod.ModId, message, exception);
     }

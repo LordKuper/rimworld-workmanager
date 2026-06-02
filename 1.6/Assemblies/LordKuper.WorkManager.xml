@@ -1,0 +1,2338 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>LordKuper.WorkManager</name>
+    </assembly>
+    <members>
+        <member name="T:WorkManager.AssignEveryoneWorkType">
+            <summary>
+                Represents a legacy work type entry that is assigned to everyone with a specific priority.
+            </summary>
+        </member>
+        <member name="F:WorkManager.AssignEveryoneWorkType.AllowDesignated">
+            <summary>
+                Indicates whether designated pawns are allowed for this work type.
+            </summary>
+        </member>
+        <member name="F:WorkManager.AssignEveryoneWorkType.Priority">
+            <summary>
+                The priority assigned to this work type.
+            </summary>
+        </member>
+        <member name="F:WorkManager.AssignEveryoneWorkType.WorkTypeDefName">
+            <summary>
+                The name of the work type definition.
+            </summary>
+        </member>
+        <member name="M:WorkManager.AssignEveryoneWorkType.ExposeData">
+            <summary>
+                Serializes and deserializes the work type entry data.
+            </summary>
+        </member>
+        <member name="T:LordKuper.WorkManager.Cache.PawnCache">
+            <summary>
+                Caches work and skill information for a specific pawn, including work priorities,
+                managed work types, and capability status. Provides efficient access to work-related
+                data and supports periodic cache updates.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Cache.PawnCache.#ctor(Verse.Pawn)">
+            <summary>
+                Caches work and skill information for a specific pawn, including work priorities,
+                managed work types, and capability status. Provides efficient access to work-related
+                data and supports periodic cache updates.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Cache.PawnCache._allowedWorkTypes">
+            <summary>
+                Dictionary of work types and whether they are allowed for the pawn.
+                The key is the <see cref="T:Verse.WorkTypeDef" />, and the value indicates if it is allowed.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Cache.PawnCache._managedWorkTypes">
+            <summary>
+                Stores whether each work type is managed for the pawn.
+                The key is the <see cref="T:Verse.WorkTypeDef" />, and the value indicates if it is managed.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Cache.PawnCache._workHours">
+            <summary>
+                For each hour of the day (0-23), indicates whether the pawn's timetable assigns it to work.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Cache.PawnCache._workPriorities">
+            <summary>
+                Stores the priority for each work type for the pawn.
+                The key is the <see cref="T:Verse.WorkTypeDef" />, and the value is the priority.
+            </summary>
+        </member>
+        <member name="P:LordKuper.WorkManager.Cache.PawnCache.IdleSince">
+            <summary>
+                Gets or sets the time since the pawn became idle.
+            </summary>
+        </member>
+        <member name="P:LordKuper.WorkManager.Cache.PawnCache.IsCapable">
+            <summary>
+                Gets a value indicating whether the pawn is currently capable of work.
+            </summary>
+        </member>
+        <member name="P:LordKuper.WorkManager.Cache.PawnCache.IsManaged">
+            <summary>
+                Gets a value indicating whether the pawn is managed by the work manager.
+            </summary>
+        </member>
+        <member name="P:LordKuper.WorkManager.Cache.PawnCache.Pawn">
+            <summary>
+                Gets the pawn associated with this cache.
+            </summary>
+        </member>
+        <member name="P:LordKuper.WorkManager.Cache.PawnCache.Skill">
+            <summary>
+                Gets the skill cache for the pawn.
+            </summary>
+        </member>
+        <member name="P:LordKuper.WorkManager.Cache.PawnCache.Work">
+            <summary>
+                Gets the work cache for the pawn.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Cache.PawnCache.GetLearningRate(Verse.WorkTypeDef)">
+            <summary>
+                Retrieves the learning rate for a specified type of work.
+            </summary>
+            <param name="workType">The type of work for which to retrieve the learning rate. This parameter cannot be null.</param>
+            <returns>The learning rate as a <see cref="T:System.Single" /> for the specified work type.</returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.Cache.PawnCache.GetWorkPassion(Verse.WorkTypeDef)">
+            <summary>
+                Retrieves the passion level of the pawn for the specified type of work.
+            </summary>
+            <param name="workType">The type of work for which the passion level is being queried. Cannot be null.</param>
+            <returns>The passion level of the pawn for the specified work type.</returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.Cache.PawnCache.GetWorkPriority(Verse.WorkTypeDef)">
+            <summary>
+                Gets the priority for the specified work type.
+            </summary>
+            <param name="workType">The work type definition.</param>
+            <returns>The priority value for the work type, or 0 if not set.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="workType" /> is null.</exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.Cache.PawnCache.GetWorkSkillLevel(Verse.WorkTypeDef)">
+            <summary>
+                Gets the average skill level for the specified work type.
+            </summary>
+            <param name="workType">The work type definition.</param>
+            <returns>The average skill level for the work type.</returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.Cache.PawnCache.IsActiveWork(Verse.WorkTypeDef)">
+            <summary>
+                Determines whether the specified work type is active for the pawn (priority &gt; 0).
+            </summary>
+            <param name="workType">The work type definition.</param>
+            <returns>
+                <c>true</c> if the work type is active for the pawn; otherwise, <c>false</c>.
+            </returns>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="workType" /> is null.</exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.Cache.PawnCache.IsAllowedWorker(Verse.WorkTypeDef)">
+            <summary>
+                Determines whether the specified work type is allowed for the pawn.
+                Results are cached for performance.
+            </summary>
+            <param name="workType">The work type to check.</param>
+            <returns>
+                <c>true</c> if the work type is allowed for the pawn; otherwise, <c>false</c>.
+            </returns>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="workType" /> is <c>null</c>.</exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.Cache.PawnCache.IsBadWork(Verse.WorkTypeDef)">
+            <summary>
+                Determines whether the specified work type is considered "bad" for the pawn.
+            </summary>
+            <param name="workType">The work type definition.</param>
+            <returns>
+                <c>true</c> if the work type is bad for the pawn; otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.Cache.PawnCache.IsDangerousWork(Verse.WorkTypeDef)">
+            <summary>
+                Determines whether the specified work type is considered dangerous.
+            </summary>
+            <param name="workType">The work type to evaluate. This parameter cannot be null.</param>
+            <returns>
+                <see langword="true" /> if the specified work type is classified as dangerous;  otherwise,
+                <see
+                    langword="false" />
+                .
+            </returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.Cache.PawnCache.IsManagedWork(Verse.WorkTypeDef)">
+            <summary>
+                Determines whether the specified work type is managed for the pawn.
+                Results are cached for performance.
+            </summary>
+            <param name="workType">The work type definition.</param>
+            <returns>
+                <c>true</c> if the work type is managed for the pawn; otherwise, <c>false</c>.
+            </returns>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="workType" /> is null.</exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.Cache.PawnCache.IsWorkingHour(System.Int32)">
+            <summary>
+                Determines whether the pawn's timetable assigns it to work at the specified hour.
+            </summary>
+            <param name="hour">The hour of the day (0-23).</param>
+            <returns>
+                <c>true</c> if the pawn's timetable assignment for the hour is <see cref="F:RimWorld.TimeAssignmentDefOf.Work" />;
+                otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.Cache.PawnCache.SetWorkPriority(Verse.WorkTypeDef,System.Int32)">
+            <summary>
+                Sets the priority level for the specified type of work.
+            </summary>
+            <remarks>
+                This method updates the priority level for the given work type. Higher priority values
+                typically indicate greater importance.
+            </remarks>
+            <param name="workType">
+                The type of work for which the priority is being set. This parameter cannot be
+                <see langword="null" />.
+            </param>
+            <param name="priority">The priority level to assign to the specified work type. Must be a non-negative integer.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="workType" /> is <see langword="null" />.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown if <paramref name="priority" /> is less than 0.</exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.Cache.PawnCache.Update(LordKuper.Common.RimWorldTime)">
+            <summary>
+                Updates the cache for the pawn at the specified time.
+                Refreshes capability, management status, work priorities, and underlying caches.
+            </summary>
+            <param name="time">The current RimWorld time.</param>
+        </member>
+        <member name="T:LordKuper.WorkManager.Cache.PawnSkillCache">
+            <summary>
+                Caches skill learning rates and work skill levels for a specific pawn.
+            </summary>
+            <remarks>
+                This cache is updated periodically and provides efficient access to skill-related data for work management.
+            </remarks>
+        </member>
+        <member name="M:LordKuper.WorkManager.Cache.PawnSkillCache.#ctor(Verse.Pawn)">
+            <summary>
+                Caches skill learning rates and work skill levels for a specific pawn.
+            </summary>
+            <remarks>
+                This cache is updated periodically and provides efficient access to skill-related data for work management.
+            </remarks>
+        </member>
+        <member name="F:LordKuper.WorkManager.Cache.PawnSkillCache._skillLearningRates">
+            <summary>
+                Stores cached learning rates for individual skills.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Cache.PawnSkillCache._workSkillLearningRates">
+            <summary>
+                Stores cached average learning rates to work types.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Cache.PawnSkillCache._workSkillLevels">
+            <summary>
+                Stores cached average skill levels for work types.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Cache.PawnSkillCache.GetSkillLearningRate(RimWorld.SkillDef)">
+            <summary>
+                Gets the learning rate for a specific skill, caching the result.
+            </summary>
+            <param name="skill">The skill definition.</param>
+            <returns>The learning rate factor for the skill.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="skill" /> is null.</exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.Cache.PawnSkillCache.GetWorkSkillLearningRate(Verse.WorkTypeDef)">
+            <summary>
+                Gets the average learning rate for all relevant skills of a work type, caching the result.
+            </summary>
+            <param name="workType">The work type definition.</param>
+            <returns>The average learning rate factor for the work type.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="workType" /> is null.</exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.Cache.PawnSkillCache.GetWorkSkillLevel(Verse.WorkTypeDef)">
+            <summary>
+                Gets the average skill level for all relevant skills of a work type, caching the result.
+            </summary>
+            <param name="workType">The work type definition.</param>
+            <returns>The average skill level for the work type, rounded down.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="workType" /> is null.</exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.Cache.PawnSkillCache.Update(LordKuper.Common.RimWorldTime)">
+            <summary>
+                Updates the cache with the latest skill and work type data for the pawn.
+            </summary>
+            <param name="time">The current RimWorld time.</param>
+            <returns>
+                <c>true</c> if the cache was updated; otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="T:LordKuper.WorkManager.Cache.PawnWorkCache">
+            <summary>
+                Caches work information for a pawn.
+                Inherits from <see cref="T:LordKuper.Common.Cache.TimedCache" /> to provide time-based cache invalidation.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Cache.PawnWorkCache.#ctor(Verse.Pawn)">
+            <summary>
+                Caches work information for a pawn.
+                Inherits from <see cref="T:LordKuper.Common.Cache.TimedCache" /> to provide time-based cache invalidation.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Cache.PawnWorkCache._badWorkTypes">
+            <summary>
+                Dictionary of work types and whether they are considered bad for the pawn.
+                The key is the <see cref="T:Verse.WorkTypeDef" />, and the value indicates if it is bad.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Cache.PawnWorkCache._dangerousWorkTypes">
+            <summary>
+                Represents a collection that maps work types to a boolean value indicating whether the work type is considered
+                dangerous.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Cache.PawnWorkCache._workPassions">
+            <summary>
+                Represents a mapping of work types to their associated passion levels.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Cache.PawnWorkCache.GetWorkPassion(Verse.WorkTypeDef)">
+            <summary>
+                Retrieves the passion level for the specified type of work.
+            </summary>
+            <remarks>
+                If the passion level for the specified work type is not already cached, it will be calculated
+                and stored for future retrieval.
+            </remarks>
+            <param name="workType">The type of work for which to retrieve the passion level. Cannot be <see langword="null" />.</param>
+            <returns>The <see cref="T:RimWorld.Passion" /> level associated with the specified work type.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="workType" /> is <see langword="null" />.</exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.Cache.PawnWorkCache.IsBadWork(Verse.WorkTypeDef)">
+            <summary>
+                Determines whether the specified work type is considered "bad" for the pawn.
+                Uses the <see cref="T:LordKuper.WorkManager.Compatibility.MoreThanCapable" /> compatibility logic if active.
+                Results are cached for performance.
+            </summary>
+            <param name="workType">The work type to check.</param>
+            <returns>
+                <c>true</c> if the work type is bad for the pawn; otherwise, <c>false</c>.
+            </returns>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="workType" /> is <c>null</c>.</exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.Cache.PawnWorkCache.IsDangerousWork(Verse.WorkTypeDef)">
+            <summary>
+                Determines whether the specified work type is considered dangerous for the pawn.
+            </summary>
+            <remarks>
+                A work type is considered dangerous based on predefined mappings or the pawn's ideology. The
+                result is cached for subsequent evaluations.
+            </remarks>
+            <param name="workType">The work type to evaluate. Cannot be <see langword="null" />.</param>
+            <returns>
+                <see langword="true" /> if the specified work type is considered dangerous; otherwise,
+                <see langword="false" />.
+            </returns>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="workType" /> is <see langword="null" />.</exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.Cache.PawnWorkCache.Update(LordKuper.Common.RimWorldTime)">
+            <summary>
+                Updates the cache for the specified time.
+                Clears cached work type information if the cache is invalidated.
+            </summary>
+            <param name="time">The current game time.</param>
+            <returns>
+                <c>true</c> if the cache was updated; otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="T:LordKuper.WorkManager.Compatibility.MoreThanCapable">
+            <summary>
+                Provides compatibility integration with the MoreThanCapable mod.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Compatibility.MoreThanCapable._isInitialized">
+            <summary>
+                Indicates whether the compatibility layer has been initialized.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Compatibility.MoreThanCapable.IsBadWork">
+            <summary>
+                Delegate to the MoreThanCapableMod.IsBadWork method.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Compatibility.MoreThanCapable.MoreThanCapableActive">
+            <summary>
+                Indicates whether the More Than Capable mod is active.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Compatibility.MoreThanCapable.Initialize">
+            <summary>
+                Initializes the compatibility layer for the MoreThanCapable mod.
+                Checks if the mod is active and sets up the IsBadWork delegate.
+            </summary>
+        </member>
+        <member name="T:LordKuper.WorkManager.Compatibility.MoreThanCapable.IsBadWorkDelegate">
+            <summary>
+                Represents a delegate for determining if a work type is considered "bad" for a pawn.
+            </summary>
+            <param name="pawn">The pawn to check.</param>
+            <param name="workType">The work type definition.</param>
+            <returns>True if the work type is considered bad for the pawn; otherwise, false.</returns>
+        </member>
+        <member name="T:LordKuper.WorkManager.Compatibility.WorkTab">
+            <summary>
+                Provides compatibility integration with the WorkTab mod.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Compatibility.WorkTab._isInitialized">
+            <summary>
+                Indicates whether the WorkTab compatibility has been initialized.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Compatibility.WorkTab.GetPriority">
+            <summary>
+                Delegate for retrieving a pawn's work priority for a specific work type and hour.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Compatibility.WorkTab.SetPriority">
+            <summary>
+                Delegate for setting a pawn's work priority for a specific work type, priority, and list of hours.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Compatibility.WorkTab.WorkTabActive">
+            <summary>
+                Indicates whether the Work Tab mod is active.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Compatibility.WorkTab.Initialize(HarmonyLib.Harmony)">
+            <summary>
+                Initializes WorkTab compatibility by applying patches and setting up delegates for priority management.
+            </summary>
+            <param name="harmony">The Harmony instance used for patching.</param>
+        </member>
+        <member name="T:LordKuper.WorkManager.Compatibility.WorkTab.GetPriorityDelegate">
+            <summary>
+                Delegate signature for retrieving a pawn's work priority for a given work type and hour.
+            </summary>
+            <param name="pawn">The pawn whose priority is being queried.</param>
+            <param name="workType">The work type definition.</param>
+            <param name="hour">The hour for which the priority is requested.</param>
+            <returns>The work priority as an integer.</returns>
+        </member>
+        <member name="T:LordKuper.WorkManager.Compatibility.WorkTab.SetPriorityDelegate">
+            <summary>
+                Delegate signature for setting a pawn's work priority for a given work type, priority, and list of hours.
+            </summary>
+            <param name="pawn">The pawn whose priority is being set.</param>
+            <param name="workType">The work type definition.</param>
+            <param name="priority">The priority value to set.</param>
+            <param name="hours">The list of hours for which to set the priority.</param>
+        </member>
+        <member name="T:LordKuper.WorkManager.DefOfs.PawnColumnDefOf">
+            <summary>
+                Contains references to custom <see cref="T:RimWorld.PawnColumnDef" /> definitions used by the Work Manager mod.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.DefOfs.PawnColumnDefOf.AutoWorkPriorities">
+            <summary>
+                The pawn column definition for displaying and editing automatic work priorities.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.DefOfs.PawnColumnDefOf.AutoWorkSchedule">
+            <summary>
+                The pawn column definition for displaying and editing automatic work schedules.
+            </summary>
+        </member>
+        <member name="T:LordKuper.WorkManager.Helpers.PassionHelper">
+            <summary>
+                Provides helper methods for calculating and retrieving normalized passion scores.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Helpers.PassionHelper.PassionScores">
+            <summary>
+                Caches normalized scores for each <see cref="T:RimWorld.Passion" /> value.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Helpers.PassionHelper.GetPassionScore(RimWorld.Passion)">
+            <summary>
+                Gets the normalized score for a given <see cref="T:RimWorld.Passion" />.
+                The score is calculated based on the learn and forget rate factors,
+                normalized to a 0-1 range across all available passions.
+            </summary>
+            <param name="passion">The <see cref="T:RimWorld.Passion" /> to retrieve the score for.</param>
+            <returns>The normalized score for the specified passion, or 0 if not found.</returns>
+        </member>
+        <member name="T:LordKuper.WorkManager.Helpers.WorkTypeAssignmentRuleComparer">
+            <summary>
+                Provides a comparison mechanism for <see cref="T:LordKuper.WorkManager.WorkTypeAssignmentRule" /> instances,
+                ordering them by relevant skill count, natural priority, and definition name.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Helpers.WorkTypeAssignmentRuleComparer.Compare(LordKuper.WorkManager.WorkTypeAssignmentRule,LordKuper.WorkManager.WorkTypeAssignmentRule)">
+            <summary>
+                Compares two <see cref="T:LordKuper.WorkManager.WorkTypeAssignmentRule" /> objects and returns a value indicating
+                whether one is less than, equal to, or greater than the other.
+            </summary>
+            <param name="x">The first <see cref="T:LordKuper.WorkManager.WorkTypeAssignmentRule" /> to compare.</param>
+            <param name="y">The second <see cref="T:LordKuper.WorkManager.WorkTypeAssignmentRule" /> to compare.</param>
+            <returns>
+                A signed integer that indicates the relative values of <paramref name="x" /> and <paramref name="y" />:
+                <list type="bullet">
+                    <item>
+                        <description>Less than zero: <paramref name="x" /> is less than <paramref name="y" />.</description>
+                    </item>
+                    <item>
+                        <description>Zero: <paramref name="x" /> equals <paramref name="y" />.</description>
+                    </item>
+                    <item>
+                        <description>Greater than zero: <paramref name="x" /> is greater than <paramref name="y" />.</description>
+                    </item>
+                </list>
+                Comparison is performed by:
+                <list type="number">
+                    <item>
+                        <description>Relevant skill count (descending).</description>
+                    </item>
+                    <item>
+                        <description>Natural priority (descending).</description>
+                    </item>
+                    <item>
+                        <description>Definition name (ordinal string comparison).</description>
+                    </item>
+                </list>
+            </returns>
+        </member>
+        <member name="T:LordKuper.WorkManager.Helpers.WorkTypePriorityHelper">
+            <summary>
+                Provides helper methods for getting and setting work type priorities for pawns,
+                supporting compatibility with WorkTab if active.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Helpers.WorkTypePriorityHelper.GetPriority(Verse.Pawn,Verse.WorkTypeDef)">
+            <summary>
+                Gets the priority of the specified work type for the given pawn.
+                Uses WorkTab if it is active; otherwise, uses the pawn's work settings.
+            </summary>
+            <param name="pawn">The pawn whose work priority is being queried.</param>
+            <param name="workType">The work type definition.</param>
+            <returns>The priority value for the specified work type.</returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.Helpers.WorkTypePriorityHelper.SetPriority(Verse.Pawn,Verse.WorkTypeDef,System.Int32)">
+            <summary>
+                Sets the priority of the specified work type for the given pawn.
+                Uses WorkTab if it is active; otherwise, sets the priority in the pawn's work settings.
+            </summary>
+            <param name="pawn">The pawn whose work priority is being set.</param>
+            <param name="workType">The work type definition.</param>
+            <param name="priority">The priority value to set.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.Logger.LogError(System.String,System.Exception)">
+            <summary>
+                Logs an error message with optional exception details.
+            </summary>
+            <param name="message">The error message to log.</param>
+            <param name="exception">The exception associated with the error, or <c>null</c> if none.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.Logger.LogMessage(System.String)">
+            <summary>
+                Logs a general informational message.
+            </summary>
+            <param name="message">The message to log.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.Logger.LogWarning(System.String,System.Exception)">
+            <summary>
+                Logs a warning message with optional exception details.
+            </summary>
+            <param name="message">The warning message to log.</param>
+            <param name="exception">The exception associated with the warning, or <c>null</c> if none.</param>
+        </member>
+        <member name="T:LordKuper.WorkManager.Patches.DefGeneratorPatch">
+            <summary>
+                Harmony patch for <see cref="M:RimWorld.DefGenerator.GenerateImpliedDefs_PreResolve(System.Boolean)" /> to inject custom pawn columns.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Patches.DefGeneratorPatch.InsertAfterLabel(RimWorld.PawnTableDef,RimWorld.PawnColumnDef)">
+            <summary>
+                Inserts <paramref name="column" /> immediately after the "Label" column of <paramref name="table" />.
+                If no "Label" column exists, the column is appended to the end instead of the start.
+            </summary>
+            <param name="table">The pawn table to modify.</param>
+            <param name="column">The column to insert.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.Patches.DefGeneratorPatch.Postfix">
+            <summary>
+                Postfix method that inserts custom pawn columns into the Work and Restrict tables after the "Label" column.
+            </summary>
+        </member>
+        <member name="T:LordKuper.WorkManager.Patches.MainTabWindowWorkPatch">
+            <summary>
+                Harmony patch for <see cref="M:RimWorld.MainTabWindow_Work.DoWindowContents(UnityEngine.Rect)" /> to inject custom UI buttons for work
+                management.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Patches.MainTabWindowWorkPatch.Postfix(UnityEngine.Rect)">
+            <summary>
+                Postfix method that adds custom buttons to the work tab window.
+            </summary>
+            <param name="rect">The window rectangle to draw contents in.</param>
+        </member>
+        <member name="T:LordKuper.WorkManager.Patches.PawnColumnWorkerWorkPriorityPatch">
+            <summary>
+                Harmony patch for <see cref="T:RimWorld.PawnColumnWorker_WorkPriority" /> to add custom UI elements and adjust header height.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Patches.PawnColumnWorkerWorkPriorityPatch.DoHeaderPostfix(RimWorld.PawnColumnWorker_WorkPriority,UnityEngine.Rect)">
+            <summary>
+                Postfix for <see cref="M:RimWorld.PawnColumnWorker_WorkPriority.DoHeader(UnityEngine.Rect,RimWorld.PawnTable)" />.
+                Draws a toggle button for enabling/disabling work type management in the work priority column header.
+            </summary>
+            <param name="__instance">The instance of <see cref="T:RimWorld.PawnColumnWorker_WorkPriority" /> being patched.</param>
+            <param name="rect">The rectangle area for the header UI.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.Patches.PawnColumnWorkerWorkPriorityPatch.GetMinHeaderHeightPostfix(System.Int32@)">
+            <summary>
+                Postfix for <see cref="M:RimWorld.PawnColumnWorker_WorkPriority.GetMinHeaderHeight(RimWorld.PawnTable)" />.
+                Increases the minimum header height to accommodate custom UI elements.
+            </summary>
+            <param name="__result">The result value to be modified.</param>
+        </member>
+        <member name="T:LordKuper.WorkManager.Patches.WidgetsWorkPatch">
+            <summary>
+                Harmony patch class for customizing the behavior of work box drawing in the work tab.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Patches.WidgetsWorkPatch.DrawWorkBoxForPostfix(System.Single,System.Single,Verse.Pawn,Verse.WorkTypeDef)">
+            <summary>
+                Postfix patch for <see cref="M:RimWorld.WidgetsWork.DrawWorkBoxFor(System.Single,System.Single,Verse.Pawn,Verse.WorkTypeDef,System.Boolean)" />.
+                Draws a semi-transparent overlay if the pawn's work type is disabled.
+            </summary>
+            <param name="x">The x position of the work box.</param>
+            <param name="y">The y position of the work box.</param>
+            <param name="p">The pawn for which the work box is drawn.</param>
+            <param name="wType">The work type definition.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.Patches.WidgetsWorkPatch.DrawWorkBoxForPrefix(System.Single,System.Single,Verse.Pawn,Verse.WorkTypeDef)">
+            <summary>
+                Prefix patch for <see cref="M:RimWorld.WidgetsWork.DrawWorkBoxFor(System.Single,System.Single,Verse.Pawn,Verse.WorkTypeDef,System.Boolean)" />.
+                Handles middle mouse button clicks to toggle the enabled state of a pawn's work type.
+            </summary>
+            <param name="x">The x position of the work box.</param>
+            <param name="y">The y position of the work box.</param>
+            <param name="p">The pawn for which the work box is drawn.</param>
+            <param name="wType">The work type definition.</param>
+        </member>
+        <member name="T:LordKuper.WorkManager.Patches.WorkTabPatch">
+            <summary>
+                Contains Harmony patches for the WorkTab mod, enabling enhanced work type management features.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Patches.WorkTabPatch.HeaderHeightExtension">
+            <summary>
+                Extra header height (pixels) reserved for the work type toggle button.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Patches.WorkTabPatch.Apply(HarmonyLib.Harmony)">
+            <summary>
+                Applies all Harmony patches related to the WorkTab mod.
+            </summary>
+            <param name="harmony">The Harmony instance to use for patching.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.Patches.WorkTabPatch.DoHeaderPrefix(RimWorld.PawnColumnWorker,UnityEngine.Rect@)">
+            <summary>
+                Prefix patch for the DoHeader method. Draws a toggle button for enabling/disabling work types in the header.
+            </summary>
+            <param name="__instance">The PawnColumnWorker instance.</param>
+            <param name="rect">The header rectangle, modified to accommodate the button.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.Patches.WorkTabPatch.DoWindowContentsPostfix(UnityEngine.Rect)">
+            <summary>
+                Adds additional UI elements to the window, including toggle buttons and action buttons for managing priority
+                settings and accessing mod settings.
+            </summary>
+            <remarks>
+                This method adds a priority-management toggle button, an "Update Now" button, and a settings button to the UI.
+            </remarks>
+            <param name="rect">
+                The rectangular area within which the UI elements are drawn. This defines the layout space available for the
+                buttons.
+            </param>
+        </member>
+        <member name="M:LordKuper.WorkManager.Patches.WorkTabPatch.DrawWorkTypeBoxForPostfix(UnityEngine.Rect,Verse.Pawn,Verse.WorkTypeDef)">
+            <summary>
+                Postfix patch for the DrawWorkTypeBoxFor method. Draws a visual indicator if a pawn's work type is disabled.
+            </summary>
+            <param name="box">The rectangle representing the work type box.</param>
+            <param name="pawn">The pawn for whom the box is drawn.</param>
+            <param name="worktype">The work type definition.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.Patches.WorkTabPatch.GetMinHeaderHeightPostfix(System.Int32@)">
+            <summary>
+                Postfix patch for the GetMinHeaderHeight method. Increases the minimum header height to accommodate custom UI
+                elements.
+            </summary>
+            <param name="__result">The minimum header height result to modify.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.Patches.WorkTabPatch.HandleInteractionsDetailedPrefix(RimWorld.PawnColumnWorker,UnityEngine.Rect,Verse.Pawn)">
+            <summary>
+                Prefix patch for the HandleInteractionsDetailed method. Handles middle-click interactions to toggle pawn work type
+                enablement.
+            </summary>
+            <param name="__instance">The PawnColumnWorker instance.</param>
+            <param name="rect">The rectangle representing the UI element.</param>
+            <param name="pawn">The pawn being interacted with.</param>
+        </member>
+        <member name="T:LordKuper.WorkManager.PawnColumnWorkers.AutoWorkPriorities">
+            <summary>
+                Pawn table column worker that toggles per-pawn work priority management.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.PawnColumnWorkers.AutoWorkPriorities.DoCell(UnityEngine.Rect,Verse.Pawn,RimWorld.PawnTable)">
+            <summary>
+                Draws the toggle button cell for the given pawn.
+            </summary>
+            <param name="rect">The cell rectangle.</param>
+            <param name="pawn">The pawn for the row.</param>
+            <param name="table">The owning pawn table.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.PawnColumnWorkers.AutoWorkPriorities.GetMinWidth(RimWorld.PawnTable)">
+            <summary>
+                Gets the minimum width of the column.
+            </summary>
+            <param name="table">The owning pawn table.</param>
+            <returns>The minimum column width.</returns>
+        </member>
+        <member name="T:LordKuper.WorkManager.PawnColumnWorkers.AutoWorkSchedule">
+            <summary>
+                Pawn table column worker that toggles per-pawn work schedule management.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.PawnColumnWorkers.AutoWorkSchedule.DoCell(UnityEngine.Rect,Verse.Pawn,RimWorld.PawnTable)">
+            <summary>
+                Draws the toggle button cell for the given pawn.
+            </summary>
+            <param name="rect">The cell rectangle.</param>
+            <param name="pawn">The pawn for the row.</param>
+            <param name="table">The owning pawn table.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.PawnColumnWorkers.AutoWorkSchedule.GetMinWidth(RimWorld.PawnTable)">
+            <summary>
+                Gets the minimum width of the column.
+            </summary>
+            <param name="table">The owning pawn table.</param>
+            <returns>The minimum column width.</returns>
+        </member>
+        <member name="T:LordKuper.WorkManager.Resources.Strings.DedicatedWorkerMode">
+            <summary>
+                Provides localized labels and tooltips for <see cref="T:LordKuper.WorkManager.DedicatedWorkerMode" /> values.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Resources.Strings.DedicatedWorkerMode.Labels">
+            <summary>
+                Caches translated labels for each <see cref="T:LordKuper.WorkManager.DedicatedWorkerMode" />.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Resources.Strings.DedicatedWorkerMode.Tooltips">
+            <summary>
+                Caches translated tooltips for each <see cref="T:LordKuper.WorkManager.DedicatedWorkerMode" />.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Resources.Strings.DedicatedWorkerMode.GetDedicatedWorkerModeLabel(System.Nullable{LordKuper.WorkManager.DedicatedWorkerMode})">
+            <summary>
+                Gets the localized label for the specified <see cref="T:LordKuper.WorkManager.DedicatedWorkerMode" />.
+            </summary>
+            <param name="mode">The dedicated worker mode, or <c>null</c> for the default label.</param>
+            <returns>The translated label string.</returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.Resources.Strings.DedicatedWorkerMode.GetDedicatedWorkerModeLabel(LordKuper.WorkManager.DedicatedWorkerMode)">
+            <summary>
+                Retrieves the localized label for the specified <see cref="T:LordKuper.WorkManager.DedicatedWorkerMode" />.
+            </summary>
+            <remarks>
+                The label is generated based on the mode and is localized using the
+                translation system.
+            </remarks>
+            <param name="mode">The dedicated worker mode for which to retrieve the label.</param>
+            <returns>A string containing the localized label for the specified mode.</returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.Resources.Strings.DedicatedWorkerMode.GetDedicatedWorkerModeTooltip(System.Nullable{LordKuper.WorkManager.DedicatedWorkerMode})">
+            <summary>
+                Gets the localized tooltip for the specified <see cref="T:LordKuper.WorkManager.DedicatedWorkerMode" />.
+            </summary>
+            <param name="mode">The dedicated worker mode, or <c>null</c> for the undefined setting tooltip.</param>
+            <returns>The translated tooltip string.</returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.Resources.Strings.DedicatedWorkerMode.GetDedicatedWorkerModeTooltip(LordKuper.WorkManager.DedicatedWorkerMode)">
+            <summary>
+                Retrieves the tooltip text associated with the specified <see cref="T:LordKuper.WorkManager.DedicatedWorkerMode" />.
+            </summary>
+            <remarks>
+                The tooltip text is localized and retrieved based on the provided
+                <paramref
+                    name="mode" />
+                .
+            </remarks>
+            <param name="mode">The dedicated worker mode for which to retrieve the tooltip.</param>
+            <returns>A string containing the tooltip text for the specified mode.</returns>
+        </member>
+        <member name="T:LordKuper.WorkManager.ScheduleUpdater">
+            <summary>
+                Map component that assigns pawn work schedules based on configured work shifts.
+            </summary>
+            <param name="map">The map this component belongs to.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.ScheduleUpdater.#ctor(Verse.Map)">
+            <summary>
+                Map component that assigns pawn work schedules based on configured work shifts.
+            </summary>
+            <param name="map">The map this component belongs to.</param>
+        </member>
+        <member name="F:LordKuper.WorkManager.ScheduleUpdater.CoverageBonus">
+            <summary>
+                Shift score bonus for each skill first covered by a pawn in that shift.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.ScheduleUpdater.EvennessWeight">
+            <summary>
+                Shift score penalty per worker already assigned to that shift (even distribution).
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.ScheduleUpdater.LearnRateCoef">
+            <summary>
+                Weight of the skill learning rate in the per-skill score.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.ScheduleUpdater.LevelWeight">
+            <summary>
+                Weight of the normalized skill level in the per-skill score.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.ScheduleUpdater.LoverShiftScoreBonus">
+            <summary>
+                Shift score bonus per lover/partner already assigned to that shift.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.ScheduleUpdater.UpdateTickMask">
+            <summary>
+                Bitmask gating updates to once every 64 game ticks.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.ScheduleUpdater.AssignGroup(System.Collections.Generic.List{Verse.Pawn},System.Collections.Generic.List{LordKuper.WorkManager.WorkShift},System.Collections.Generic.List{RimWorld.SkillDef},System.Collections.Generic.Dictionary{RimWorld.SkillDef,System.Int32})">
+            <summary>
+                Distributes the pawns of a group across shifts: evenly, with per-skill coverage,
+                keeping lovers/partners together.
+            </summary>
+            <param name="pawns">The pawns to assign.</param>
+            <param name="shifts">The eligible shifts for the group.</param>
+            <param name="relevantSkills">Skills considered for coverage.</param>
+            <param name="maxLevels">Maximum colony level per skill, used for normalization.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.ScheduleUpdater.GetLovers(Verse.Pawn)">
+            <summary>
+                Gets the lovers/partners of a pawn (for clustering them into the same shift).
+            </summary>
+            <param name="pawn">The pawn whose lovers to resolve.</param>
+            <returns>The distinct lover/partner pawns, or an empty list.</returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.ScheduleUpdater.GetRelevantSkills">
+            <summary>
+                Gets the skills relevant to active (visible) work types.
+            </summary>
+            <returns>The distinct relevant skills.</returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.ScheduleUpdater.MapComponentTick">
+            <summary>
+                Periodically updates pawn work schedules according to the configured update frequency.
+            </summary>
+        </member>
+        <member name="T:LordKuper.WorkManager.DedicatedWorkerMode">
+            <summary>
+                Specifies the mode used to determine the allocation of dedicated workers in a system.
+            </summary>
+            <remarks>
+                This enumeration defines various strategies for assigning workers, such as using a constant value,
+                basing the allocation on the number of work types, or considering the ratio or count of capable pawns.
+            </remarks>
+        </member>
+        <member name="T:LordKuper.WorkManager.DedicatedWorkerSettings">
+            <summary>
+                Stores configuration settings for dedicated worker management.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.DedicatedWorkerSettings.CapablePawnRatioFactorDefault">
+            <summary>
+                The default value for <see cref="F:LordKuper.WorkManager.DedicatedWorkerSettings.CapablePawnRatioFactor" />.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.DedicatedWorkerSettings.CapablePawnRatioFactorMax">
+            <summary>
+                The maximum allowed value for <see cref="F:LordKuper.WorkManager.DedicatedWorkerSettings.CapablePawnRatioFactor" />.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.DedicatedWorkerSettings.CapablePawnRatioFactorMin">
+            <summary>
+                The minimum allowed value for <see cref="F:LordKuper.WorkManager.DedicatedWorkerSettings.CapablePawnRatioFactor" />.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.DedicatedWorkerSettings.ConstantWorkerCountDefault">
+            <summary>
+                The default value for <see cref="F:LordKuper.WorkManager.DedicatedWorkerSettings.ConstantWorkerCount" />.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.DedicatedWorkerSettings.ConstantWorkerCountMax">
+            <summary>
+                The maximum allowed value for <see cref="F:LordKuper.WorkManager.DedicatedWorkerSettings.ConstantWorkerCount" />.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.DedicatedWorkerSettings.ConstantWorkerCountMin">
+            <summary>
+                The minimum allowed value for <see cref="F:LordKuper.WorkManager.DedicatedWorkerSettings.ConstantWorkerCount" />.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.DedicatedWorkerSettings.PawnCountFactorDefault">
+            <summary>
+                The default value for <see cref="F:LordKuper.WorkManager.DedicatedWorkerSettings.PawnCountFactor" />.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.DedicatedWorkerSettings.PawnCountFactorMax">
+            <summary>
+                The maximum allowed value for <see cref="F:LordKuper.WorkManager.DedicatedWorkerSettings.PawnCountFactor" />.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.DedicatedWorkerSettings.PawnCountFactorMin">
+            <summary>
+                The minimum allowed value for <see cref="F:LordKuper.WorkManager.DedicatedWorkerSettings.PawnCountFactor" />.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.DedicatedWorkerSettings.WorkTypeCountFactorDefault">
+            <summary>
+                The default value for <see cref="F:LordKuper.WorkManager.DedicatedWorkerSettings.WorkTypeCountFactor" />.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.DedicatedWorkerSettings.WorkTypeCountFactorMax">
+            <summary>
+                The maximum allowed value for <see cref="F:LordKuper.WorkManager.DedicatedWorkerSettings.WorkTypeCountFactor" />.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.DedicatedWorkerSettings.WorkTypeCountFactorMin">
+            <summary>
+                The minimum allowed value for <see cref="F:LordKuper.WorkManager.DedicatedWorkerSettings.WorkTypeCountFactor" />.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.DedicatedWorkerSettings._mode">
+            <summary>
+                Represents the mode of operation for a dedicated worker.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.DedicatedWorkerSettings.AllowDedicated">
+            <summary>
+                Indicates whether dedicated workers are allowed.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.DedicatedWorkerSettings.CapablePawnRatioFactor">
+            <summary>
+                Multiplier for the ratio of capable pawns when calculating dedicated workers.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.DedicatedWorkerSettings.ConstantWorkerCount">
+            <summary>
+                The constant number of dedicated workers to assign.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.DedicatedWorkerSettings.PawnCountFactor">
+            <summary>
+                Multiplier for the pawn count when calculating dedicated workers.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.DedicatedWorkerSettings.PawnCountFilter">
+            <summary>
+                Filter used when <see cref="P:LordKuper.WorkManager.DedicatedWorkerSettings.Mode" /> is <see cref="F:LordKuper.WorkManager.DedicatedWorkerMode.PawnCount" />.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.DedicatedWorkerSettings.TriStateMode">
+            <summary>
+                Indicates whether tri-state mode is enabled.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.DedicatedWorkerSettings.WorkTypeCountFactor">
+            <summary>
+                Multiplier for the work type count when calculating dedicated workers.
+            </summary>
+        </member>
+        <member name="P:LordKuper.WorkManager.DedicatedWorkerSettings.Mode">
+            <summary>
+                The mode used for dedicated worker calculation.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.DedicatedWorkerSettings.ExposeData">
+            <summary>
+                Serializes and deserializes the settings data.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.DedicatedWorkerSettings.Combine(LordKuper.WorkManager.DedicatedWorkerSettings,LordKuper.WorkManager.DedicatedWorkerSettings)">
+            <summary>
+                Combines two <see cref="T:LordKuper.WorkManager.DedicatedWorkerSettings" /> instances into a single configuration.
+            </summary>
+            <remarks>
+                The resulting configuration prioritizes values from <paramref name="main" />. If a value is
+                not specified in <paramref name="main" />, the corresponding value from <paramref name="fallback" /> is used. The
+                <c>Mode</c> property determines additional behavior, such as which specific settings are applied.
+            </remarks>
+            <param name="main">
+                The primary <see cref="T:LordKuper.WorkManager.DedicatedWorkerSettings" /> instance. Values from this instance take precedence if
+                specified.
+            </param>
+            <param name="fallback">
+                The fallback <see cref="T:LordKuper.WorkManager.DedicatedWorkerSettings" /> instance. Values from this instance are used if not specified
+                in <paramref name="main" />.
+            </param>
+            <returns>
+                A new <see cref="T:LordKuper.WorkManager.DedicatedWorkerSettings" /> instance that merges the values from <paramref name="main" /> and
+                <paramref name="fallback" />.
+            </returns>
+            <exception cref="T:System.ArgumentNullException">
+                Thrown if <paramref name="main" /> or <paramref name="fallback" /> is
+                <see langword="null" />.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.DedicatedWorkerSettings.Validate">
+            <summary>
+                Validates and clamps all configurable values to their allowed ranges.
+            </summary>
+        </member>
+        <member name="T:LordKuper.WorkManager.Settings">
+            <summary>
+                Represents the mod settings for the Work Manager.
+            </summary>
+            <summary>
+                Contains settings and logic for managing work priorities in the mod.
+            </summary>
+            <summary>
+                Partial class for managing WorkType-related settings, including UI logic for displaying and editing work type
+                assignment rules.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings._tabs">
+            <summary>
+                The list of tab records for the settings window.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings._currentTab">
+            <summary>
+                The currently active tab in the settings window.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings._isInitialized">
+            <summary>
+                Indicates whether the settings have been initialized.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings._scrollPosition">
+            <summary>
+                The scroll position for the settings window.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.DoTab(UnityEngine.Rect,LordKuper.WorkManager.SettingsTabs)">
+            <summary>
+                Draws the contents of the specified tab in the settings window.
+            </summary>
+            <param name="rect">The rectangle area to draw the tab contents.</param>
+            <param name="tab">The tab to display.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.DoWindowContents(UnityEngine.Rect)">
+            <summary>
+                Draws the window contents for the settings, including tabs and their contents.
+            </summary>
+            <param name="rect">The rectangle area to draw the window contents.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.ExposeData">
+            <summary>
+                Exposes the mod settings data for saving and loading.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.Initialize">
+            <summary>
+                Initializes the settings if not already initialized.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.InitializeTabs">
+            <summary>
+                Initializes the tab records for the settings window.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.ResetAll">
+            <summary>
+                Resets all work-related configurations to their default states.
+            </summary>
+            <remarks>
+                This method resets work priorities, work types, and schedules to their default values. It is
+                intended to restore the system to its initial configuration.
+            </remarks>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.Validate">
+            <summary>
+                Validates the current state of the object to ensure it meets required conditions.
+            </summary>
+            <remarks>
+                This method performs internal validation checks. It is
+                intended to ensure the object is in a consistent and valid state before further processing.
+            </remarks>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.ColonistWorkShifts">
+            <summary>
+                The work shifts used for regular colonists.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.ManageWorkSchedule">
+            <summary>
+                Indicates whether the work schedule is managed automatically.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.NightOwlWorkShifts">
+            <summary>
+                The work shifts used for night owl colonists.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.ScheduleUpdateFrequency">
+            <summary>
+                The frequency (per day) at which the schedule is updated.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.CurrentVersion">
+            <summary>
+                The current version of the settings schema.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.Version">
+            <summary>
+                The version of the settings currently stored.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.ExposeVersionData">
+            <summary>
+                Serializes or deserializes the <see cref="F:LordKuper.WorkManager.Settings.Version" /> field using RimWorld's Scribe system.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.ValidateVersion">
+            <summary>
+                Validates the settings version and upgrades or resets settings if necessary.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkerLearningRateScoreFactorDefault">
+            <summary>Default score factor for learning rate of dedicated workers.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkerPassionScoreFactorDefault">
+            <summary>Default score factor for passion of dedicated workers.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkerPriorityDefault">
+            <summary>Default priority for dedicated workers.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkerSkillScoreFactorDefault">
+            <summary>Default score factor for skill of dedicated workers.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkerWorkCountScoreFactorDefault">
+            <summary>Default score factor for number of assigned dedicated work types of dedicated workers.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.HighestSkillPriorityDefault">
+            <summary>Default priority for highest skill.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.IdlePriorityDefault">
+            <summary>Default priority for idle work.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.LeftoverPriorityDefault">
+            <summary>Default priority for leftover work.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.MajorLearningRatePriorityDefault">
+            <summary>Default priority for major learning rate.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.MajorLearningRateThresholdDefault">
+            <summary>Default threshold for major learning rate.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.MinorLearningRatePriorityDefault">
+            <summary>Default priority for minor learning rate.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.MinorLearningRateThresholdDefault">
+            <summary>Default threshold for minor learning rate.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.ScoreFactorMax">
+            <summary>Maximum allowed score factor.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.ScoreFactorMin">
+            <summary>Minimum allowed score factor.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.UseScheduleForDedicatedWorkersDefault">
+            <summary>Default value for using pawn schedules when selecting dedicated workers.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.WorkPrioritiesUpdateFrequencyDefault">
+            <summary>Default update frequency for work priorities.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.WorkPrioritiesUpdateFrequencyMax">
+            <summary>Maximum allowed update frequency for work priorities.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.WorkPrioritiesUpdateFrequencyMin">
+            <summary>Minimum allowed update frequency for work priorities.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.MajorLearningRateThresholdMax">
+            <summary>
+                Maximum allowed threshold for major learning rate, depending on mod compatibility.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings._workPrioritiesContentHeight">
+            <summary>Cached height of the work priorities content for UI layout.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.AssignAllWorkTypes">
+            <summary>If true, assign all work types to pawns.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.AssignWorkToIdlePawns">
+            <summary>If true, assign work to idle pawns.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkerLearningRateScoreFactor">
+            <summary>Score factor for learning rate of dedicated workers.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkerPassionScoreFactor">
+            <summary>Score factor for passion of dedicated workers.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkerPriority">
+            <summary>Priority for dedicated workers.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkerSkillScoreFactor">
+            <summary>Score factor for skill of dedicated workers.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkerWorkCountScoreFactor">
+            <summary>Score factor for number of assigned dedicated work types of dedicated workers.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.HighestSkillPriority">
+            <summary>Priority for highest skill.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.IdlePriority">
+            <summary>Priority for idle work.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.LeftoverPriority">
+            <summary>Priority for leftover work.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.MajorLearningRatePriority">
+            <summary>Priority for major learning rate.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.MajorLearningRateThreshold">
+            <summary>Threshold for major learning rate.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.MaxWorkTypePriority">
+            <summary>Maximum allowed work type priority.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.MinorLearningRatePriority">
+            <summary>Priority for minor learning rate.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.MinorLearningRateThreshold">
+            <summary>Threshold for minor learning rate.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.PassionPriorities">
+            <summary>Dictionary mapping passion def names to their priorities.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.UseDedicatedWorkers">
+            <summary>If true, use dedicated workers logic.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.UseLearningRatesPriorities">
+            <summary>If true, use learning rates for priorities.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.UsePassionPriorities">
+            <summary>If true, use passion priorities.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.UsePawnLearningRateThresholds">
+            <summary>If true, use pawn-specific learning rate thresholds.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.UseScheduleForDedicatedWorkers">
+            <summary>
+                If true, dedicated workers are selected per hour from the pawns actually working that hour
+                (based on their schedule), instead of one selection for the whole day.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.WorkPrioritiesUpdateFrequency">
+            <summary>Frequency at which work priorities are updated.</summary>
+        </member>
+        <member name="P:LordKuper.WorkManager.Settings.PassionPrioritiesDefault">
+            <summary>
+                Gets the default dictionary of passion priorities, depending on mod compatibility.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.DoWorkPrioritiesTab(UnityEngine.Rect)">
+            <summary>
+                Draws the work priorities tab in the settings UI.
+            </summary>
+            <param name="rect">The rectangle area to draw the tab in.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.DoWorkPrioritiesTabContent(UnityEngine.Rect)">
+            <summary>
+                Draws the content of the work priorities tab, including all relevant settings fields.
+            </summary>
+            <param name="rect">The rectangle area to draw the content in.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.ExposeWorkPrioritiesData">
+            <summary>
+                Exposes (saves/loads) the work priorities settings data using the Scribe system.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.ResetWorkPriorities">
+            <summary>
+                Resets all work priority settings to their default values.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.ValidateWorkPriorities">
+            <summary>
+                Validates and adjusts work priority-related settings to ensure they fall within acceptable ranges or default
+                values.
+            </summary>
+            <remarks>
+                This method ensures that all work priority parameters, thresholds, and factors are properly
+                initialized and constrained  within their defined limits. Default values are applied where necessary, and
+                invalid or out-of-range values are clamped  to maintain consistency. Additionally, missing passion priorities
+                are initialized with default values.
+            </remarks>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.AllowedWorkersPawnCapacityInputLocalId">
+            <summary>
+                Local input ID for allowed workers pawn capacity.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.AllowedWorkersPawnSkillInputLocalId">
+            <summary>
+                Local input ID for allowed workers pawn skill.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.AllowedWorkersPawnStatInputLocalId">
+            <summary>
+                Local input ID for allowed workers pawn stat.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkersPawnCapacityInputLocalId">
+            <summary>
+                Local input ID for dedicated workers pawn capacity.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkersPawnSkillInputLocalId">
+            <summary>
+                Local input ID for dedicated workers pawn skill.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkersPawnStatInputLocalId">
+            <summary>
+                Local input ID for dedicated workers pawn stat.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkerModeLabel">
+            <summary>
+                Provides a function to get the label for a dedicated worker mode.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkerModesCache">
+            <summary>
+                Caches all available dedicated worker modes.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkerModeTooltip">
+            <summary>
+                Provides a function to get the tooltip for a dedicated worker mode.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkerNullableModeLabel">
+            <summary>
+                Provides a function to get the label for a nullable dedicated worker mode.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkerNullableModesCache">
+            <summary>
+                Caches all available nullable dedicated worker modes.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkerNullableModeTooltip">
+            <summary>
+                Provides a function to get the tooltip for a nullable dedicated worker mode.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings._allowedWorkers">
+            <summary>
+                List of pawns allowed to work for the selected work type rule.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings._allowedWorkersScrollPosition">
+            <summary>
+                Scroll position for the allowed workers list UI.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings._allowedWorkersSectionContentHeight">
+            <summary>
+                Cached height of the allowed workers section content.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings._assignmentSectionContentHeight">
+            <summary>
+                Cached height of the assignment section content.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings._dedicatedWorkersSectionContentHeight">
+            <summary>
+                Cached height of the dedicated workers section content.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings._selectedWorkTypeRule">
+            <summary>
+                Currently selected work type rule for editing.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings._workTypeRules">
+            <summary>
+                List of work type assignment rules, initialized with default rules.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings._workTypesBottomHeight">
+            <summary>
+                Cached height of the bottom part of the work types tab.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings._workTypesScrollableContentHeight">
+            <summary>
+                Cached height of the scrollable content in the work types tab.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings._workTypesTopHeight">
+            <summary>
+                Cached height of the top part of the work types tab.
+            </summary>
+        </member>
+        <member name="P:LordKuper.WorkManager.Settings.SelectedWorkTypeRule">
+            <summary>
+                Gets or sets the currently selected work type rule for editing.
+                When set, updates the allowed workers list.
+            </summary>
+        </member>
+        <member name="P:LordKuper.WorkManager.Settings.WorkTypeRules">
+            <summary>
+                Gets the list of work type assignment rules as a read-only list.
+            </summary>
+        </member>
+        <member name="P:LordKuper.WorkManager.Settings.WorkTypesBottomHeight">
+            <summary>
+                Gets the height of the bottom part of the work types tab, calculating if not cached.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.DoNoWorkTypeRuleSelectedLabel(UnityEngine.Rect)">
+            <summary>
+                Draws a label indicating that no work type rule is selected.
+            </summary>
+            <param name="rect">The rectangle in which to draw the label.</param>
+            <returns>The height of the label drawn.</returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.DoRuleAllowedWorkers(UnityEngine.Rect,UnityEngine.Rect@)">
+            <summary>
+                Processes the "Allowed Workers" rule section within the specified rectangle and updates the layout.
+            </summary>
+            <param name="rect">The rectangle within which the "Allowed Workers" section is rendered.</param>
+            <param name="remRect">
+                When this method returns, contains the remaining rectangle after the "Allowed Workers" section has been
+                processed.
+            </param>
+            <returns>
+                The vertical position after processing the "Allowed Workers" section, which can be used for further layout
+                adjustments.
+            </returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.DoRuleAssignmentSettings(UnityEngine.Rect,System.Boolean,UnityEngine.Rect@)">
+            <summary>
+                Renders the rule assignment settings section within the specified rectangle and updates the associated rule
+                settings.
+            </summary>
+            <param name="rect">The rectangle within which the section is rendered.</param>
+            <param name="defaultRule">
+                A value indicating whether the default rule settings should be used. If <see langword="true" />, default rule
+                settings are applied; otherwise, custom rule settings are used.
+            </param>
+            <param name="remRect">When this method returns, contains the remaining rectangle after rendering the section.</param>
+            <returns>The vertical offset after rendering the section, which can be used to position subsequent UI elements.</returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.DoRuleDedicatedWorkerSettings(UnityEngine.Rect,System.Boolean,UnityEngine.Rect@)">
+            <summary>
+                Configures and renders the UI for dedicated worker settings within a specified rectangular area.
+            </summary>
+            <param name="rect">The rectangular area in which the dedicated worker settings UI will be rendered.</param>
+            <param name="defaultRule">
+                A boolean value indicating whether the default rule should be applied.  If <see langword="true" />, the default
+                rule is used; otherwise, custom settings are applied.
+            </param>
+            <param name="remRect">
+                When this method returns, contains the remaining rectangular area after rendering the dedicated worker settings
+                UI.
+            </param>
+            <returns>The vertical offset (Y-coordinate) after rendering the dedicated worker settings UI.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown if an unsupported <c>DedicatedWorkerMode</c> value is encountered.</exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.DoWorkTypeRule(UnityEngine.Rect)">
+            <summary>
+                Draws the UI for editing a selected work type rule.
+            </summary>
+            <param name="rect">The rectangle in which to draw the rule UI.</param>
+            <returns>The total height of the UI drawn.</returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.DoWorkTypesTab(UnityEngine.Rect)">
+            <summary>
+                Draws the main Work Types tab, including the top and scrollable parts.
+            </summary>
+            <param name="rect">The rectangle in which to draw the tab.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.DoWorkTypesTabBottomPart(UnityEngine.Rect)">
+            <summary>
+                Draws the bottom part of the Work Types tab.
+            </summary>
+            <param name="rect">The rectangle in which to draw the bottom part.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.DoWorkTypesTabScrollablePart(UnityEngine.Rect)">
+            <summary>
+                Draws the scrollable part of the Work Types tab, including the selected rule or a placeholder label.
+            </summary>
+            <param name="rect">The rectangle in which to draw the scrollable content.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.DoWorkTypesTabTopPart(UnityEngine.Rect)">
+            <summary>
+                Manages the user interface and interactions for the top section of the Work Types tab.
+            </summary>
+            <remarks>
+                This method handles the display and functionality of action buttons for managing work type
+                rules, including selecting, adding, deleting, and resetting work type assignments. It dynamically determines
+                which work types can be added or deleted based on the current state of the rules and available
+                definitions.
+            </remarks>
+            <param name="rect">The rectangular area within which the UI elements are rendered.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.ExposeWorkTypesData">
+            <summary>
+                Exposes work type rules data for saving and loading.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.ResetWorkTypes">
+            <summary>
+                Resets the work type rules to their default state.
+            </summary>
+            <remarks>
+                This method clears all existing work type rules, restores the default rules,  and sets the
+                selected work type rule to <see langword="null" />.
+            </remarks>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.UpdateAllowedWorkers">
+            <summary>
+                Updates the list of allowed workers based on the currently selected work type rule.
+            </summary>
+            <remarks>
+                This method clears the existing list of allowed workers and repopulates it by applying  the
+                filtering logic defined in the selected work type rule. If no rule is selected or  the rule does not specify
+                allowed workers, the list remains empty.
+            </remarks>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.ValidateWorkTypes">
+            <summary>
+                Validates the work type rules list, ensuring it is initialized with default rules if null.
+            </summary>
+        </member>
+        <member name="T:LordKuper.WorkManager.SettingsTabs">
+            <summary>
+                Represents the available tabs in the settings section of the application.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.SettingsTabs.WorkPriorities">
+            <summary>
+                Tab for configuring work priorities.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.SettingsTabs.WorkTypes">
+            <summary>
+                Tab for managing work types.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.SettingsTabs.Schedule">
+            <summary>
+                Tab for setting up the schedule.
+            </summary>
+        </member>
+        <member name="T:LordKuper.WorkManager.WorkTypeAssignmentRule">
+            <summary>
+                Represents a rule for assigning work types to pawns, including allowed workers, dedicated worker settings,
+                and assignment priorities.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkTypeAssignmentRule.AllowedWorkersForbiddenPawnHealthStates">
+            <summary>
+                The forbidden pawn health states for allowed workers.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkTypeAssignmentRule.AssignEveryonePriorityDefault">
+            <summary>
+                The default priority value for <see cref="F:LordKuper.WorkManager.WorkTypeAssignmentRule.AssignEveryonePriority" />.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkTypeAssignmentRule._defaultRule">
+            <summary>
+                Cached default rule (the one with a <c>null</c> <see cref="P:LordKuper.Common.Cache.DefCache`1.DefName" />).
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkTypeAssignmentRule._defaultRulesByName">
+            <summary>
+                Cached default rules keyed by work type def name, built once from <see cref="P:LordKuper.WorkManager.WorkTypeAssignmentRule.DefaultRules" />.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkTypeAssignmentRule.AllowedWorkersForbiddenPawnTypes">
+            <summary>
+                The forbidden pawn types for allowed workers.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkTypeAssignmentRule.AllowedWorkers">
+            <summary>
+                The filter specifying which pawns are allowed to be assigned to this work type.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkTypeAssignmentRule.AssignEveryone">
+            <summary>
+                Indicates whether all pawns should be assigned to this work type.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkTypeAssignmentRule.AssignEveryonePriority">
+            <summary>
+                The priority for assigning everyone to this work type.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkTypeAssignmentRule.DedicatedWorkerSettings">
+            <summary>
+                The settings for dedicated workers for this work type.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkTypeAssignmentRule.EnsureWorkerAssigned">
+            <summary>
+                Indicates whether at least one worker should always be assigned to this work type.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkTypeAssignmentRule.MinWorkerNumber">
+            <summary>
+                Gets or sets the minimum number of workers to be assigned.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkTypeAssignmentRule.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:LordKuper.WorkManager.WorkTypeAssignmentRule" /> class.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkTypeAssignmentRule.#ctor(System.String)">
+            <summary>
+                Initializes a new instance of the <see cref="T:LordKuper.WorkManager.WorkTypeAssignmentRule" /> class for the specified work type.
+            </summary>
+            <param name="workTypeDefName">The name of the work type definition, or <c>null</c> for the default rule.</param>
+        </member>
+        <member name="P:LordKuper.WorkManager.WorkTypeAssignmentRule.DefaultRules">
+            <summary>
+                Gets the default set of work type assignment rules.
+            </summary>
+        </member>
+        <member name="P:LordKuper.WorkManager.WorkTypeAssignmentRule.Description">
+            <summary>
+                Gets a detailed description of the rule, including assignment and dedicated worker settings.
+            </summary>
+        </member>
+        <member name="P:LordKuper.WorkManager.WorkTypeAssignmentRule.Label">
+            <summary>
+                Gets the label for this rule, or the default label if not set.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkTypeAssignmentRule.ExposeData">
+            <summary>
+                Serializes and deserializes the rule data.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkTypeAssignmentRule.Combine(LordKuper.WorkManager.WorkTypeAssignmentRule,LordKuper.WorkManager.WorkTypeAssignmentRule)">
+            <summary>
+                Combines two <see cref="T:LordKuper.WorkManager.WorkTypeAssignmentRule" /> instances into a single rule by applying fallback logic.
+            </summary>
+            <param name="main">The primary <see cref="T:LordKuper.WorkManager.WorkTypeAssignmentRule" /> to use. Cannot be <see langword="null" />.</param>
+            <param name="fallback">
+                The fallback <see cref="T:LordKuper.WorkManager.WorkTypeAssignmentRule" /> to use when values in <paramref name="main" /> are not set.
+                Cannot be <see langword="null" />.
+            </param>
+            <returns>
+                A new <see cref="T:LordKuper.WorkManager.WorkTypeAssignmentRule" /> instance that merges the values from <paramref name="main" /> and
+                <paramref name="fallback" />. Values from <paramref name="main" /> take precedence unless they are
+                <see
+                    langword="null" />
+                or unset, in which case values from <paramref name="fallback" /> are used.
+            </returns>
+            <exception cref="T:System.ArgumentNullException">
+                Thrown if <paramref name="main" /> or <paramref name="fallback" /> is
+                <see langword="null" />.
+            </exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkTypeAssignmentRule.CreateRule(System.String)">
+            <summary>
+                Creates a new <see cref="T:LordKuper.WorkManager.WorkTypeAssignmentRule" /> for the specified work type.
+            </summary>
+            <param name="workTypeDefName">The name of the work type definition, or <c>null</c> for the default rule.</param>
+            <returns>A new <see cref="T:LordKuper.WorkManager.WorkTypeAssignmentRule" /> instance.</returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkTypeAssignmentRule.GetDefaultRule(System.String)">
+            <summary>
+                Returns the cached default rule matching <paramref name="defName" />, or the fallback default rule
+                (the one with a <c>null</c> def name) if no specific default exists.
+            </summary>
+            <param name="defName">The work type def name, or <c>null</c> for the fallback default rule.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkTypeAssignmentRule.GetTargetWorkersCount(Verse.Map,System.Int32,System.Int32)">
+            <summary>
+                Calculates the target number of workers based on the current dedicated worker mode and relevant parameters.
+            </summary>
+            <param name="map">The map context used to filter pawns when calculating the worker count in certain modes.</param>
+            <param name="capablePawnCount">The number of pawns capable of performing work, used in ratio-based calculations.</param>
+            <param name="dedicatedWorkTypesCount">The number of dedicated work types, used in work type-based calculations.</param>
+            <returns>
+                The calculated target number of workers based on the selected <see cref="T:LordKuper.WorkManager.DedicatedWorkerMode" /> and the provided
+                parameters.
+            </returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+                Thrown if the <see cref="T:LordKuper.WorkManager.DedicatedWorkerMode" /> is set to an unsupported
+                value.
+            </exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkTypeAssignmentRule.IsAllowedWorker(Verse.Pawn)">
+            <summary>
+                Determines whether the specified pawn is allowed to perform work based on the defined criteria.
+            </summary>
+            <param name="pawn">The pawn to evaluate. Cannot be <see langword="null" />.</param>
+            <returns>
+                <see langword="true" /> if the pawn satisfies the allowed worker criteria; otherwise, <see langword="false" />
+                .
+            </returns>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="pawn" /> is <see langword="null" />.</exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkTypeAssignmentRule.Validate">
+            <summary>
+                Validates and normalizes the rule's settings, ensuring all values are within allowed ranges.
+            </summary>
+        </member>
+        <member name="T:LordKuper.WorkManager.WorkManagerGameComponent">
+            <summary>
+                Game component for managing work assignments, priorities, and schedules for pawns.
+                Handles enabling/disabling work types, pawn work assignments, and caches assignment rules.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkManagerGameComponent._assignEveryoneWorkTypes">
+            <summary>
+                Dictionary of work types assigned to everyone, with their priorities.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkManagerGameComponent.CombinedRules">
+            <summary>
+                Represents a collection of combined work type assignment rules, sorted according to a specified comparer.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkManagerGameComponent.CombinedRulesDict">
+            <summary>
+                Dictionary for O(1) lookup of combined rules by work type definition.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkManagerGameComponent._disabledPawns">
+            <summary>
+                Set of pawns with disabled work assignments.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkManagerGameComponent._disabledPawnSchedules">
+            <summary>
+                Set of pawns with disabled schedules.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkManagerGameComponent._disabledPawnWorkTypes">
+            <summary>
+                Dictionary of pawns and their disabled work types.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkManagerGameComponent._disabledWorkTypes">
+            <summary>
+                Set of disabled work types.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkManagerGameComponent.PriorityManagementEnabled">
+            <summary>
+                Indicates if priority management is enabled.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkManagerGameComponent.ScheduleManagementEnabled">
+            <summary>
+                Indicates if schedule management is enabled.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerGameComponent.#ctor(Verse.Game)">
+            <summary>
+                Initializes a new instance of the <see cref="T:LordKuper.WorkManager.WorkManagerGameComponent" /> class and sets the singleton instance.
+            </summary>
+            <remarks>
+                This constructor sets the <see cref="P:LordKuper.WorkManager.WorkManagerGameComponent.Instance" /> property to the current instance, ensuring
+                that only one instance of <see cref="T:LordKuper.WorkManager.WorkManagerGameComponent" /> exists at a time. This component is typically
+                used to manage work-related tasks within the game.
+            </remarks>
+            <param name="game">The game instance to associate with this component. Cannot be null.</param>
+        </member>
+        <member name="P:LordKuper.WorkManager.WorkManagerGameComponent.AssignEveryoneWorkTypes">
+            <summary>
+                Gets the dictionary of work types assigned to everyone and their priorities.
+            </summary>
+        </member>
+        <member name="P:LordKuper.WorkManager.WorkManagerGameComponent.DedicatedWorkTypes">
+            <summary>
+                Gets the set of work types that configured to use dedicated workers.
+            </summary>
+        </member>
+        <member name="P:LordKuper.WorkManager.WorkManagerGameComponent.DisabledPawns">
+            <summary>
+                Gets the set of pawns with disabled work assignments.
+            </summary>
+        </member>
+        <member name="P:LordKuper.WorkManager.WorkManagerGameComponent.DisabledPawnSchedules">
+            <summary>
+                Gets the set of pawns with disabled schedules.
+            </summary>
+        </member>
+        <member name="P:LordKuper.WorkManager.WorkManagerGameComponent.DisabledPawnWorkTypes">
+            <summary>
+                Gets the dictionary of pawns and their disabled work types.
+            </summary>
+        </member>
+        <member name="P:LordKuper.WorkManager.WorkManagerGameComponent.DisabledWorkTypes">
+            <summary>
+                Gets the set of disabled work types.
+            </summary>
+        </member>
+        <member name="P:LordKuper.WorkManager.WorkManagerGameComponent.Instance">
+            <summary>
+                Gets the singleton instance of the <see cref="T:LordKuper.WorkManager.WorkManagerGameComponent" /> class.
+            </summary>
+        </member>
+        <member name="P:LordKuper.WorkManager.WorkManagerGameComponent.WorkTypeAssignmentRuleComparer">
+            <summary>
+                Gets a comparer for evaluating work type assignment rules.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerGameComponent.ExposeData">
+            <summary>
+                Serializes and deserializes the component's data.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerGameComponent.ForceUpdateAssignments">
+            <summary>
+                Forces an update of work assignments for the current map.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerGameComponent.ForceUpdateSchedules">
+            <summary>
+                Forces an update of work schedules for all loaded maps.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerGameComponent.GetPawnEnabled(Verse.Pawn)">
+            <summary>
+                Determines if a pawn is enabled for work assignments.
+            </summary>
+            <param name="pawn">The pawn to check.</param>
+            <returns>True if enabled; otherwise, false.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="pawn" /> is null.</exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerGameComponent.GetPawnScheduleEnabled(Verse.Pawn)">
+            <summary>
+                Determines if a pawn's schedule is enabled.
+            </summary>
+            <param name="pawn">The pawn to check.</param>
+            <returns>True if enabled; otherwise, false.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="pawn" /> is null.</exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerGameComponent.GetPawnWorkTypeEnabled(Verse.Pawn,Verse.WorkTypeDef)">
+            <summary>
+                Determines if a pawn is enabled for a specific work type.
+            </summary>
+            <param name="pawn">The pawn to check.</param>
+            <param name="workType">The work type to check.</param>
+            <returns>True if enabled; otherwise, false.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="pawn" /> or <paramref name="workType" /> is null.</exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerGameComponent.GetWorkTypeEnabled(Verse.WorkTypeDef)">
+            <summary>
+                Determines if a work type is enabled.
+            </summary>
+            <param name="workType">The work type to check.</param>
+            <returns>True if enabled; otherwise, false.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="workType" /> is null.</exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerGameComponent.LoadedGame">
+            <summary>
+                Called when a game is loaded. Initializes settings and updates caches.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerGameComponent.SetPawnEnabled(Verse.Pawn,System.Boolean)">
+            <summary>
+                Enables or disables a pawn for work assignments.
+            </summary>
+            <param name="pawn">The pawn to modify.</param>
+            <param name="enabled">True to enable; false to disable.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="pawn" /> is null.</exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerGameComponent.SetPawnScheduleEnabled(Verse.Pawn,System.Boolean)">
+            <summary>
+                Enables or disables a pawn's schedule.
+            </summary>
+            <param name="pawn">The pawn to modify.</param>
+            <param name="enabled">True to enable; false to disable.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="pawn" /> is null.</exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerGameComponent.SetPawnWorkTypeEnabled(Verse.Pawn,Verse.WorkTypeDef,System.Boolean)">
+            <summary>
+                Enables or disables a pawn for a specific work type.
+            </summary>
+            <param name="pawn">The pawn to modify.</param>
+            <param name="workType">The work type to modify.</param>
+            <param name="enabled">True to enable; false to disable.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="pawn" /> or <paramref name="workType" /> is null.</exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerGameComponent.SetPriorityManagementEnabled(System.Boolean)">
+            <summary>
+                Enables or disables automatic priority management and updates assignments when enabled.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerGameComponent.SetWorkTypeEnabled(Verse.WorkTypeDef,System.Boolean)">
+            <summary>
+                Enables or disables a work type.
+            </summary>
+            <param name="workType">The work type to modify.</param>
+            <param name="enabled">True to enable; false to disable.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="workType" /> is null.</exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerGameComponent.StartedNewGame">
+            <summary>
+                Called when a new game is started. Initializes settings and updates caches.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerGameComponent.UpdateAssignEveryoneWorkTypes">
+            <summary>
+                Updates the dictionary of work types that should be assigned to everyone, along with their priorities.
+            </summary>
+            <remarks>
+                This method clears the <see cref="F:LordKuper.WorkManager.WorkManagerGameComponent._assignEveryoneWorkTypes" /> dictionary and repopulates it by iterating
+                through the combined work type assignment rules. For each rule where
+                <see cref="F:LordKuper.WorkManager.WorkTypeAssignmentRule.AssignEveryone" />
+                is <c>true</c>, the corresponding <see cref="T:Verse.WorkTypeDef" /> and
+                <see cref="F:LordKuper.WorkManager.WorkTypeAssignmentRule.AssignEveryonePriority" />
+                are added to the dictionary.
+            </remarks>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerGameComponent.UpdateCombinedRules">
+            <summary>
+                Updates the combined work type assignment rules by merging default and special rules.
+            </summary>
+            <remarks>
+                This method clears the existing combined rules and rebuilds them by combining a default  work
+                type assignment rule with any applicable special rules. If no default rule is found,  a
+                <see
+                    cref="T:System.InvalidOperationException" />
+                is thrown. The combined rules are stored in  a dictionary where each key is a
+                <see cref="T:Verse.WorkTypeDef" /> and the value is the resulting  <see cref="T:LordKuper.WorkManager.WorkTypeAssignmentRule" />.
+            </remarks>
+            <exception cref="T:System.InvalidOperationException">Thrown if no default work type assignment rule is found in the settings.</exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerGameComponent.UpdateDedicatedWorkTypes">
+            <summary>
+                Updates the collection of dedicated work types based on the current rules.
+            </summary>
+            <remarks>
+                This method clears the existing collection of dedicated work types and repopulates it by
+                evaluating the rules in <see cref="F:LordKuper.WorkManager.WorkManagerGameComponent.CombinedRules" />. Only work types with rules that allow dedicated workers are
+                added to the collection.
+            </remarks>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerGameComponent.UpdateSettingsCache">
+            <summary>
+                Updates the cached settings for work type assignment rules and assignments to everyone.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerGameComponent.Validate">
+            <summary>
+                Validates and cleans up the internal state by removing invalid or destroyed entries  from the disabled pawns,
+                pawn schedules, and work types collections.
+            </summary>
+            <remarks>
+                This method ensures that the internal collections only contain valid and active entries.  It
+                removes destroyed pawns from the disabled pawns and pawn schedules collections,  and removes work types that are
+                no longer defined in the database from the disabled work types collection.
+            </remarks>
+        </member>
+        <member name="T:LordKuper.WorkManager.WorkManagerMod">
+            <summary>
+                The main mod class for Work Manager, responsible for initialization and settings management.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkManagerMod.ModId">
+            <summary>
+                The unique identifier for the Work Manager mod.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerMod.#ctor(Verse.ModContentPack)">
+            <summary>
+                Initializes a new instance of the <see cref="T:LordKuper.WorkManager.WorkManagerMod" /> class.
+                Sets up logging, settings, Harmony patches, and compatibility integrations.
+            </summary>
+            <param name="content">The mod content pack.</param>
+        </member>
+        <member name="P:LordKuper.WorkManager.WorkManagerMod.Settings">
+            <summary>
+                Gets the mod settings instance.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerMod.DoSettingsWindowContents(UnityEngine.Rect)">
+            <summary>
+                Draws the settings window contents for the mod.
+            </summary>
+            <param name="inRect">The rectangle area to draw the settings window contents.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerMod.GetModInputId(System.Int32)">
+            <summary>
+                Returns a unique input ID for the mod by adding an offset to the local ID.
+                This ensures that input IDs used within the mod do not conflict with those from other mods or the base game.
+            </summary>
+            <param name="localId">
+                The local input ID to be offset. This should be a unique identifier within the context of the mod.
+            </param>
+            <returns>
+                An integer representing the unique mod input ID, calculated by adding the hash code of the mod's unique identifier
+                (<see cref="F:LordKuper.WorkManager.WorkManagerMod.ModId" />) to the provided <paramref name="localId" />.
+            </returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerMod.OpenModSettingsWindow">
+            <summary>
+                Opens the Mod Settings window, allowing the user to configure settings for the current mod.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerMod.SettingsCategory">
+            <summary>
+                Gets the settings category label for the mod.
+            </summary>
+            <returns>The settings category label.</returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkManagerMod.WriteSettings">
+            <summary>
+                Writes the current settings to the appropriate game component, ensuring they are updated in the game's settings
+                cache.
+            </summary>
+        </member>
+        <member name="T:LordKuper.WorkManager.WorkPriorityUpdater">
+            <summary>
+                Manages and updates work priorities for pawns on a specific map.
+            </summary>
+            <remarks>
+                This class is responsible for dynamically assigning and updating work priorities for pawns based on
+                various factors such as skill levels, passions, learning rates, and predefined rules. It ensures that work
+                priorities are optimized and aligned with the current game state and configuration settings. The updates are
+                performed periodically and take into account both global and pawn-specific conditions.
+            </remarks>
+            <param name="map"></param>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkPriorityUpdater.#ctor(Verse.Map)">
+            <summary>
+                Manages and updates work priorities for pawns on a specific map.
+            </summary>
+            <remarks>
+                This class is responsible for dynamically assigning and updating work priorities for pawns based on
+                various factors such as skill levels, passions, learning rates, and predefined rules. It ensures that work
+                priorities are optimized and aligned with the current game state and configuration settings. The updates are
+                performed periodically and take into account both global and pawn-specific conditions.
+            </remarks>
+            <param name="map"></param>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkPriorityUpdater.DangerousWorkScorePenalty">
+            <summary>
+                Score penalty applied to a pawn for a work type considered dangerous by its ideology.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkPriorityUpdater.IdleHoursThreshold">
+            <summary>
+                Hours a pawn must remain idle before idle work assignment is cleared.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkPriorityUpdater.UpdateTickMask">
+            <summary>
+                Bitmask gating updates to once every 64 game ticks.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkPriorityUpdater.ApplyWorkPriorities">
+            <summary>
+                Applies the calculated work priorities to all managed pawns.
+            </summary>
+            <remarks>
+                Iterates through all managed pawns in the cache and sets their work priorities for each managed work type.
+                The priority value is retrieved from the pawn's cache and applied using
+                <see cref="M:LordKuper.WorkManager.Helpers.WorkTypePriorityHelper.SetPriority(Verse.Pawn,Verse.WorkTypeDef,System.Int32)" />.
+                Only work types that are managed for the pawn are updated.
+            </remarks>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkPriorityUpdater.AssignBestDedicatedWorkers(System.Collections.Generic.Dictionary{LordKuper.WorkManager.Cache.PawnCache,System.Single},LordKuper.WorkManager.WorkTypeAssignmentRule,System.Int32,System.Int32)">
+            <summary>
+                Repeatedly assigns the highest-scoring pawn as a dedicated worker for the rule's work type until the
+                target worker count is reached or no candidates remain.
+            </summary>
+            <param name="pawnScores">Candidate pawns mapped to their suitability scores. Assigned pawns are removed.</param>
+            <param name="rule">The work type assignment rule being satisfied.</param>
+            <param name="workerCount">The current number of assigned dedicated workers.</param>
+            <param name="targetWorkersCount">The desired number of dedicated workers.</param>
+            <returns>The updated worker count after assignments.</returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkPriorityUpdater.AssignBestDedicatedWorkersForHour(System.Collections.Generic.Dictionary{LordKuper.WorkManager.Cache.PawnCache,System.Single},System.Int32,System.Int32,System.Collections.Generic.HashSet{LordKuper.WorkManager.Cache.PawnCache},System.Int32)">
+            <summary>
+                Adds the highest-scoring workers on the clock at the given hour to the dedicated set until the
+                hour's target count is reached or no further candidates remain.
+            </summary>
+            <param name="pawnScores">Candidate pawns mapped to their suitability scores.</param>
+            <param name="hour">The hour of the day (0-23) being covered.</param>
+            <param name="targetWorkersCount">The number of dedicated workers wanted for the hour.</param>
+            <param name="dedicatedSet">The accumulating set of dedicated workers (mutated).</param>
+            <param name="alreadyPicked">Workers already counted toward the hour from a previous pass.</param>
+            <returns>The number of workers covering the hour after this pass.</returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkPriorityUpdater.AssignCommonWork">
+            <summary>
+                Assigns common work priorities to managed pawns based on predefined work types and conditions.
+            </summary>
+            <remarks>
+                This method evaluates all managed pawns and assigns work priorities for specific work types
+                that are both relevant and compatible with the pawn's capabilities. Only pawns that are managed, capable, and
+                not recovering are considered. Work types that are disabled or deemed unsuitable for a pawn are excluded from
+                assignment.
+            </remarks>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkPriorityUpdater.AssignDedicatedWorkers">
+            <summary>
+                Assigns dedicated workers to specific work types based on predefined rules and priorities.
+            </summary>
+            <remarks>
+                This method evaluates the available workers and assigns them to work types that allow
+                dedicated workers, ensuring that the target number of workers is met for each applicable work type. The
+                assignment process considers worker suitability, existing assignments, and priority settings. If no suitable
+                workers are available, a fallback mechanism is used to assign less optimal workers.
+            </remarks>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkPriorityUpdater.AssignDedicatedWorkersForDay(LordKuper.WorkManager.WorkTypeAssignmentRule,System.Collections.Generic.List{LordKuper.WorkManager.WorkTypeAssignmentRule})">
+            <summary>
+                Assigns dedicated workers for a single rule using the legacy day-level selection:
+                picks the highest-scoring workers for the whole day, ignoring schedules.
+            </summary>
+            <param name="rule">The work type assignment rule being satisfied.</param>
+            <param name="relevantRules">All dedicated rules, used for scoring (dedication counts).</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkPriorityUpdater.AssignLeftoverWorkTypes">
+            <summary>
+                Assigns unallocated work types to capable pawns based on their suitability and the current configuration
+                settings.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkPriorityUpdater.AssignWorkersByLearningRate">
+            <summary>
+                Assigns work priorities to managed workers based on their learning rates for specific work types.
+            </summary>
+            <remarks>
+                This method evaluates each managed worker's learning rate for eligible work types and assigns
+                a priority  if the learning rate meets or exceeds predefined thresholds. Workers with higher learning rates are
+                assigned  higher priorities. Only workers and work types that meet specific conditions are considered for
+                assignment.
+            </remarks>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkPriorityUpdater.AssignWorkersByPassion">
+            <summary>
+                Assigns work priorities to managed workers based on their passions and predefined rules.
+            </summary>
+            <remarks>
+                This method iterates through all capable and managed workers, evaluating their suitability
+                for specific work types based on passion levels, work type rules, and other constraints. If a worker's passion
+                for a work type meets the criteria and a priority is defined for that passion, the worker's priority for the
+                work type is updated accordingly.
+            </remarks>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkPriorityUpdater.AssignWorkersBySkill">
+            <summary>
+                Assigns workers to tasks based on their skill levels and predefined work type rules.
+            </summary>
+            <remarks>
+                This method evaluates the skills of available workers and assigns them to tasks where they
+                are most proficient,  following the rules defined in the managed work type configuration. Workers with higher
+                skill levels are prioritized,  and only those who meet the criteria for a specific task are considered. If no
+                workers or relevant rules are available,  the method exits without making any assignments.
+            </remarks>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkPriorityUpdater.AssignWorkToIdlePawns">
+            <summary>
+                Assigns work priorities to pawns that are currently idle, based on managed work type rules and eligibility.
+            </summary>
+            <remarks>
+                This method identifies pawns that have been idle for a specified duration and assigns them
+                work priorities  for eligible work types. It ensures that only managed pawns and work types that meet specific
+                conditions  (e.g., allowed and not marked as bad work) are considered. If no idle pawns are found, the method
+                exits early.
+            </remarks>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkPriorityUpdater.GetDedicatedWorkersScores(System.Collections.Generic.IReadOnlyCollection{LordKuper.WorkManager.Cache.PawnCache},Verse.WorkTypeDef,System.Collections.Generic.IReadOnlyCollection{LordKuper.WorkManager.WorkTypeAssignmentRule})">
+            <summary>
+                Calculates and returns a dictionary of scores for a collection of pawns, indicating their suitability as
+                dedicated workers for a specified work type based on various factors.
+            </summary>
+            <remarks>
+                The score for each pawn is calculated based on several factors, including:
+                <list
+                    type="bullet">
+                    <item>
+                        <description>The pawn's skill level for the specified work type.</description>
+                    </item>
+                    <item>
+                        <description>The pawn's passion for the work type.</description>
+                    </item>
+                    <item>
+                        <description>
+                            The pawn's
+                            learning rate for the work type.
+                        </description>
+                    </item>
+                    <item>
+                        <description>
+                            The number of other work types the pawn
+                            is dedicated to.
+                        </description>
+                    </item>
+                </list>
+                Each factor is normalized and weighted according to predefined
+                settings, and the final score is computed as a weighted sum of these factors. Pawns that are not managed for the
+                specified work type are excluded from the results.
+            </remarks>
+            <param name="pawns">The collection of pawns to evaluate. Cannot be <see langword="null" />.</param>
+            <param name="workType">The work type for which the scores are being calculated. Cannot be <see langword="null" />.</param>
+            <param name="rules">
+                The collection of work type assignment rules to consider during evaluation. Cannot be
+                <see langword="null" />.
+            </param>
+            <returns>
+                A dictionary where each key is a <see cref="T:LordKuper.WorkManager.Cache.PawnCache" /> representing a pawn, and the value is a
+                <see
+                    cref="T:System.Single" />
+                representing the calculated score for that pawn. Higher scores indicate greater suitability as a
+                dedicated worker for the specified work type.
+            </returns>
+            <exception cref="T:System.ArgumentNullException">
+                Thrown if <paramref name="pawns" />, <paramref name="workType" />, or <paramref name="rules" /> is
+                <see
+                    langword="null" />
+                .
+            </exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkPriorityUpdater.MapComponentTick">
+            <summary>
+                Executes periodic updates for work priorities and related settings in the game.
+            </summary>
+            <remarks>
+                This method is called on each tick of the game and performs updates to work priorities  if
+                priority management is enabled and certain conditions are met. It ensures that work  priorities are updated at a
+                configurable frequency and applies the changes to all  player-controlled pawns. The method also enables work
+                priorities if they are disabled  in the game settings.  This method skips execution when the game paused or
+                when the current tick does not  align with the update interval. Additionally, it respects the configured update
+                frequency  to avoid unnecessary recalculations.
+            </remarks>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkPriorityUpdater.TryAssignDedicatedWorkersBySchedule(LordKuper.WorkManager.WorkTypeAssignmentRule,System.Collections.Generic.List{LordKuper.WorkManager.WorkTypeAssignmentRule})">
+            <summary>
+                Assigns dedicated workers for a single rule taking pawn schedules into account.
+            </summary>
+            <remarks>
+                For every hour of the day the target worker count is recomputed from the number of capable
+                pawns actually working that hour, and the best-scoring workers on the clock that hour are
+                selected. The union of those workers receives the (whole-day) dedicated worker priority, so
+                each working hour is covered by the most suitable workers available at that time. When fewer
+                than the target good workers are on the clock, allowed-but-bad workers of that hour are used
+                as a fail-safe.
+            </remarks>
+            <param name="rule">The work type assignment rule being satisfied.</param>
+            <param name="relevantRules">All dedicated rules, used for scoring (dedication counts).</param>
+            <returns>
+                <c>true</c> if the schedule-aware selection was applied (including when there are no allowed
+                workers); <c>false</c> when no allowed worker has any working hour, signalling the caller to
+                fall back to the legacy day-level selection.
+            </returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkPriorityUpdater.Update">
+            <summary>
+                Updates the work priorities for all player-controlled pawns, ensuring that work priorities are enabled and
+                recalculated as necessary.
+            </summary>
+            <remarks>
+                This method ensures that the game's work priorities setting is enabled and notifies all
+                relevant pawns of the change. It then updates internal caches and recalculates work priorities to reflect the
+                current state.
+            </remarks>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkPriorityUpdater.UpdateCache">
+            <summary>
+                Updates the internal cache of managed work types and pawn data for the current map.
+            </summary>
+            <remarks>
+                This method synchronizes the cache with the current state of the game, ensuring that:
+                <list
+                    type="bullet">
+                    <item>
+                        <description>
+                            Only enabled work types are tracked in the managed work types
+                            list.
+                        </description>
+                    </item>
+                    <item>
+                        <description>
+                            All free colonists currently spawned on the map are included in
+                            the pawn list.
+                        </description>
+                    </item>
+                    <item>
+                        <description>
+                            Stale entries in the pawn cache are removed, and new
+                            entries are added for any missing pawns.
+                        </description>
+                    </item>
+                </list>
+                The cache is updated to reflect the latest
+                game state, and any necessary updates are applied to individual pawn caches.
+            </remarks>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkPriorityUpdater.UpdateWorkPriorities">
+            <summary>
+                Updates the work priorities for all workers based on the current settings and configurations.
+            </summary>
+            <remarks>
+                This method adjusts work priorities by applying a series of rules and strategies, such as
+                assigning  common work, using dedicated workers, prioritizing by skill, passion, or learning rate, and handling
+                leftover work types. The behavior of this method is influenced by the settings in
+                <see
+                    cref="P:LordKuper.WorkManager.WorkManagerMod.Settings" />
+                .
+            </remarks>
+        </member>
+        <member name="T:LordKuper.WorkManager.WorkShift">
+            <summary>
+                Represents a work shift: a 24-hour timetable assignment template with a pawn-count threshold.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkShift.PawnThreshold">
+            <summary>
+                The minimum number of pawns required for this work shift to be used.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkShift.ExposeData">
+            <summary>
+                Serializes and deserializes the work shift data.
+            </summary>
+        </member>
+    </members>
+</doc>

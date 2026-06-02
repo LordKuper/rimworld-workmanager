@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -16,12 +15,27 @@ public partial class Settings
     private float _timeAssignmentColumnWidth;
     private float _workShiftNumberColumnWidth;
     private float _workShiftTableWidth;
+
+    /// <summary>
+    ///     The work shifts used for regular colonists.
+    /// </summary>
     public List<WorkShift> ColonistWorkShifts = [..DefaultColonistWorkShifts];
+
+    /// <summary>
+    ///     Indicates whether the work schedule is managed automatically.
+    /// </summary>
     public bool ManageWorkSchedule = true;
+
+    /// <summary>
+    ///     The work shifts used for night owl colonists.
+    /// </summary>
     public List<WorkShift> NightOwlWorkShifts = [..DefaultNightOwlWorkShifts];
+
+    /// <summary>
+    ///     The frequency (per day) at which the schedule is updated.
+    /// </summary>
     public int ScheduleUpdateFrequency = 2;
 
-    [NotNull]
     private static IEnumerable<string> DefaultAfternoonWorkShift
     {
         get
@@ -41,14 +55,12 @@ public partial class Settings
         }
     }
 
-    [NotNull]
     private static IEnumerable<WorkShift> DefaultColonistWorkShifts =>
     [
         new(DefaultMorningWorkShift, 1), new(DefaultAfternoonWorkShift, 6),
         new(DefaultNightWorkShift, 9)
     ];
 
-    [NotNull]
     private static IEnumerable<string> DefaultMorningWorkShift
     {
         get
@@ -68,7 +80,6 @@ public partial class Settings
         }
     }
 
-    [NotNull]
     private static IEnumerable<string> DefaultNightOwlWorkShift
     {
         get
@@ -88,11 +99,9 @@ public partial class Settings
         }
     }
 
-    [NotNull]
     private static IEnumerable<WorkShift> DefaultNightOwlWorkShifts =>
         [new(DefaultNightOwlWorkShift, 1)];
 
-    [NotNull]
     private static IEnumerable<string> DefaultNightWorkShift
     {
         get
@@ -116,11 +125,10 @@ public partial class Settings
     {
         _workShiftNumberColumnWidth = rect.width * 0.1f;
         _pawnThresholdColumnWidth = rect.width * 0.25f;
-        _timeAssignmentColumnWidth =
-            rect.width - (_workShiftNumberColumnWidth + _pawnThresholdColumnWidth);
+        _timeAssignmentColumnWidth = rect.width - (_workShiftNumberColumnWidth + _pawnThresholdColumnWidth);
     }
 
-    private void DoColonistWorkShifts([NotNull] Listing listing)
+    private void DoColonistWorkShifts(Listing listing)
     {
         var headerRect = listing.GetRect(Text.LineHeight);
         TooltipHandler.TipRegion(headerRect, Strings.ColonistWorkShiftsTooltip);
@@ -128,18 +136,16 @@ public partial class Settings
         var buttonRowRect = listing.GetRect(35f);
         Rect buttonRect = new(buttonRowRect.x, buttonRowRect.y, 150f, 35f);
         if (Widgets.ButtonText(buttonRect, Strings.AddWorkShift))
-            ColonistWorkShifts.Add(new WorkShift
-                { PawnThreshold = ColonistWorkShifts.Last().PawnThreshold });
+            ColonistWorkShifts.Add(new WorkShift { PawnThreshold = ColonistWorkShifts.Last().PawnThreshold });
         buttonRect = new Rect(buttonRect.xMax + 10f, buttonRect.y, 150f, 35f);
-        if (Widgets.ButtonText(buttonRect, Strings.DeleteWorkShift,
-                active: ColonistWorkShifts.Count > 1))
+        if (Widgets.ButtonText(buttonRect, Strings.DeleteWorkShift, active: ColonistWorkShifts.Count > 1))
         {
             List<FloatMenuOption> options = [];
             for (var i = 1; i < ColonistWorkShifts.Count; i++)
             {
                 var workShift = ColonistWorkShifts[i];
-                options.Add(new FloatMenuOption($"Work shift #{i + 1}",
-                    () => { ColonistWorkShifts.Remove(workShift); }));
+                options.Add(
+                    new FloatMenuOption($"Work shift #{i + 1}", () => { ColonistWorkShifts.Remove(workShift); }));
             }
             Find.WindowStack.Add(new FloatMenu(options));
         }
@@ -169,15 +175,13 @@ public partial class Settings
             else
             {
                 minThreshold = ColonistWorkShifts[i - 1].PawnThreshold;
-                maxThreshold = i == ColonistWorkShifts.Count - 1
-                    ? 20
-                    : ColonistWorkShifts[i + 1].PawnThreshold;
+                maxThreshold = i == ColonistWorkShifts.Count - 1 ? 20 : ColonistWorkShifts[i + 1].PawnThreshold;
             }
             DoWorkShiftRow(listing.GetRect(35f), workShift, i, minThreshold, maxThreshold);
         }
     }
 
-    private void DoNightOwlWorkShifts([NotNull] Listing listing)
+    private void DoNightOwlWorkShifts(Listing listing)
     {
         var headerRect = listing.GetRect(Text.LineHeight);
         TooltipHandler.TipRegion(headerRect, Strings.NightOwlWorkShiftsTooltip);
@@ -185,18 +189,16 @@ public partial class Settings
         var buttonRowRect = listing.GetRect(35f);
         Rect buttonRect = new(buttonRowRect.x, buttonRowRect.y, 150f, 35f);
         if (Widgets.ButtonText(buttonRect, Strings.AddWorkShift))
-            NightOwlWorkShifts.Add(new WorkShift
-                { PawnThreshold = NightOwlWorkShifts.Last().PawnThreshold });
+            NightOwlWorkShifts.Add(new WorkShift { PawnThreshold = NightOwlWorkShifts.Last().PawnThreshold });
         buttonRect = new Rect(buttonRect.xMax + 10f, buttonRect.y, 150f, 35f);
-        if (Widgets.ButtonText(buttonRect, Strings.DeleteWorkShift,
-                active: NightOwlWorkShifts.Count > 1))
+        if (Widgets.ButtonText(buttonRect, Strings.DeleteWorkShift, active: NightOwlWorkShifts.Count > 1))
         {
             List<FloatMenuOption> options = [];
             for (var i = 1; i < NightOwlWorkShifts.Count; i++)
             {
                 var workShift = NightOwlWorkShifts[i];
-                options.Add(new FloatMenuOption($"Work shift #{i + 1}",
-                    () => { NightOwlWorkShifts.Remove(workShift); }));
+                options.Add(
+                    new FloatMenuOption($"Work shift #{i + 1}", () => { NightOwlWorkShifts.Remove(workShift); }));
             }
             Find.WindowStack.Add(new FloatMenu(options));
         }
@@ -226,9 +228,7 @@ public partial class Settings
             else
             {
                 minThreshold = NightOwlWorkShifts[i - 1].PawnThreshold;
-                maxThreshold = i == NightOwlWorkShifts.Count - 1
-                    ? 20
-                    : NightOwlWorkShifts[i + 1].PawnThreshold;
+                maxThreshold = i == NightOwlWorkShifts.Count - 1 ? 20 : NightOwlWorkShifts[i + 1].PawnThreshold;
             }
             DoWorkShiftRow(listing.GetRect(35f), workShift, i, minThreshold, maxThreshold);
         }
@@ -241,16 +241,14 @@ public partial class Settings
         const int numericSettingsCount = 1;
         var height = boolSettingsCount * (Text.LineHeight + listing.verticalSpacing) +
                      numericSettingsCount * (Text.LineHeight * 1.5f + listing.verticalSpacing) +
-                     listing.verticalSpacing + Text.LineHeight * 1.5f + listing.verticalSpacing +
-                     Text.LineHeight + 35f + Text.LineHeight * 2 + Text.SpaceBetweenLines +
-                     35 * ColonistWorkShifts.Count + listing.verticalSpacing + Text.LineHeight +
-                     35f + Text.LineHeight * 2 + Text.SpaceBetweenLines +
+                     listing.verticalSpacing + Text.LineHeight * 1.5f + listing.verticalSpacing + Text.LineHeight +
+                     35f + Text.LineHeight * 2 + Text.SpaceBetweenLines + 35 * ColonistWorkShifts.Count +
+                     listing.verticalSpacing + Text.LineHeight + 35f + Text.LineHeight * 2 + Text.SpaceBetweenLines +
                      35 * NightOwlWorkShifts.Count;
         Rect viewRect = new(rect.x, 0, rect.width - 16f, height);
         Widgets.BeginScrollView(rect, ref _scrollPosition, viewRect);
         listing.Begin(viewRect);
-        listing.CheckboxLabeled(Strings.ManageWorkSchedule, ref ManageWorkSchedule,
-            Strings.ManageWorkScheduleTooltip);
+        listing.CheckboxLabeled(Strings.ManageWorkSchedule, ref ManageWorkSchedule, Strings.ManageWorkScheduleTooltip);
         var optionRect = listing.GetRect(Text.LineHeight * 1.5f);
         var fieldRect = optionRect;
         var labelRect = optionRect;
@@ -259,8 +257,8 @@ public partial class Settings
         TooltipHandler.TipRegion(optionRect, Strings.UpdateFrequencyTooltip);
         Widgets.DrawHighlightIfMouseover(optionRect);
         Widgets.Label(labelRect, Strings.UpdateFrequency);
-        ScheduleUpdateFrequency = (int)Widgets.HorizontalSlider(fieldRect.ContractedBy(4f),
-            ScheduleUpdateFrequency, 1f, 24f, true, ScheduleUpdateFrequency.ToString(), roundTo: 1);
+        ScheduleUpdateFrequency = (int)Widgets.HorizontalSlider(fieldRect.ContractedBy(4f), ScheduleUpdateFrequency, 1f,
+            24f, true, ScheduleUpdateFrequency.ToString(), roundTo: 1);
         listing.Gap(listing.verticalSpacing);
         listing.GapLine(listing.verticalSpacing);
         DoTimeAssignmentSelector(listing.GetRect(Text.LineHeight * 1.5f));
@@ -308,33 +306,28 @@ public partial class Settings
         Text.Anchor = TextAnchor.MiddleCenter;
         Rect numberRect = new(rect.x, rect.y, _workShiftNumberColumnWidth, rect.height);
         Widgets.Label(numberRect, Strings.WorkShiftNumberColumnHeader);
-        Rect timeAssignmentRect =
-            new(numberRect.xMax, rect.y, _timeAssignmentColumnWidth, rect.height);
+        Rect timeAssignmentRect = new(numberRect.xMax, rect.y, _timeAssignmentColumnWidth, rect.height);
         Widgets.Label(timeAssignmentRect, Strings.WorkShiftColumnHeader);
         TooltipHandler.TipRegion(timeAssignmentRect, Strings.WorkShiftColumnHeaderTooltip);
-        Rect thresholdRect = new(timeAssignmentRect.xMax, rect.y, _pawnThresholdColumnWidth,
-            rect.height);
+        Rect thresholdRect = new(timeAssignmentRect.xMax, rect.y, _pawnThresholdColumnWidth, rect.height);
         Widgets.Label(thresholdRect, Strings.WorkShiftThresholdColumnHeader);
         TooltipHandler.TipRegion(thresholdRect, Strings.WorkShiftThresholdColumnHeaderTooltip);
         Text.Anchor = TextAnchor.UpperLeft;
     }
 
-    private void DoWorkShiftRow(Rect rect, [NotNull] WorkShift workShift, int number,
-        int minThreshold, int maxThreshold)
+    private void DoWorkShiftRow(Rect rect, WorkShift workShift, int number, int minThreshold, int maxThreshold)
     {
         Text.Anchor = TextAnchor.MiddleCenter;
-        var numberRect = new Rect(rect.x, rect.y, _workShiftNumberColumnWidth, rect.height)
-            .ContractedBy(4f);
+        var numberRect = new Rect(rect.x, rect.y, _workShiftNumberColumnWidth, rect.height).ContractedBy(4f);
         Widgets.Label(numberRect, (number + 1).ToString("N0"));
         var timeAssignmentRect =
-            new Rect(numberRect.xMax, rect.y, _timeAssignmentColumnWidth, rect.height)
-                .ContractedBy(4f);
+            new Rect(numberRect.xMax, rect.y, _timeAssignmentColumnWidth, rect.height).ContractedBy(4f);
         var cellWidth = timeAssignmentRect.width / 24f;
         Text.Font = GameFont.Tiny;
         for (var hour = 0; hour < 24; hour++)
         {
-            var cellRect = new Rect(timeAssignmentRect.x + hour * cellWidth, timeAssignmentRect.y,
-                cellWidth, timeAssignmentRect.height).ContractedBy(1f);
+            var cellRect = new Rect(timeAssignmentRect.x + hour * cellWidth, timeAssignmentRect.y, cellWidth,
+                timeAssignmentRect.height).ContractedBy(1f);
             var assignment = workShift.GetTimeAssignment(hour);
             GUI.DrawTexture(cellRect, assignment.ColorTexture);
             Widgets.Label(cellRect.ContractedBy(2f), hour.ToString("N0"));
@@ -351,15 +344,13 @@ public partial class Settings
         }
         Text.Font = GameFont.Small;
         GUI.color = Color.white;
-        var thresholdRect =
-            new Rect(timeAssignmentRect.xMax, rect.y, _pawnThresholdColumnWidth, rect.height)
-                .ContractedBy(4f);
+        var thresholdRect = new Rect(timeAssignmentRect.xMax, rect.y, _pawnThresholdColumnWidth, rect.height)
+            .ContractedBy(4f);
         if (number == 0)
             Widgets.Label(thresholdRect, workShift.PawnThreshold.ToString("N0"));
         else
-            workShift.PawnThreshold = (int)Widgets.HorizontalSlider(thresholdRect,
-                workShift.PawnThreshold, minThreshold, maxThreshold, true,
-                workShift.PawnThreshold.ToString(), roundTo: 1);
+            workShift.PawnThreshold = (int)Widgets.HorizontalSlider(thresholdRect, workShift.PawnThreshold,
+                minThreshold, maxThreshold, true, workShift.PawnThreshold.ToString(), roundTo: 1);
         Text.Anchor = TextAnchor.UpperLeft;
     }
 

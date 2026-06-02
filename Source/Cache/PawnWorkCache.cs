@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using LordKuper.Common;
 using LordKuper.Common.Cache;
 using LordKuper.Common.Helpers;
@@ -43,7 +42,7 @@ internal class PawnWorkCache(Pawn pawn) : TimedCache(RimWorldTime.HoursInDay)
     /// <param name="workType">The type of work for which to retrieve the passion level. Cannot be <see langword="null" />.</param>
     /// <returns>The <see cref="Passion" /> level associated with the specified work type.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="workType" /> is <see langword="null" />.</exception>
-    public Passion GetWorkPassion([NotNull] WorkTypeDef workType)
+    public Passion GetWorkPassion(WorkTypeDef workType)
     {
         if (workType == null) throw new ArgumentNullException(nameof(workType));
         if (_workPassions.TryGetValue(workType, out var passion)) return passion;
@@ -62,12 +61,12 @@ internal class PawnWorkCache(Pawn pawn) : TimedCache(RimWorldTime.HoursInDay)
     ///     <c>true</c> if the work type is bad for the pawn; otherwise, <c>false</c>.
     /// </returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="workType" /> is <c>null</c>.</exception>
-    public bool IsBadWork([NotNull] WorkTypeDef workType)
+    public bool IsBadWork(WorkTypeDef workType)
     {
         if (workType == null) throw new ArgumentNullException(nameof(workType));
         if (!MoreThanCapable.MoreThanCapableActive) return false;
         if (_badWorkTypes.TryGetValue(workType, out var work)) return work;
-        var value = MoreThanCapable.IsBadWork(pawn, workType);
+        var value = MoreThanCapable.IsBadWork?.Invoke(pawn, workType) ?? false;
         _badWorkTypes.Add(workType, value);
         return value;
     }
@@ -85,7 +84,7 @@ internal class PawnWorkCache(Pawn pawn) : TimedCache(RimWorldTime.HoursInDay)
     ///     <see langword="false" />.
     /// </returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="workType" /> is <see langword="null" />.</exception>
-    public bool IsDangerousWork([NotNull] WorkTypeDef workType)
+    public bool IsDangerousWork(WorkTypeDef workType)
     {
         if (workType == null) throw new ArgumentNullException(nameof(workType));
         if (_dangerousWorkTypes.TryGetValue(workType, out var dangerous)) return dangerous;

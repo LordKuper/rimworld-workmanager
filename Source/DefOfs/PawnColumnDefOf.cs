@@ -15,10 +15,10 @@ public static class PawnColumnDefOf
     /// <summary>
     ///     The pawn column definition for displaying and editing automatic work priorities.
     /// </summary>
-    public static PawnColumnDef AutoWorkPriorities;
+    public static PawnColumnDef AutoWorkPriorities = null!;
 
     /// <summary>
     ///     The pawn column definition for displaying and editing automatic work schedules.
     /// </summary>
-    public static PawnColumnDef AutoWorkSchedule;
+    public static PawnColumnDef AutoWorkSchedule = null!;
 }

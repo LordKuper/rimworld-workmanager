@@ -28,8 +28,7 @@ public class WorkManagerMod : Mod
     /// <param name="content">The mod content pack.</param>
     public WorkManagerMod(ModContentPack content) : base(content)
     {
-        Logger.LogMessage(
-            $"Initializing (v.{Assembly.GetExecutingAssembly().GetName().Version})...");
+        Logger.LogMessage($"Initializing (v.{Assembly.GetExecutingAssembly().GetName().Version})...");
         Settings = GetSettings<Settings>();
         if (!_isPatched)
         {
@@ -44,7 +43,7 @@ public class WorkManagerMod : Mod
     /// <summary>
     ///     Gets the mod settings instance.
     /// </summary>
-    internal static Settings Settings { get; private set; }
+    internal static Settings Settings { get; private set; } = null!;
 
     /// <summary>
     ///     Draws the settings window contents for the mod.

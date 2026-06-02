@@ -1,5 +1,4 @@
 using System;
-using JetBrains.Annotations;
 using LordKuper.Common.Filters;
 using UnityEngine;
 using Verse;
@@ -99,7 +98,7 @@ internal class DedicatedWorkerSettings : IExposable
     /// <summary>
     ///     Filter used when <see cref="Mode" /> is <see cref="DedicatedWorkerMode.PawnCount" />.
     /// </summary>
-    public PawnFilter PawnCountFilter;
+    public PawnFilter? PawnCountFilter;
 
     /// <summary>
     ///     Indicates whether tri-state mode is enabled.
@@ -127,9 +126,7 @@ internal class DedicatedWorkerSettings : IExposable
                 WorkTypeCountFactor = WorkTypeCountFactorDefault;
             if (_mode != DedicatedWorkerMode.CapablePawnRatio)
                 CapablePawnRatioFactor = CapablePawnRatioFactorDefault;
-            PawnCountFilter = _mode == DedicatedWorkerMode.PawnCount
-                ? new PawnFilter { TriStateMode = false }
-                : null;
+            PawnCountFilter = _mode == DedicatedWorkerMode.PawnCount ? new PawnFilter { TriStateMode = false } : null;
         }
     }
 
@@ -142,12 +139,9 @@ internal class DedicatedWorkerSettings : IExposable
         Scribe_Values.Look(ref TriStateMode, nameof(TriStateMode));
         Scribe_Values.Look(ref AllowDedicated, nameof(AllowDedicated), true);
         Scribe_Values.Look(ref _mode, nameof(Mode));
-        Scribe_Values.Look(ref ConstantWorkerCount, nameof(ConstantWorkerCount),
-            ConstantWorkerCountDefault);
-        Scribe_Values.Look(ref WorkTypeCountFactor, nameof(WorkTypeCountFactor),
-            WorkTypeCountFactorDefault);
-        Scribe_Values.Look(ref CapablePawnRatioFactor, nameof(CapablePawnRatioFactor),
-            CapablePawnRatioFactorDefault);
+        Scribe_Values.Look(ref ConstantWorkerCount, nameof(ConstantWorkerCount), ConstantWorkerCountDefault);
+        Scribe_Values.Look(ref WorkTypeCountFactor, nameof(WorkTypeCountFactor), WorkTypeCountFactorDefault);
+        Scribe_Values.Look(ref CapablePawnRatioFactor, nameof(CapablePawnRatioFactor), CapablePawnRatioFactorDefault);
         Scribe_Values.Look(ref PawnCountFactor, nameof(PawnCountFactor), PawnCountFactorDefault);
         Scribe_Deep.Look(ref PawnCountFilter, nameof(PawnCountFilter));
     }
@@ -177,9 +171,7 @@ internal class DedicatedWorkerSettings : IExposable
     ///     <see langword="null" />.
     /// </exception>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    [NotNull]
-    public static DedicatedWorkerSettings Combine([NotNull] DedicatedWorkerSettings main,
-        [NotNull] DedicatedWorkerSettings fallback)
+    public static DedicatedWorkerSettings Combine(DedicatedWorkerSettings main, DedicatedWorkerSettings fallback)
     {
         if (main == null) throw new ArgumentNullException(nameof(main));
         if (fallback == null) throw new ArgumentNullException(nameof(fallback));
@@ -207,12 +199,8 @@ internal class DedicatedWorkerSettings : IExposable
                     : fallback.CapablePawnRatioFactor;
                 break;
             case DedicatedWorkerMode.PawnCount:
-                settings.PawnCountFactor = main.Mode.HasValue
-                    ? main.PawnCountFactor
-                    : fallback.PawnCountFactor;
-                settings.PawnCountFilter = main.Mode.HasValue
-                    ? main.PawnCountFilter
-                    : fallback.PawnCountFilter;
+                settings.PawnCountFactor = main.Mode.HasValue ? main.PawnCountFactor : fallback.PawnCountFactor;
+                settings.PawnCountFilter = main.Mode.HasValue ? main.PawnCountFilter : fallback.PawnCountFilter;
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -232,10 +220,8 @@ internal class DedicatedWorkerSettings : IExposable
         }
         if (Mode == DedicatedWorkerMode.PawnCount && PawnCountFilter == null)
             PawnCountFilter = new PawnFilter();
-        ConstantWorkerCount = Mathf.Clamp(ConstantWorkerCount, ConstantWorkerCountMin,
-            ConstantWorkerCountMax);
-        WorkTypeCountFactor = Mathf.Clamp(WorkTypeCountFactor, WorkTypeCountFactorMin,
-            WorkTypeCountFactorMax);
+        ConstantWorkerCount = Mathf.Clamp(ConstantWorkerCount, ConstantWorkerCountMin, ConstantWorkerCountMax);
+        WorkTypeCountFactor = Mathf.Clamp(WorkTypeCountFactor, WorkTypeCountFactorMin, WorkTypeCountFactorMax);
         CapablePawnRatioFactor = Mathf.Clamp(CapablePawnRatioFactor, CapablePawnRatioFactorMin,
             CapablePawnRatioFactorMax);
         PawnCountFactor = Mathf.Clamp(PawnCountFactor, PawnCountFactorMin, PawnCountFactorMax);
