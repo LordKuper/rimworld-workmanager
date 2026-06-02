@@ -36,6 +36,7 @@ public class WorkManagerMod : Mod
             Harmony harmony = new(ModId);
             harmony.PatchAll(Assembly.GetExecutingAssembly());
             WorkTab.Initialize(harmony);
+            PriorityMaster.Initialize();
             MoreThanCapable.Initialize();
         }
     }
