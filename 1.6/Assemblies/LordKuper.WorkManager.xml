@@ -387,6 +387,30 @@
             <param name="workType">The work type definition.</param>
             <returns>True if the work type is considered bad for the pawn; otherwise, false.</returns>
         </member>
+        <member name="T:LordKuper.WorkManager.Compatibility.PriorityMaster">
+            <summary>
+                Provides compatibility integration with the PriorityMaster mod, which expands the vanilla work priority range.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Compatibility.PriorityMaster._isInitialized">
+            <summary>
+                Indicates whether the PriorityMaster compatibility has been initialized.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Compatibility.PriorityMaster.PriorityMasterActive">
+            <summary>
+                Indicates whether the PriorityMaster mod is active.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Compatibility.PriorityMaster.Initialize">
+            <summary>
+                Initializes PriorityMaster compatibility by reading the mod's configured maximum work priority.
+            </summary>
+            <remarks>
+                PriorityMaster only widens the vanilla priority range; it keeps the vanilla pawn work settings priority
+                API, so no custom get/set delegates are required. Only the maximum priority value needs to be imported.
+            </remarks>
+        </member>
         <member name="T:LordKuper.WorkManager.Compatibility.WorkTab">
             <summary>
                 Provides compatibility integration with the WorkTab mod.
