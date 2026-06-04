@@ -80,11 +80,11 @@ The sprint is done when all of the following hold:
 - [ ] Confirm no `NullReferenceException` from `Instance` on game-less UI paths (AC-12) via the code-level guard audit; if a live-game integration test is infeasible, record AC-12 as a manual in-game verification note (see DoD). — BLOCKED: MS-1
 
 ### Task 4: Localize work-shift labels (ADR-0005) — AC-9, AC-10
-- [ ] Replace the two hardcoded `"Work shift #{i + 1}"` strings in `Source/WorkManager/Settings/Settings_Schedules.cs` (lines 148 and 201) with a keyed lookup using `WorkManager.Settings_Schedule_WorkShiftLabel` via `.Translate()` and the 1-based shift index argument. (AC-9)
-- [ ] Confirm the rendered English text is byte-for-byte identical to the current output (key value `"Work shift #{0}"`). (AC-9)
-- [ ] Add the `WorkManager.Settings_Schedule_WorkShiftLabel` key to the 1.6 keyed files for English, Russian, and ChineseSimplified (`1.6/Languages/**/Keyed/WorkManager_Keyed.xml`). (AC-10)
-- [ ] Add the same key (English) to the legacy 1.1–1.5 English keyed files (`1.*/Languages/English/Keyed/WorkManager_Keyed.xml`). (AC-10)
-- [ ] Confirm no other visible text or layout change.
+- [x] Replace the two hardcoded `"Work shift #{i + 1}"` strings in `Source/WorkManager/Settings/Settings_Schedules.cs` (lines 148 and 201) with a keyed lookup using `WorkManager.Settings_Schedule_WorkShiftLabel` via `.Translate()` and the 1-based shift index argument. (AC-9)
+- [x] Confirm the rendered English text is byte-for-byte identical to the current output (key value `"Work shift #{0}"`). (AC-9)
+- [x] Add the `WorkManager.Settings_Schedule_WorkShiftLabel` key to the 1.6 keyed files for English, Russian, and ChineseSimplified (`1.6/Languages/**/Keyed/WorkManager_Keyed.xml`). (AC-10)
+- [x] Add the same key (English) to the legacy 1.1–1.5 English keyed files (`1.*/Languages/English/Keyed/WorkManager_Keyed.xml`). (AC-10)
+- [x] Confirm no other visible text or layout change.
 
 ### Task 5: Remove vendored Lib.Harmony 2.3.6 (ADR-0003) — AC-13
 - [ ] Delete the `Source/packages/Lib.Harmony.2.3.6/` directory tree (DLLs, nupkg, pdbs, README).

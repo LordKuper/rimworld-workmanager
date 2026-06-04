@@ -125,6 +125,7 @@
 	<WorkManager.Settings_Schedule_WorkShiftThresholdColumnHeaderTooltip>Пешки будут назначены на смену только если количество подходящих пешек равно или больше этого значения (для первой смены всегда равно 1)</WorkManager.Settings_Schedule_WorkShiftThresholdColumnHeaderTooltip>
 	<WorkManager.Settings_Schedule_NightOwlWorkShifts>Смены для «Сов»</WorkManager.Settings_Schedule_NightOwlWorkShifts>
 	<WorkManager.Settings_Schedule_NightOwlWorkShiftsTooltip>Рабочие смены для колонистов с чертой «Сова»</WorkManager.Settings_Schedule_NightOwlWorkShiftsTooltip>
+	<WorkManager.Settings_Schedule_WorkShiftLabel>Рабочая смена #{0}</WorkManager.Settings_Schedule_WorkShiftLabel>
 	<WorkManager.Settings_Misc_Title>Разное</WorkManager.Settings_Misc_Title>
 	<WorkManager.Settings_Misc_VerboseLogging>Подробное логирование</WorkManager.Settings_Misc_VerboseLogging>
 	<WorkManager.Settings_Misc_VerboseLoggingTooltip>Показывать подробности работы мода в журнале (работает только при включённом режиме разработчика)</WorkManager.Settings_Misc_VerboseLoggingTooltip>

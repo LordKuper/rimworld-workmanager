@@ -125,6 +125,7 @@
 	<WorkManager.Settings_Schedule_WorkShiftThresholdColumnHeaderTooltip>Pawns will be assigned to a work shift only if number of eligible pawns is equal or higher than this value (always equals 1 for first work shift)</WorkManager.Settings_Schedule_WorkShiftThresholdColumnHeaderTooltip>
 	<WorkManager.Settings_Schedule_NightOwlWorkShifts>Night owl work shifts</WorkManager.Settings_Schedule_NightOwlWorkShifts>
 	<WorkManager.Settings_Schedule_NightOwlWorkShiftsTooltip>Work shifts for colonists with 'Night Owl' trait</WorkManager.Settings_Schedule_NightOwlWorkShiftsTooltip>
+	<WorkManager.Settings_Schedule_WorkShiftLabel>Work shift #{0}</WorkManager.Settings_Schedule_WorkShiftLabel>
 	<WorkManager.Settings_Misc_Title>Misc</WorkManager.Settings_Misc_Title>
 	<WorkManager.Settings_Misc_VerboseLogging>Verbose logging</WorkManager.Settings_Misc_VerboseLogging>
 	<WorkManager.Settings_Misc_VerboseLoggingTooltip>Show mod execution details in log (only works when development mode is enabled)</WorkManager.Settings_Misc_VerboseLoggingTooltip>

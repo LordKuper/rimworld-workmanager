@@ -26,4 +26,5 @@
   <WorkManager.WorkTypeDisableTooltip>Disable automatic priority assignment for work type</WorkManager.WorkTypeDisableTooltip>
   <WorkManager.VerboseLogging>Verbose logging</WorkManager.VerboseLogging>
   <WorkManager.VerboseLoggingTooltip>Show mod execution details in log (only works when development mode is enabled)</WorkManager.VerboseLoggingTooltip>
+  <WorkManager.Settings_Schedule_WorkShiftLabel>Work shift #{0}</WorkManager.Settings_Schedule_WorkShiftLabel>
 </LanguageData>

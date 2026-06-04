@@ -247,7 +247,9 @@
     <!-- EN: Night owl work shifts -->
     <WorkManager.Settings_Schedule_NightOwlWorkShifts>夜猫子工作班次</WorkManager.Settings_Schedule_NightOwlWorkShifts>
     <!-- EN: Work shifts for colonists with 'Night Owl' trait -->
-    <WorkManager.Settings_Schedule_NightOwlWorkShiftsTooltip>拥有“夜猫子”特征的殖民者的工作班次</WorkManager.Settings_Schedule_NightOwlWorkShiftsTooltip>
+    <WorkManager.Settings_Schedule_NightOwlWorkShiftsTooltip>拥有”夜猫子”特征的殖民者的工作班次</WorkManager.Settings_Schedule_NightOwlWorkShiftsTooltip>
+    <!-- EN: Work shift #{0} -->
+    <WorkManager.Settings_Schedule_WorkShiftLabel>工作班次 #{0}</WorkManager.Settings_Schedule_WorkShiftLabel>
     <!-- EN: Misc -->
     <WorkManager.Settings_Misc_Title>杂项</WorkManager.Settings_Misc_Title>
     <!-- EN: Verbose logging -->

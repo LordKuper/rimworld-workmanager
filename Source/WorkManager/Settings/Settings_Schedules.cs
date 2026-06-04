@@ -19,7 +19,7 @@ public partial class Settings
     /// <summary>
     ///     The work shifts used for regular colonists.
     /// </summary>
-    public List<WorkShift> ColonistWorkShifts = [..DefaultColonistWorkShifts];
+    public List<WorkShift> ColonistWorkShifts = [.. DefaultColonistWorkShifts];
 
     /// <summary>
     ///     Indicates whether the work schedule is managed automatically.
@@ -29,7 +29,7 @@ public partial class Settings
     /// <summary>
     ///     The work shifts used for night owl colonists.
     /// </summary>
-    public List<WorkShift> NightOwlWorkShifts = [..DefaultNightOwlWorkShifts];
+    public List<WorkShift> NightOwlWorkShifts = [.. DefaultNightOwlWorkShifts];
 
     /// <summary>
     ///     The frequency (per day) at which the schedule is updated.
@@ -145,7 +145,9 @@ public partial class Settings
             {
                 var workShift = ColonistWorkShifts[i];
                 options.Add(
-                    new FloatMenuOption($"Work shift #{i + 1}", () => { ColonistWorkShifts.Remove(workShift); }));
+                    new FloatMenuOption(
+                        "WorkManager.Settings_Schedule_WorkShiftLabel".Translate(i + 1),
+                        () => { ColonistWorkShifts.Remove(workShift); }));
             }
             Find.WindowStack.Add(new FloatMenu(options));
         }
@@ -198,7 +200,9 @@ public partial class Settings
             {
                 var workShift = NightOwlWorkShifts[i];
                 options.Add(
-                    new FloatMenuOption($"Work shift #{i + 1}", () => { NightOwlWorkShifts.Remove(workShift); }));
+                    new FloatMenuOption(
+                        "WorkManager.Settings_Schedule_WorkShiftLabel".Translate(i + 1),
+                        () => { NightOwlWorkShifts.Remove(workShift); }));
             }
             Find.WindowStack.Add(new FloatMenu(options));
         }
@@ -365,8 +369,8 @@ public partial class Settings
     private void InitializeSchedules()
     {
         if (ScheduleUpdateFrequency == 0) ScheduleUpdateFrequency = 2;
-        ColonistWorkShifts ??= [..DefaultColonistWorkShifts];
-        NightOwlWorkShifts ??= [..DefaultNightOwlWorkShifts];
+        ColonistWorkShifts ??= [.. DefaultColonistWorkShifts];
+        NightOwlWorkShifts ??= [.. DefaultNightOwlWorkShifts];
     }
 
     private void ResetSchedules()
