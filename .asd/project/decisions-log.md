@@ -79,3 +79,7 @@ Append-only. Never edited or removed. New entries appended below.
 
 - **Decision**: impl-review iter 05: APPROVE — DoD met (all 8 reviewers APPROVE: quality, implementation, testing, ui, simplification, documentation, performance, external). Sprint ready for PR. Cycle summary: iter-01 CONCERNS→fix, iter-02 FAIL(external test gaps)→fix-all, iter-03 FAIL(Assert.Pass placeholder)→fix, iter-04 testing FAIL overridden(AC-5 manual)+simplification→fix, iter-05 all APPROVE.
 
+## 2026-06-05 — Sprint 001-full-audit-alignment completed + archived
+
+- **Decision**: sprint 001-full-audit-alignment completed + archived 2026-06-05; PR: https://github.com/LordKuper/rimworld-workmanager/pull/20. DoD met: build 0/0, 63 tests green, lint clean, impl-review iter-05 all APPROVE; MS-1/2/3 user-verified.
+

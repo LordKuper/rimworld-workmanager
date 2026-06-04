@@ -1,7 +1,7 @@
 {
   "sprint_id": "001-full-audit-alignment",
   "branch": "sprint/001-full-audit-alignment",
-  "phase": "pr",
+  "phase": "done",
   "reviews": {
     "design": {
       "iteration": 2,
@@ -78,6 +78,7 @@
   },
   "created_at": "2026-06-04",
   "updated_at": "2026-06-05",
+  "archived_at": "2026-06-05",
   "review_fixes_pending": null,
   "subsystems_touched": [],
   "new_subsystems": [],
