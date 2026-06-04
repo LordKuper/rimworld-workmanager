@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="WorkManager/WorkManager.csproj" />
+  <Project Path="WorkManager.Tests/WorkManager.Tests.csproj" />
+</Solution>

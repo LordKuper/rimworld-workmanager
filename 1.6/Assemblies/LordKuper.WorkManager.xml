@@ -4,31 +4,6 @@
         <name>LordKuper.WorkManager</name>
     </assembly>
     <members>
-        <member name="T:WorkManager.AssignEveryoneWorkType">
-            <summary>
-                Represents a legacy work type entry that is assigned to everyone with a specific priority.
-            </summary>
-        </member>
-        <member name="F:WorkManager.AssignEveryoneWorkType.AllowDesignated">
-            <summary>
-                Indicates whether designated pawns are allowed for this work type.
-            </summary>
-        </member>
-        <member name="F:WorkManager.AssignEveryoneWorkType.Priority">
-            <summary>
-                The priority assigned to this work type.
-            </summary>
-        </member>
-        <member name="F:WorkManager.AssignEveryoneWorkType.WorkTypeDefName">
-            <summary>
-                The name of the work type definition.
-            </summary>
-        </member>
-        <member name="M:WorkManager.AssignEveryoneWorkType.ExposeData">
-            <summary>
-                Serializes and deserializes the work type entry data.
-            </summary>
-        </member>
         <member name="T:LordKuper.WorkManager.Cache.PawnCache">
             <summary>
                 Caches work and skill information for a specific pawn, including work priorities,
