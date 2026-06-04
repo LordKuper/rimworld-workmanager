@@ -1,0 +1,29 @@
+# commands.yaml — machine-only SSoT for project build/test/run commands
+# read by Backend Dev, Frontend Dev, Test Engineer, and review agents
+
+test: "{{command to run all tests}}"
+lint: "{{command to run linters}}"
+build: "{{command to build artifacts}}"
+run: "{{command to start application locally}}"
+
+custom:
+  # optional named commands beyond the required four
+  # examples: format, typecheck, migrate, seed, e2e, coverage, docker-build, deploy-staging
+  {{name}}: "{{command}}"
+
+  # design.md tooling (set by /asd-init per OS).
+  # Convention: linter is always invoked as `designmd-lint`. On Windows, run
+  # `designmd-install` once per session before first `designmd-lint`/`-diff`/`-export`.
+  # On Linux/macOS `designmd-install` is a no-op (npx fetches on demand).
+  #
+  # Windows (run from project root):
+  # designmd-install: "npm install @google/design.md"
+  # designmd-lint:    "node_modules\\.bin\\design.md.cmd lint design\\ux\\DESIGN.md"
+  # designmd-diff:    "node_modules\\.bin\\design.md.cmd diff"            # path args supplied at call time
+  # designmd-export:  "node_modules\\.bin\\design.md.cmd export --format json-tailwind design\\ux\\DESIGN.md"
+  #
+  # Linux/macOS:
+  # designmd-install: ""
+  # designmd-lint:    "npx @google/design.md lint design/ux/DESIGN.md"
+  # designmd-diff:    "npx @google/design.md diff"
+  # designmd-export:  "npx @google/design.md export --format json-tailwind design/ux/DESIGN.md"

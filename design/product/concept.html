@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<!--
+responsibility:
+  owns: project vision, target users, value proposition, identity
+  excludes: tech stack, ux, requirements, architecture
+  delegates_to: stack.html (tech), DESIGN.md (visual identity), requirements/ (features)
+provenance: reverse-engineered
+source: About/About.xml
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="generator" content="ASD workflow">
+  <meta name="doc-type" content="concept">
+  <meta name="subsystem" content="project">
+  <meta name="sprint-id" content="n/a">
+  <meta name="status" content="approved">
+  <meta name="updated" content="2026-06-04">
+  <meta name="responsibility" content="owns: vision, target users, value proposition, identity; excludes: tech stack, ux, requirements, architecture">
+  <meta name="provenance" content="reverse-engineered">
+  <meta name="source" content="About/About.xml">
+  <title>Work Manager — Concept</title>
+  <style>
+    :root {
+      --fg: #1a1c1e; --bg: #fff; --muted: #5b6770; --accent: #0066cc;
+      --code-bg: #f4f6f8; --border: #d0d7de; --max: 1040px;
+      --card-bg: #fafbfc;
+      --ok: #1f883d; --warn: #b35900; --danger: #cf222e; --info: #0969da; --neutral: #5b6770;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --fg: #e6e6e6; --bg: #0e1116; --muted: #9aa4ad; --code-bg: #161b22; --border: #30363d;
+        --card-bg: #161b22;
+      }
+    }
+    html, body { margin: 0; padding: 0; }
+    * { box-sizing: border-box; }
+    body { font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--fg); background: var(--bg); }
+    .layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); min-height: 100vh; }
+    .content { min-width: 0; }
+    header, main, footer { max-width: var(--max); margin: 0 auto; padding: 16px 24px; }
+    header { border-bottom: 1px solid var(--border); }
+    header h1 { margin: 4px 0 8px; font-size: 1.9rem; }
+    .badges span { display: inline-block; padding: 2px 8px; margin-right: 6px; font-size: 0.75rem; border: 1px solid var(--border); border-radius: 4px; color: var(--muted); background: var(--bg); }
+    .badges .provenance-reverse-engineered { color: var(--warn); border-color: var(--warn); }
+    .badges .status-approved { color: var(--ok); border-color: var(--ok); }
+    .stats { margin-top: 6px; font-size: 0.85rem; color: var(--muted); }
+    nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 18px 14px; border-right: 1px solid var(--border); background: var(--card-bg); font-size: 0.9rem; }
+    nav.toc .toc-title { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 8px; padding-left: 6px; }
+    nav.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: tocn; }
+    nav.toc li { margin: 2px 0; counter-increment: tocn; }
+    nav.toc a { display: block; padding: 4px 8px; border-radius: 4px; color: var(--fg); text-decoration: none; border-left: 2px solid transparent; }
+    nav.toc a:hover { background: var(--code-bg); color: var(--accent); }
+    nav.toc a.active { background: var(--code-bg); color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+    nav.toc a::before { content: counter(tocn) ". "; color: var(--muted); font-variant-numeric: tabular-nums; }
+    @media (max-width: 880px) {
+      .layout { grid-template-columns: 1fr; }
+      nav.toc { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--border); }
+    }
+    h2 { line-height: 1.25; margin-top: 1.6em; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+    footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 32px; }
+    .lede { font-size: 1.08rem; color: var(--fg); }
+    section.hero { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 18px; }
+    section.callout { border-left: 4px solid var(--border); padding: 8px 14px; background: var(--card-bg); border-radius: 4px; }
+    section.callout.warn { border-left-color: var(--warn); }
+    section.callout.warn h2::before { content: "⊘ "; color: var(--warn); }
+    .pillar-grid { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+    .pillar-grid li { background: var(--card-bg); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; padding: 10px 12px; }
+    .pillar-grid li strong { display: block; margin-bottom: 4px; color: var(--accent); }
+    .anti-pillar-grid li { border-left-color: var(--danger); }
+    .anti-pillar-grid li strong { color: var(--danger); }
+    ul.user-segments { list-style: none; padding: 0; }
+    ul.user-segments li { padding: 8px 12px; margin: 6px 0; border-left: 3px solid var(--accent); background: var(--card-bg); border-radius: 4px; }
+    ul.user-segments li b { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <nav class="toc" aria-label="Table of contents">
+      <p class="toc-title">Contents</p>
+      <ol>
+        <li><a href="#vision">Vision</a></li>
+        <li><a href="#target-users">Target users</a></li>
+        <li><a href="#value-proposition">Value proposition</a></li>
+        <li><a href="#pillars">Pillars</a></li>
+        <li><a href="#anti-pillars">Anti-Pillars</a></li>
+        <li><a href="#constraints">Constraints</a></li>
+      </ol>
+    </nav>
+    <div class="content">
+      <header>
+        <div class="badges">
+          <span>concept</span>
+          <span>project</span>
+          <span class="status-approved">approved</span>
+          <span class="provenance-reverse-engineered">reverse-engineered (About/About.xml)</span>
+        </div>
+        <h1>Work Manager — Concept</h1>
+        <div class="stats">6 sections · RimWorld 1.1–1.6 · reverse-engineered from existing mod</div>
+      </header>
+      <main>
+
+<section id="vision" class="hero">
+  <h2>Vision</h2>
+  <p class="lede">Work Manager is a RimWorld mod that takes over the tedious, error-prone job of micromanaging colonist work. It automatically and continuously assigns each pawn's work-type priorities — and, optionally, their daily schedules — based on skills, passions, learning rates, health and configurable per-work-type rules, so the colony keeps the right people on the right jobs as it grows and changes without the player re-balancing the work tab by hand.</p>
+</section>
+
+<section id="target-users">
+  <h2>Target users</h2>
+  <ul class="user-segments">
+    <li><b>Players who dislike work-tab micromanagement</b> — want colonists' work priorities kept sensible automatically instead of manually retuning the work tab every time the colony changes.</li>
+    <li><b>Players of larger or fast-changing colonies</b> — need scheduling and dedicated-worker coverage to scale across many pawns, day/night shifts and night-owl colonists without manual upkeep.</li>
+    <li><b>Players who tune colony behavior in depth</b> — want fine-grained control via per-work-type rules, allowed-worker filters, dedicated-worker modes, passion/learning-rate priorities and scoring weights, with per-pawn opt-out.</li>
+    <li><b>Modded-game users</b> — run alongside other work and skill mods and expect Work Manager to integrate cleanly rather than conflict.</li>
+  </ul>
+</section>
+
+<section id="value-proposition">
+  <h2>Value proposition</h2>
+  <p class="lede">Work Manager removes the constant chore of hand-tuning the work tab. It periodically recomputes priorities so the most skilled, passionate or fastest-learning colonists are kept on each job, ensures critical work types always have enough coverage through configurable dedicated-worker rules, fills idle and leftover work, and can manage daily schedules into coordinated shifts (keeping partners together and covering key skills across shifts). It stays flexible — per-work-type rules, allowed-worker filters and per-pawn opt-out — and integrates with popular work and skill mods rather than fighting them.</p>
+</section>
+
+<section id="pillars">
+  <h2>Pillars</h2>
+  <ul class="pillar-grid">
+    <li><strong>Automatic &amp; continuous</strong>Priorities (and optionally schedules) recompute on a configurable cadence as the colony changes, with no manual re-tuning.</li>
+    <li><strong>Skill-aware assignment</strong>Work is steered to the most suitable colonists using skill level, passion and learning rate, with weighted scoring for dedicated workers.</li>
+    <li><strong>Guaranteed coverage</strong>Per-work-type rules ensure minimum workers and dedicated-worker counts so essential jobs are never left unstaffed.</li>
+    <li><strong>Configurable &amp; overridable</strong>Per-work-type rules, allowed-worker filters, priority/threshold sliders and per-pawn opt-out toggles keep the player in control.</li>
+    <li><strong>Plays well with others</strong>Dedicated compatibility shims let it integrate with other work and skill mods instead of conflicting.</li>
+  </ul>
+</section>
+
+<section id="anti-pillars">
+  <h2>Anti-Pillars</h2>
+  <ul class="pillar-grid anti-pillar-grid">
+    <li><strong>Not a work-tab UI replacement</strong>It automates assignments rather than reimplementing the work tab; where a work-tab mod is present it defers to that mod's priority API.</li>
+    <li><strong>Not a forced takeover</strong>Managed pawns and managed schedules can be toggled off per pawn, and schedule management is opt-in per pawn and globally.</li>
+    <li><strong>Not for non-player or non-working pawns</strong>Mechanoids, animals, prisoners and pawns that never work are excluded from management.</li>
+  </ul>
+</section>
+
+<section id="constraints" class="callout warn">
+  <h2>Constraints</h2>
+  <ul>
+    <li><b>Platform</b>: RimWorld mod, packageId <code>LordKuper.WorkManager</code>; supports RimWorld 1.1 through 1.6.</li>
+    <li><b>Dependencies</b>: requires Harmony (<code>brrainz.harmony</code>) on all versions; additionally requires <code>LordKuper.Common</code> on RimWorld 1.6.</li>
+    <li><b>Optional integrations (load-after)</b>: WorkTab, More Than Capable, PriorityMaster, Vanilla Skills Expanded.</li>
+    <li><b>License</b>: CC BY-NC-SA 4.0 — share-alike, attribution required, non-commercial use only.</li>
+  </ul>
+</section>
+
+      </main>
+      <footer>by asd-concept (asd-ba) | 2026-06-04 | sprint n/a</footer>
+    </div>
+  </div>
+</body>
+</html>

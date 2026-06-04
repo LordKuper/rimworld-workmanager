@@ -1,0 +1,79 @@
+<!--
+responsibility:
+  owns: current tech stack reference (languages, frameworks, runtime, infra)
+  excludes: build commands, architecture decisions, deployment ops
+  delegates_to: commands.yaml (commands), adr/ (decisions), runbooks (ops)
+provenance: original          # original | reverse-engineered | migrated
+source: ""                    # optional path/URL when provenance != original
+-->
+
+<section id="languages">
+  <h2>Languages</h2>
+  <table class="tech-table">
+    <thead><tr><th>Language</th><th>Version</th><th>Used in</th></tr></thead>
+    <tbody>
+      <tr><td><strong>{{lang}}</strong></td><td class="ver">{{version}}</td><td><span class="chip area">{{area}}</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="frameworks">
+  <h2>Frameworks / libraries</h2>
+  <table class="tech-table">
+    <thead><tr><th>Name</th><th>Version</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><strong>{{name}}</strong></td><td class="ver">{{version}}</td><td>{{purpose}}</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="runtime-infrastructure">
+  <h2>Runtime / infrastructure</h2>
+  <table class="tech-table">
+    <thead><tr><th>Component</th><th>Version</th><th>Role</th></tr></thead>
+    <tbody>
+      <tr><td><strong>{{component}}</strong></td><td class="ver">{{version}}</td><td><span class="chip area">{{role}}</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="tooling">
+  <h2>Tooling (optional)</h2>
+  <table class="tech-table">
+    <thead><tr><th>Tool</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><strong>{{tool}}</strong></td><td>{{purpose}}</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="layers-diagram" class="hero">
+  <h2>Layers diagram (optional)</h2>
+  <pre class="mermaid">
+flowchart TB
+  subgraph frontend
+    fe[client app]
+  end
+  subgraph backend
+    api[api service]
+  end
+  subgraph data
+    db[(database)]
+  end
+  fe --> api --> db
+  </pre>
+</section>
+
+<section id="constraints" class="callout warn">
+  <h2>Constraints (optional)</h2>
+  <ul>
+    <li>{{constraint, e.g. "no library X due to Y"}}</li>
+  </ul>
+</section>
+
+<section id="architecture-principles">
+  <h2>Architecture Principles (optional)</h2>
+  <ul class="principle-list">
+    <li><strong>{{principle}}</strong> — {{rationale + how applied}}</li>
+  </ul>
+</section>

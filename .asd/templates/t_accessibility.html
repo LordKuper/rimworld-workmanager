@@ -1,0 +1,81 @@
+<!--
+responsibility:
+  owns: project-wide accessibility commitments, per-domain rules, test plan, declared limitations
+  excludes: design tokens, ux flows, ui mockups
+  delegates_to: DESIGN.md (visual tokens with contrast), ux-spec (sprint-scoped ux)
+-->
+
+<section id="overall-commitment" class="hero">
+  <h2>Overall Commitment</h2>
+  <dl class="def-list">
+    <dt>Baseline</dt><dd>{{e.g. WCAG 2.2 AA}}</dd>
+    <dt>What we deliver</dt><dd>{{cross-cutting commitments — keyboard reach, captions, …}}</dd>
+    <dt>Intentionally out</dt><dd>{{features deliberately excluded — see Known Intentional Limitations}}</dd>
+  </dl>
+</section>
+
+<section id="visual-accessibility" class="a11y-domain">
+  <h2>👁  Visual Accessibility</h2>
+  <p class="scope">Color contrast, typography legibility, focus indicators, content reflow, zoom, color-only signaling, dark/light modes.</p>
+  <ul>
+    <li>{{rule}}</li>
+  </ul>
+</section>
+
+<section id="motor-accessibility" class="a11y-domain">
+  <h2>✋  Motor Accessibility</h2>
+  <p class="scope">Keyboard operability, touch target size, drag/swipe alternatives, time limits, gesture alternatives, pointer accuracy tolerance.</p>
+  <ul>
+    <li>{{rule}}</li>
+  </ul>
+</section>
+
+<section id="cognitive-accessibility" class="a11y-domain">
+  <h2>🧠  Cognitive Accessibility</h2>
+  <p class="scope">Plain language, predictable navigation, error prevention and recovery, consistent labeling, content chunking, undo/confirmation for destructive actions.</p>
+  <ul>
+    <li>{{rule}}</li>
+  </ul>
+</section>
+
+<section id="auditory-accessibility" class="a11y-domain">
+  <h2>🔊  Auditory Accessibility</h2>
+  <p class="scope">Captions, transcripts, visual alternatives for audio cues, volume control, no audio-only critical information.</p>
+  <ul>
+    <li>{{rule}}</li>
+  </ul>
+</section>
+
+<section id="platform-accessibility-integration" class="a11y-domain">
+  <h2>⚙  Platform Accessibility Integration</h2>
+  <p class="scope">ARIA, semantic markup, screen reader expectations, OS-level features (reduced motion, high contrast, font scaling, voice control).</p>
+  <table>
+    <thead><tr><th>Integration point</th><th>How supported</th></tr></thead>
+    <tbody>
+      <tr><td>{{integration point}}</td><td>{{how supported}}</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="accessibility-test-plan">
+  <h2>Accessibility Test Plan</h2>
+  <dl class="def-list">
+    <dt>Automated</dt><dd>{{tools — axe-core, lighthouse — when run}}</dd>
+    <dt>Manual checks</dt><dd>{{checklist run per sprint}}</dd>
+    <dt>Assistive tech</dt><dd>{{tech tested against, frequency}}</dd>
+    <dt>User testing</dt><dd>{{if any, with whom and when}}</dd>
+  </dl>
+</section>
+
+<section id="known-intentional-limitations">
+  <h2>Known Intentional Limitations</h2>
+  <p>Areas where the product knowingly does not meet baseline. Documented to set expectations and prevent silent regressions.</p>
+  <div class="limitation">
+    <b>{{limitation}}</b> — reason: {{why}}; workaround: {{if any}}; revisit: {{when/condition}}
+  </div>
+</section>
+
+<section id="internationalization">
+  <h2>Internationalization (optional)</h2>
+  <p>RTL support, language tagging, content adaptation, locale handling.</p>
+</section>

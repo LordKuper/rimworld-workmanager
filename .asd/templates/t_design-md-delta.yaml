@@ -1,0 +1,24 @@
+# proposed changes to design/ux/DESIGN.md
+# applied in design-promote phase after user approval
+
+add:
+  - path: {{token path, e.g. colors.primary}}
+    new_value: {{value}}
+    usage: {{where + when used, one line — required, becomes inline YAML comment in DESIGN.md per design-system.md §4}}
+    reason: {{why}}
+    affects_components: []      # optional
+    breaking: false             # optional
+
+update:
+  - path: {{token path}}
+    new_value: {{new value}}
+    usage: {{where + when used — required if missing or stale}}
+    reason: {{why}}
+    affects_components: []
+    breaking: false
+
+remove:
+  - path: {{token path}}
+    reason: {{why no longer needed}}
+    affects_components: []
+    breaking: true

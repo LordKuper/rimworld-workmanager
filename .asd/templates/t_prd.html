@@ -1,0 +1,49 @@
+<!--
+responsibility:
+  owns: product requirements (sprint draft full scope, or persistent per-subsystem feature set)
+  excludes: ui mockups, design decisions, code, ux flows
+  delegates_to: ux-spec.html (ui + flows), adr.html (decisions)
+provenance: original          # original | reverse-engineered | migrated
+source: ""                    # optional path/URL when provenance != original
+-->
+
+<section id="problem" class="hero">
+  <h2>Problem</h2>
+  <p class="lede">{{what we solve}}</p>
+</section>
+
+<section id="goals">
+  <h2>Goals</h2>
+  <ol class="goal-grid">
+    <li><span class="num">G1</span><p>{{goal}}</p></li>
+  </ol>
+</section>
+
+<section id="user-stories">
+  <h2>User stories</h2>
+  <details class="role-group" open>
+    <summary>{{role}} <span class="count">{{n}}</span></summary>
+    <ul class="stories">
+      <li><b>as</b> {{role}}, <b>I want</b> {{feature}}, <b>so that</b> {{benefit}}</li>
+    </ul>
+  </details>
+</section>
+
+<section id="acceptance-criteria">
+  <h2>Acceptance criteria</h2>
+  <table class="ac-table">
+    <thead>
+      <tr><th>ID</th><th>Criterion</th><th>Area</th><th>Priority</th></tr>
+    </thead>
+    <tbody>
+      <tr id="AC-1"><td><a href="#AC-1">AC-1</a></td><td>{{criterion}}</td><td><span class="chip area">{{area}}</span></td><td><span class="chip prio-must">must</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="non-goals" class="callout warn">
+  <h2>Non-goals (optional)</h2>
+  <ul class="non-goals">
+    <li>{{out of scope item}}</li>
+  </ul>
+</section>

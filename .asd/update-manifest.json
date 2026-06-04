@@ -1,0 +1,46 @@
+{
+  "$comment": "ASD framework update manifest. SSoT for which paths /asd-update overwrites. trees = dirs ASD owns fully (replaced wholesale). paths = files/dirs that live beside user-owned files (skills/agents/hooks) and so are listed individually — never blanket their parent dir or a user's custom skill/agent/hook gets deleted. Bump version on every framework change. update.js deletes by the LOCAL copy of this list, then copies by the freshly fetched list.",
+  "repo": "https://github.com/LordKuper/agentic-software-development",
+  "branch": "main",
+  "version": "1.0.1",
+  "managed": {
+    "trees": [
+      ".asd/rules",
+      ".asd/templates"
+    ],
+    "paths": [
+      ".claude/agents/asd-architect.md",
+      ".claude/agents/asd-ba.md",
+      ".claude/agents/asd-backend-dev.md",
+      ".claude/agents/asd-external-review.md",
+      ".claude/agents/asd-frontend-dev.md",
+      ".claude/agents/asd-pm.md",
+      ".claude/agents/asd-reviewer-documentation.md",
+      ".claude/agents/asd-reviewer-implementation.md",
+      ".claude/agents/asd-reviewer-performance.md",
+      ".claude/agents/asd-reviewer-quality.md",
+      ".claude/agents/asd-reviewer-simplification.md",
+      ".claude/agents/asd-reviewer-testing.md",
+      ".claude/agents/asd-reviewer-ui.md",
+      ".claude/agents/asd-test-engineer.md",
+      ".claude/agents/asd-ux-designer.md",
+      ".claude/skills/asd-concept",
+      ".claude/skills/asd-design-system",
+      ".claude/skills/asd-init",
+      ".claude/skills/asd-phase-audit",
+      ".claude/skills/asd-phase-design",
+      ".claude/skills/asd-phase-design-promote",
+      ".claude/skills/asd-phase-design-review",
+      ".claude/skills/asd-phase-impl",
+      ".claude/skills/asd-phase-impl-review",
+      ".claude/skills/asd-phase-plan",
+      ".claude/skills/asd-phase-pr",
+      ".claude/skills/asd-phase-scope",
+      ".claude/skills/asd-sprint",
+      ".claude/skills/asd-stack",
+      ".claude/skills/asd-update",
+      ".claude/hooks/session-start.js",
+      ".claude/hooks/stop.js"
+    ]
+  }
+}

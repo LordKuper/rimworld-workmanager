@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<!--
+responsibility:
+  owns: current tech stack reference (languages, frameworks, runtime, infra)
+  excludes: build commands, architecture decisions, deployment ops
+  delegates_to: commands.yaml (commands), adr/ (decisions), runbooks (ops)
+provenance: reverse-engineered
+source: Source/WorkManager/WorkManager.csproj
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="generator" content="ASD workflow">
+  <meta name="doc-type" content="stack">
+  <meta name="subsystem" content="project">
+  <meta name="sprint-id" content="n/a">
+  <meta name="status" content="approved">
+  <meta name="updated" content="2026-06-04">
+  <meta name="responsibility" content="owns: current tech stack (languages, frameworks, runtime, infra); excludes: build commands, architecture decisions, deployment ops">
+  <meta name="provenance" content="reverse-engineered">
+  <meta name="source" content="Source/WorkManager/WorkManager.csproj">
+  <title>Work Manager — Tech Stack</title>
+  <style>
+    :root {
+      --fg: #1a1c1e; --bg: #fff; --muted: #5b6770; --accent: #0066cc;
+      --code-bg: #f4f6f8; --border: #d0d7de; --max: 1040px;
+      --card-bg: #fafbfc;
+      --ok: #1f883d; --warn: #b35900; --danger: #cf222e; --info: #0969da; --neutral: #5b6770;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --fg: #e6e6e6; --bg: #0e1116; --muted: #9aa4ad; --code-bg: #161b22; --border: #30363d;
+        --card-bg: #161b22;
+      }
+    }
+    html, body { margin: 0; padding: 0; }
+    * { box-sizing: border-box; }
+    body { font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--fg); background: var(--bg); }
+    .layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); min-height: 100vh; }
+    .content { min-width: 0; }
+    header, main, footer { max-width: var(--max); margin: 0 auto; padding: 16px 24px; }
+    header { border-bottom: 1px solid var(--border); }
+    header h1 { margin: 4px 0 8px; font-size: 1.9rem; }
+    .badges span { display: inline-block; padding: 2px 8px; margin-right: 6px; font-size: 0.75rem; border: 1px solid var(--border); border-radius: 4px; color: var(--muted); background: var(--bg); }
+    .badges .provenance-reverse-engineered { color: var(--warn); border-color: var(--warn); }
+    .badges .status-approved { color: var(--ok); border-color: var(--ok); }
+    .stats { margin-top: 6px; font-size: 0.85rem; color: var(--muted); }
+    nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 18px 14px; border-right: 1px solid var(--border); background: var(--card-bg); font-size: 0.9rem; }
+    nav.toc .toc-title { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 8px; padding-left: 6px; }
+    nav.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: tocn; }
+    nav.toc li { margin: 2px 0; counter-increment: tocn; }
+    nav.toc a { display: block; padding: 4px 8px; border-radius: 4px; color: var(--fg); text-decoration: none; border-left: 2px solid transparent; }
+    nav.toc a:hover { background: var(--code-bg); color: var(--accent); }
+    nav.toc a.active { background: var(--code-bg); color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+    nav.toc a::before { content: counter(tocn) ". "; color: var(--muted); font-variant-numeric: tabular-nums; }
+    @media (max-width: 880px) {
+      .layout { grid-template-columns: 1fr; }
+      nav.toc { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--border); }
+    }
+    h2 { line-height: 1.25; margin-top: 1.6em; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+    h3 { line-height: 1.25; margin-top: 1.3em; color: var(--muted); font-size: 1rem; }
+    code { background: var(--code-bg); padding: 1px 5px; border-radius: 3px; font-size: 0.9em; font-family: ui-monospace, "Cascadia Code", Menlo, monospace; }
+    table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+    th, td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; vertical-align: top; }
+    th { background: var(--code-bg); }
+    tbody tr:nth-child(even) td { background: var(--card-bg); }
+    footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 32px; }
+    section.callout { border-left: 4px solid var(--border); padding: 8px 14px; background: var(--card-bg); border-radius: 4px; }
+    section.callout.warn { border-left-color: var(--warn); }
+    section.callout.warn h2::before { content: "⊘ "; color: var(--warn); }
+    table.tech-table .ver { font-variant-numeric: tabular-nums; color: var(--muted); }
+    .chip.area { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 0.78rem; border: 1px solid var(--border); background: var(--code-bg); color: var(--muted); }
+    .principle-list { list-style: none; padding: 0; }
+    .principle-list li { background: var(--card-bg); border: 1px solid var(--border); border-left: 3px solid var(--info); border-radius: 6px; padding: 8px 12px; margin: 6px 0; }
+    .principle-list li strong { color: var(--info); }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <nav class="toc" aria-label="Table of contents">
+      <p class="toc-title">Contents</p>
+      <ol>
+        <li><a href="#languages">Languages</a></li>
+        <li><a href="#frameworks">Frameworks / libraries</a></li>
+        <li><a href="#runtime-infrastructure">Runtime / infrastructure</a></li>
+        <li><a href="#tooling">Tooling</a></li>
+        <li><a href="#constraints">Constraints</a></li>
+        <li><a href="#architecture-principles">Architecture Principles</a></li>
+      </ol>
+    </nav>
+    <div class="content">
+      <header>
+        <div class="badges">
+          <span>stack</span>
+          <span>project</span>
+          <span class="status-approved">approved</span>
+          <span class="provenance-reverse-engineered">reverse-engineered (WorkManager.csproj)</span>
+        </div>
+        <h1>Work Manager — Tech Stack</h1>
+        <div class="stats">RimWorld mod · net472 · C# 14 · tech-references in design/architecture/tech-reference/</div>
+      </header>
+      <main>
+
+<section id="languages">
+  <h2>Languages</h2>
+  <table class="tech-table">
+    <thead><tr><th>Language</th><th>Version</th><th>Used in</th></tr></thead>
+    <tbody>
+      <tr><td><strong>C#</strong></td><td class="ver"><code>latest</code> → C# 14 (via .NET SDK 10.0.300)</td><td>Production mod assembly (<code>LordKuper.WorkManager</code>) and test assembly</td></tr>
+      <tr><td><strong>XML</strong></td><td class="ver">n/a</td><td>Mod metadata / RimWorld Defs (<code>About/About.xml</code>, Defs)</td></tr>
+    </tbody>
+  </table>
+  <p><small><code>LangVersion=latest</code> resolves the C# language version from the Roslyn compiler in the build SDK (10.0.300 → C# 14), not from the <code>net472</code> target. Code compiles modern C# syntax but runs on RimWorld's fixed Mono/Unity (net472 BCL); features needing newer BCL/runtime support require polyfill shims or are unavailable.</small></p>
+</section>
+
+<section id="frameworks">
+  <h2>Frameworks / libraries</h2>
+  <h3>Production (<code>WorkManager.csproj</code>)</h3>
+  <table class="tech-table">
+    <thead><tr><th>Name</th><th>Version</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Lib.Harmony</strong></td><td class="ver">2.4.2</td><td>Runtime method patching of RimWorld code. <strong>Compile-only</strong> (<code>ExcludeAssets=runtime</code>, <code>PrivateAssets=all</code>); the Harmony runtime is supplied by the <code>brrainz.harmony</code> mod dependency, not shipped here.</td></tr>
+      <tr><td><strong>RimWorld <code>Assembly-CSharp</code></strong></td><td class="ver">game-pinned (1.6)</td><td>Core game API surface. Referenced from the local RimWorld install (<code>Private=False</code> — not redistributed).</td></tr>
+      <tr><td><strong>UnityEngine.CoreModule</strong></td><td class="ver">game-pinned</td><td>Unity core runtime types used by RimWorld. Reference-only.</td></tr>
+      <tr><td><strong>UnityEngine.IMGUIModule</strong></td><td class="ver">game-pinned</td><td>Immediate-mode GUI for mod settings / UI. Reference-only.</td></tr>
+      <tr><td><strong>UnityEngine.TextRenderingModule</strong></td><td class="ver">game-pinned</td><td>Text rendering for UI. Reference-only.</td></tr>
+      <tr><td><strong>LordKuper.Common</strong></td><td class="ver">game-pinned (1.6 Assemblies)</td><td>Shared parent library (helpers, scoring, RimWorld abstractions). Reference-only (<code>Private=False</code>); supplied at runtime by the <code>LordKuper.Common</code> mod dependency on RW 1.6.</td></tr>
+    </tbody>
+  </table>
+  <h3>Test (<code>WorkManager.Tests.csproj</code>)</h3>
+  <table class="tech-table">
+    <thead><tr><th>Name</th><th>Version</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><strong>NUnit</strong></td><td class="ver">4.6.1</td><td>Unit-test framework (attributes + lifecycle). Assertions are FluentAssertions, not NUnit <code>Assert.*</code>.</td></tr>
+      <tr><td><strong>NUnit3TestAdapter</strong></td><td class="ver">6.2.0</td><td>VSTest adapter so <code>dotnet test</code> discovers/runs NUnit tests. Ships a net462 build covering net472.</td></tr>
+      <tr><td><strong>Microsoft.NET.Test.Sdk</strong></td><td class="ver">18.6.0</td><td>Test host / <code>dotnet test</code> infrastructure. Produces a net462 host; net472 supported.</td></tr>
+      <tr><td><strong>FluentAssertions</strong></td><td class="ver">7.2.2</td><td>Assertion library (<code>.Should()</code>). <strong>Pinned to 7.x (Apache-2.0)</strong> — 8.x is commercial-licensed and forbidden.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="runtime-infrastructure">
+  <h2>Runtime / infrastructure</h2>
+  <table class="tech-table">
+    <thead><tr><th>Component</th><th>Version</th><th>Role</th></tr></thead>
+    <tbody>
+      <tr><td><strong>.NET Framework</strong></td><td class="ver">4.7.2 (<code>net472</code>)</td><td><span class="chip area">target framework — platform-pinned</span> Matches RimWorld's Mono/Unity runtime; not upgradeable.</td></tr>
+      <tr><td><strong>Mono / Unity runtime</strong></td><td class="ver">game-pinned (RW 1.6)</td><td><span class="chip area">execution host</span> The mod assembly is loaded by the game, not run standalone (<code>run</code> command is empty).</td></tr>
+      <tr><td><strong>RimWorld (game host)</strong></td><td class="ver">1.1–1.6</td><td><span class="chip area">host application</span> Loaded via <code>About/About.xml</code> (packageId <code>LordKuper.WorkManager</code>). 1.6 additionally requires <code>LordKuper.Common</code>.</td></tr>
+      <tr><td><strong>Harmony (runtime mod)</strong></td><td class="ver"><code>brrainz.harmony</code></td><td><span class="chip area">runtime dependency</span> Hard mod dependency on all versions; provides the Harmony runtime the compile-time reference binds against.</td></tr>
+      <tr><td><strong>.NET SDK</strong></td><td class="ver">10.0.300</td><td><span class="chip area">build only</span> Local build/test/lint toolchain. Not a runtime dependency of the shipped mod.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="tooling">
+  <h2>Tooling</h2>
+  <table class="tech-table">
+    <thead><tr><th>Tool</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><strong>dotnet CLI</strong></td><td><code>build</code> (<code>-c Release</code>), <code>test</code> against <code>Source/WorkManager.slnx</code>.</td></tr>
+      <tr><td><strong>dotnet format</strong></td><td>Lint: <code>dotnet format ... --verify-no-changes</code>; the <code>format</code> custom command applies fixes.</td></tr>
+      <tr><td><strong>JetBrains ReSharper CLI (<code>jb</code>)</strong></td><td><code>jb-cleanup</code> (cleanupcode) run <strong>before</strong> build; <code>jb-inspect</code> (inspectcode → SARIF) run <strong>after</strong> lint, SARIF must be error/warning-clean. Tool pkg <code>jetbrains.resharper.globaltools</code>.</td></tr>
+      <tr><td><strong>design.md (<code>@google/design.md</code>)</strong></td><td>UX design-doc lint/diff/export (<code>designmd-*</code> commands); design-side tooling, not part of the mod build.</td></tr>
+    </tbody>
+  </table>
+  <p><small>Build discipline (<code>WorkManager.csproj</code>): <code>TreatWarningsAsErrors=true</code> + <code>WarningLevel 9999</code> (Debug and Release), <code>Nullable=enable</code>, <code>GenerateDocumentationFile=true</code>. A warning fails the build.</small></p>
+</section>
+
+<section id="constraints" class="callout warn">
+  <h2>Constraints</h2>
+  <ul>
+    <li><strong>Target framework pinned</strong> — <code>net472</code> is fixed by RimWorld's Mono/Unity runtime. Do not upgrade the TFM.</li>
+    <li><strong>Game version range pinned</strong> — supports RimWorld 1.1–1.6; runtime API surface is whatever the loaded game version exposes.</li>
+    <li><strong>No bundled runtime deps</strong> — Harmony and LordKuper.Common are referenced compile-only / reference-only (<code>Private=False</code>, <code>ExcludeAssets=runtime</code>) and provided at runtime by their own mods — must never be redistributed inside this mod.</li>
+    <li><strong>Zero-warning build</strong> — <code>TreatWarningsAsErrors=true</code>, <code>WarningLevel 9999</code>; any warning fails the build.</li>
+    <li><strong>Nullable enabled</strong> — <code>Nullable=enable</code> across Source and Tests; the nullable context must not be disabled.</li>
+    <li><strong>FluentAssertions license guard</strong> — FluentAssertions must stay on <strong>7.x</strong> (Apache-2.0); 8.x is commercial-licensed and forbidden.</li>
+    <li><strong>Mod license</strong> — CC BY-NC-SA 4.0: share-alike, attribution, non-commercial.</li>
+  </ul>
+</section>
+
+<section id="architecture-principles">
+  <h2>Architecture Principles</h2>
+  <ul class="principle-list">
+    <li><strong>Compile against, never ship, the host</strong> — RimWorld <code>Assembly-CSharp</code>, Unity modules, Harmony and LordKuper.Common are referenced with <code>Private=False</code> / compile-only assets. Keeps the payload small and avoids assembly conflicts; runtime copies come from the game and dependency mods.</li>
+    <li><strong>Patch, don't fork the game</strong> — behaviour is injected via Harmony runtime patching rather than replacing game code — aligns with the concept's "not a work-tab UI replacement" / "plays well with others" pillars.</li>
+    <li><strong>Defer to other mods where present</strong> — <code>loadAfter</code> ordering plus compatibility shims; integrate via others' APIs instead of conflicting.</li>
+    <li><strong>Build on the shared parent library</strong> — common helpers/abstractions live in <code>LordKuper.Common</code>; WorkManager consumes them (RW 1.6 dependency) rather than re-implementing, and inherits its coding standards.</li>
+    <li><strong>Strict, self-contained code</strong> — zero-warning build + nullable + XML docs; code must be self-sufficient without ASD design docs. Quality enforced by the toolchain, not convention.</li>
+    <li><strong>Multi-version support via metadata + conditional deps</strong> — <code>About.xml</code> <code>supportedVersions</code> 1.1–1.6 and <code>modDependenciesByVersion</code> (Common only on 1.6) keep one codebase serving multiple game versions.</li>
+  </ul>
+</section>
+
+      </main>
+      <footer>by asd-stack (asd-architect) | 2026-06-04 | sprint n/a</footer>
+    </div>
+  </div>
+</body>
+</html>

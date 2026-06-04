@@ -1,5 +1,3 @@
-using NUnit.Framework;
-
 namespace LordKuper.WorkManager.Tests;
 
 [TestFixture]
