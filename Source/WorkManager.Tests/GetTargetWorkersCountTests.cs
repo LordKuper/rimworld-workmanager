@@ -5,7 +5,7 @@ namespace LordKuper.WorkManager.Tests;
 
 /// <summary>
 ///     Tests for <see cref="WorkTypeAssignmentRule.GetTargetWorkersCount" /> method,
-///     covering non-PawnCount modes (Constant, WorkTypeCount, CapablePawnRatio). (AC-6)
+///     covering non-PawnCount modes (Constant, WorkTypeCount, CapablePawnRatio).
 ///     PawnCount mode requires live game context and is tested via manual verification.
 /// </summary>
 [TestFixture]
@@ -194,12 +194,12 @@ public class GetTargetWorkersCountTests
     }
 
     /// <summary>
-    ///     Tests that GetTargetWorkersCount throws when called with a PawnCount mode
-    ///     (PawnCount mode requires a Map and live game context, not testable without integration).
-    ///     This documents the untestable path and notes it as manual verification.
+    ///     Tests that GetTargetWorkersCount throws when called with a PawnCount mode and null Map.
+    ///     PawnCount mode requires a live Map instance and game context to filter pawns;
+    ///     this test documents the failure boundary when the Map precondition is violated.
     /// </summary>
     [Test]
-    public void GetTargetWorkersCount_PawnCountMode_RequiresLiveGameContext()
+    public void GetTargetWorkersCount_PawnCountMode_NullMapThrows()
     {
         var rule = new WorkTypeAssignmentRule("Patient")
         {
@@ -211,13 +211,11 @@ public class GetTargetWorkersCountTests
             }
         };
 
-        // PawnCount mode calls GetFilteredPawns on a Map, which requires live game context.
-        // Calling with null map should throw or fail gracefully (not tested in unit context).
+        // PawnCount mode calls GetFilteredPawns on the Map, which will throw NullReferenceException
+        // if Map is null (GetFilteredPawns passes the map to filter logic that dereferences it).
         Action act = () => rule.GetTargetWorkersCount(null!, 10, 5);
 
-        // We expect this to throw (NullReferenceException or similar) since Map is null
-        // and the method tries to call methods on it. This documents the untestable boundary.
-        act.Should().Throw<Exception>();
+        act.Should().Throw<NullReferenceException>();
     }
 
     /// <summary>

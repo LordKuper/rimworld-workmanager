@@ -5,7 +5,7 @@ namespace LordKuper.WorkManager.Tests;
 
 /// <summary>
 ///     Tests for <see cref="WorkTypeAssignmentRuleComparer" /> ordering logic and
-///     <see cref="WorkTypeAssignmentRule.Combine" /> merge result. (AC-3)
+///     <see cref="WorkTypeAssignmentRule.Combine" /> merge result.
 /// </summary>
 [TestFixture]
 public class WorkTypeAssignmentRuleComparerTests
@@ -173,19 +173,20 @@ public class WorkTypeAssignmentRuleComparerTests
     }
 
     /// <summary>
-    ///     Tests that the comparer correctly orders rules by skill count (descending).
+    ///     Tests that the comparer orders rules by skill count in descending order when defs are available.
+    ///     Without RimWorld game context, this test documents that rules with null Def fall back to defName ordering.
     /// </summary>
     [Test]
-    public void Compare_OrdersBySkillCountDescending()
+    public void Compare_OrdersBySkillCountDescending_FallsBackToDefNameWhenNoDefs()
     {
         var comparer = new WorkTypeAssignmentRuleComparer();
-        var rule1 = new WorkTypeAssignmentRule("Hauling");
-        var rule2 = new WorkTypeAssignmentRule("Doctor");
+        var rule1 = new WorkTypeAssignmentRule("Aardvark"); // No Def loaded; will fall back to defName
+        var rule2 = new WorkTypeAssignmentRule("Zebra");    // No Def loaded; will fall back to defName
 
-        // Without RimWorld defs loaded, both rules have null Def, so they fall back to defName ordering.
-        // This test verifies the comparer doesn't crash and respects the null-def case.
+        // Both rules have null Def (no RimWorld context), so they are ordered by defName (ordinal)
+        // "Aardvark" < "Zebra" in ordinal comparison
         var result = comparer.Compare(rule1, rule2);
-        result.Should().NotBe(0); // Different rules should not be equal
+        result.Should().BeLessThan(0); // Confirms defName fall-back ordering
     }
 
     /// <summary>

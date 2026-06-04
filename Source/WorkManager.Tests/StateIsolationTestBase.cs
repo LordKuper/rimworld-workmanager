@@ -29,17 +29,20 @@ public abstract class StateIsolationTestBase
     private static object? GetWorkManagerGameComponentInstance()
     {
         var type = GetWorkManagerGameComponentType();
-        if (type == null) return null;
-        var property = type.GetProperty("Instance", BindingFlags.Static | BindingFlags.NonPublic);
-        return property?.GetValue(null);
+        var property = type.GetProperty("Instance", BindingFlags.Static | BindingFlags.NonPublic)
+                      ?? throw new InvalidOperationException(
+                          "WorkManagerGameComponent.Instance property not found; test infrastructure may be out of sync with production code");
+        return property.GetValue(null);
     }
 
     /// <summary>
-    ///     Gets the Type of WorkManagerGameComponent via reflection.
+    ///     Gets the Type of WorkManagerGameComponent.
+    ///     Uses the direct typeof operator rather than string-based lookup, which only searches
+    ///     mscorlib and the calling assembly and would fail for types in other assemblies.
     /// </summary>
-    private static Type? GetWorkManagerGameComponentType()
+    private static Type GetWorkManagerGameComponentType()
     {
-        return Type.GetType("LordKuper.WorkManager.WorkManagerGameComponent");
+        return typeof(WorkManagerGameComponent);
     }
 
     /// <summary>
@@ -73,8 +76,10 @@ public abstract class StateIsolationTestBase
     /// </summary>
     private static void SetStaticFieldValue(Type type, string fieldName, object? value)
     {
-        var field = type.GetField(fieldName, BindingFlags.Static | BindingFlags.NonPublic);
-        if (field != null) field.SetValue(null, value);
+        var field = type.GetField(fieldName, BindingFlags.Static | BindingFlags.NonPublic)
+                   ?? throw new InvalidOperationException(
+                       $"Static field {type.Name}.{fieldName} not found; test infrastructure may be out of sync with production code");
+        field.SetValue(null, value);
     }
 
     /// <summary>
@@ -83,9 +88,13 @@ public abstract class StateIsolationTestBase
     private static void SetWorkManagerGameComponentInstance(object? value)
     {
         var type = GetWorkManagerGameComponentType();
-        if (type == null) return;
-        var property = type.GetProperty("Instance", BindingFlags.Static | BindingFlags.NonPublic);
-        if (property?.GetSetMethod(true) != null) property.SetValue(null, value);
+        var property = type.GetProperty("Instance", BindingFlags.Static | BindingFlags.NonPublic)
+                      ?? throw new InvalidOperationException(
+                          "WorkManagerGameComponent.Instance property not found; test infrastructure may be out of sync with production code");
+        var setter = property.GetSetMethod(true)
+                    ?? throw new InvalidOperationException(
+                        "WorkManagerGameComponent.Instance property has no setter; test infrastructure may be out of sync with production code");
+        setter.Invoke(null, [value]);
     }
 
     /// <summary>
