@@ -12,8 +12,8 @@ responsibility:
 | ID | Title | Blocks | Performed by | Status |
 |---|---|---|---|---|
 | MS-1 | Verify no NRE on game-less UI screens | Task 3 — AC-12 | user | pending |
-| MS-2 | Verify passion score normalization across passion levels | Task 2 — AC-5 | user | pending |
-| MS-3 | Verify valid hour-to-assignment mapping in WorkShift | Task 2 — AC-2 | user | pending |
+| MS-2 | Verify passion score normalization across passion levels | Task 2 — AC-5 | user | done |
+| MS-3 | Verify valid hour-to-assignment mapping in WorkShift | Task 2 — AC-2 | user | done |
 
 ## MS-1 — Verify no NRE on game-less UI screens
 
@@ -43,7 +43,8 @@ No `NullReferenceException` with a stack trace containing `LordKuper.WorkManager
 - **When**: After building and deploying the mod to a RimWorld 1.6 installation
 - **Prerequisites**: Production build (`dotnet build Source/WorkManager.slnx -c Release`) completed and `1.6/Assemblies/LordKuper.WorkManager.dll` deployed
 - **Performed by**: user (mod developer or tester with a RimWorld 1.6 installation)
-- **Status**: pending
+- **Status**: done
+- **Note**: Verified by user 2026-06-05: PASS.
 
 ### Steps
 
@@ -64,7 +65,8 @@ Passion-based work assignments execute without error. The mod correctly computes
 - **When**: After building and deploying the mod to a RimWorld 1.6 installation
 - **Prerequisites**: Production build (`dotnet build Source/WorkManager.slnx -c Release`) completed and `1.6/Assemblies/LordKuper.WorkManager.dll` deployed
 - **Performed by**: user (mod developer or tester with a RimWorld 1.6 installation)
-- **Status**: pending
+- **Status**: done
+- **Note**: Verified by user 2026-06-05: PASS.
 
 ### Steps
 
