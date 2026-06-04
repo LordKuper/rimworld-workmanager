@@ -87,8 +87,8 @@ The sprint is done when all of the following hold:
 - [x] Confirm no other visible text or layout change.
 
 ### Task 5: Remove vendored Lib.Harmony 2.3.6 (ADR-0003) — AC-13
-- [ ] Delete the `Source/packages/Lib.Harmony.2.3.6/` directory tree (DLLs, nupkg, pdbs, README).
-- [ ] Confirm no project or build file (`WorkManager.csproj`, `WorkManager.Tests.csproj`, `Directory.Build.props`, `WorkManager.slnx`) references the removed path; the only remaining Harmony reference is the `Lib.Harmony` 2.4.2 `PackageReference`. (AC-13)
+- [x] Delete the `Source/packages/Lib.Harmony.2.3.6/` directory tree (DLLs, nupkg, pdbs, README).
+- [x] Confirm no project or build file (`WorkManager.csproj`, `WorkManager.Tests.csproj`, `Directory.Build.props`, `WorkManager.slnx`) references the removed path; the only remaining Harmony reference is the `Lib.Harmony` 2.4.2 `PackageReference`. (AC-13)
 
 ### Task 6: Documentation alignment — AC-7, AC-8, AC-14, AC-15, AC-16
 - [ ] Update `README.md` version badges to include RimWorld 1.6 (full 1.1–1.6 support range), matching `About/About.xml` `supportedVersions`. (AC-14)
