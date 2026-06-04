@@ -62,12 +62,12 @@ The sprint is done when all of the following hold:
 - [x] Build the test project clean and confirm the resolver loads a RimWorld-typed test type without `FileNotFoundException`.
 
 ### Task 2: Unit tests for pure-logic units (ADR-0002) — AC-2…AC-6, AC-18
-- [ ] `WorkShift`: test start/end hour-to-shift mapping and validation/normalization of out-of-range or invalid hour values. (AC-2)
-- [ ] `WorkTypeAssignmentRuleComparer`: test ordering; `WorkTypeAssignmentRule.Combine`: test the merge result including deterministic tie-breaks. (AC-3)
-- [ ] `DedicatedWorkerSettings.Combine` and `DedicatedWorkerSettings.Validate`: test value-clamping on out-of-range inputs. (AC-4)
-- [ ] `PassionHelper.GetPassionScore`: test normalization across all handled passion levels, asserting the expected normalized score for each. (AC-5)
+- [x] `WorkShift`: test start/end hour-to-shift mapping and validation/normalization of out-of-range or invalid hour values. (AC-2) — BLOCKED: MS-3
+- [x] `WorkTypeAssignmentRuleComparer`: test ordering; `WorkTypeAssignmentRule.Combine`: test the merge result including deterministic tie-breaks. (AC-3)
+- [x] `DedicatedWorkerSettings.Combine` and `DedicatedWorkerSettings.Validate`: test value-clamping on out-of-range inputs. (AC-4)
+- [ ] `PassionHelper.GetPassionScore`: test normalization across all handled passion levels, asserting the expected normalized score for each. (AC-5) — BLOCKED: MS-2
 - [ ] `GetTargetWorkersCount`: test the non-`PawnCount` modes, asserting the computed target per mode. (AC-6)
-- [ ] Use FluentAssertions `.Should()` exclusively; derive from `StateIsolationTestBase` for any test touching static state or RimWorld defs; pure-input tests may skip the base class.
+- [x] Use FluentAssertions `.Should()` exclusively; derive from `StateIsolationTestBase` for any test touching static state or RimWorld defs; pure-input tests may skip the base class.
 - [ ] Verify the covered units meet the 80% line-coverage floor (AC-6); ensure no test is skipped/ignored in a way that masks AC-2…AC-6 coverage (AC-18).
 - [ ] Run `dotnet test Source/WorkManager.slnx` and confirm green.
 

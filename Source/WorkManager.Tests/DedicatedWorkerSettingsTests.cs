@@ -222,9 +222,13 @@ public class DedicatedWorkerSettingsTests
             TriStateMode = false
         };
 
-        // Validate is private; call it indirectly via ExposeData during save mode
-        // For testing, we construct settings and verify clamping would occur by checking constants
-        outOfRangeValue.Should().Be(outOfRangeValue); // Placeholder; actual validation tested via Combine
+        // Invoke private Validate method via reflection
+        var validateMethod = typeof(DedicatedWorkerSettings)
+            .GetMethod("Validate", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            ?? throw new System.InvalidOperationException("Validate method not found");
+        validateMethod.Invoke(settings, null);
+
+        settings.ConstantWorkerCount.Should().Be(expectedClamped);
     }
 
     /// <summary>
@@ -234,9 +238,20 @@ public class DedicatedWorkerSettingsTests
     [TestCase(3f, DedicatedWorkerSettingsTests.WorkTypeCountFactorMax)]
     public void Validate_WorkTypeCountFactor_ClampedToRange(float outOfRangeValue, float expectedClamped)
     {
-        // WorkTypeCountFactor is clamped by Validate, which is private and called during serialization
-        // The bounds are defined as public constants on DedicatedWorkerSettings
-        outOfRangeValue.Should().Be(outOfRangeValue); // Placeholder
+        var settings = new DedicatedWorkerSettings
+        {
+            Mode = DedicatedWorkerMode.WorkTypeCount,
+            WorkTypeCountFactor = outOfRangeValue,
+            TriStateMode = false
+        };
+
+        // Invoke private Validate method via reflection
+        var validateMethod = typeof(DedicatedWorkerSettings)
+            .GetMethod("Validate", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            ?? throw new System.InvalidOperationException("Validate method not found");
+        validateMethod.Invoke(settings, null);
+
+        settings.WorkTypeCountFactor.Should().BeApproximately(expectedClamped, 0.0001f);
     }
 
     /// <summary>
@@ -246,8 +261,20 @@ public class DedicatedWorkerSettingsTests
     [TestCase(6f, DedicatedWorkerSettingsTests.CapablePawnRatioFactorMax)]
     public void Validate_CapablePawnRatioFactor_ClampedToRange(float outOfRangeValue, float expectedClamped)
     {
-        // CapablePawnRatioFactor is clamped by Validate
-        outOfRangeValue.Should().Be(outOfRangeValue); // Placeholder
+        var settings = new DedicatedWorkerSettings
+        {
+            Mode = DedicatedWorkerMode.CapablePawnRatio,
+            CapablePawnRatioFactor = outOfRangeValue,
+            TriStateMode = false
+        };
+
+        // Invoke private Validate method via reflection
+        var validateMethod = typeof(DedicatedWorkerSettings)
+            .GetMethod("Validate", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            ?? throw new System.InvalidOperationException("Validate method not found");
+        validateMethod.Invoke(settings, null);
+
+        settings.CapablePawnRatioFactor.Should().BeApproximately(expectedClamped, 0.0001f);
     }
 
     /// <summary>
@@ -257,8 +284,21 @@ public class DedicatedWorkerSettingsTests
     [TestCase(6f, DedicatedWorkerSettingsTests.PawnCountFactorMax)]
     public void Validate_PawnCountFactor_ClampedToRange(float outOfRangeValue, float expectedClamped)
     {
-        // PawnCountFactor is clamped by Validate
-        outOfRangeValue.Should().Be(outOfRangeValue); // Placeholder
+        var settings = new DedicatedWorkerSettings
+        {
+            Mode = DedicatedWorkerMode.PawnCount,
+            PawnCountFactor = outOfRangeValue,
+            TriStateMode = false,
+            PawnCountFilter = new LordKuper.Common.Filters.PawnFilter()
+        };
+
+        // Invoke private Validate method via reflection
+        var validateMethod = typeof(DedicatedWorkerSettings)
+            .GetMethod("Validate", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            ?? throw new System.InvalidOperationException("Validate method not found");
+        validateMethod.Invoke(settings, null);
+
+        settings.PawnCountFactor.Should().BeApproximately(expectedClamped, 0.0001f);
     }
 
     private const int ConstantWorkerCountMin = DedicatedWorkerSettings.ConstantWorkerCountMin;

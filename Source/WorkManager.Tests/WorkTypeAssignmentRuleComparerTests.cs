@@ -190,6 +190,61 @@ public class WorkTypeAssignmentRuleComparerTests
     }
 
     /// <summary>
+    ///     Tests that the comparer orders by defName (ordinal) as final tie-breaker.
+    ///     This exercises the third discriminator in the ordering logic.
+    /// </summary>
+    [Test]
+    public void Compare_DefNameTieBreaker_OrdersOrdinal()
+    {
+        var comparer = new WorkTypeAssignmentRuleComparer();
+        // Both rules have null Def, so skill count and priority comparisons both yield 0
+        // The tie-breaker is defName ordinal comparison
+        var ruleB = new WorkTypeAssignmentRule("Banana");
+        var ruleA = new WorkTypeAssignmentRule("Apple");
+
+        var result = comparer.Compare(ruleB, ruleA);
+        // "Banana" > "Apple" in ordinal comparison, so ruleB should be greater than ruleA
+        result.Should().BeGreaterThan(0);
+    }
+
+    /// <summary>
+    ///     Tests that Combine result preserves the merging of defName and settings.
+    /// </summary>
+    [Test]
+    public void Combine_Result_MergesCorrectly()
+    {
+        var main = new WorkTypeAssignmentRule("Doctor")
+        {
+            EnsureWorkerAssigned = true,
+            MinWorkerNumber = 3,
+            DedicatedWorkerSettings = new DedicatedWorkerSettings
+            {
+                Mode = DedicatedWorkerMode.Constant,
+                ConstantWorkerCount = 2
+            }
+        };
+        var fallback = new WorkTypeAssignmentRule("Cleaning")
+        {
+            EnsureWorkerAssigned = false,
+            MinWorkerNumber = 1,
+            DedicatedWorkerSettings = new DedicatedWorkerSettings
+            {
+                Mode = DedicatedWorkerMode.WorkTypeCount,
+                WorkTypeCountFactor = 0.5f
+            }
+        };
+
+        var result = WorkTypeAssignmentRule.Combine(main, fallback);
+
+        // Combined result should have main's defName and settings
+        result.DefName.Should().Be("Doctor");
+        result.EnsureWorkerAssigned.Should().Be(true);
+        result.MinWorkerNumber.Should().Be(3);
+        result.DedicatedWorkerSettings.Mode.Should().Be(DedicatedWorkerMode.Constant);
+        result.DedicatedWorkerSettings.ConstantWorkerCount.Should().Be(2);
+    }
+
+    /// <summary>
     ///     Tests that the comparer treats reference-equal rules as equal.
     /// </summary>
     [Test]
