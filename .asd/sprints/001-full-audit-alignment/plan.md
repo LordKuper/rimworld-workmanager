@@ -98,11 +98,11 @@ The sprint is done when all of the following hold:
 - [x] Verify-only: confirm `design/architecture/tech-reference/RimWorld-1.6.md` and `dotnet-framework-4.7.2.md` exist, are version-accurate, and that every technology in `stack.html` has a corresponding reference with no reference pointing to an unused version (these two docs were authored in design / design-promote per ADR-0004 — do not re-create). (AC-7, AC-8)
 
 ### Task 7: Build + quality gate — AC-17, AC-18
-- [ ] Run `jb cleanupcode Source\WorkManager.slnx` before the build.
-- [ ] Run the production build `dotnet build Source/WorkManager.slnx -c Release` and confirm zero errors and zero warnings, with `TreatWarningsAsErrors` enabled in Debug and Release. (AC-17)
-- [ ] Run the full test suite `dotnet test Source/WorkManager.slnx` and confirm green, with no skipped/ignored tests masking AC-2…AC-6 coverage. (AC-18)
-- [ ] Run `dotnet format Source/WorkManager.slnx --verify-no-changes` and confirm clean.
-- [ ] Run `jb inspectcode Source\WorkManager.slnx -o=".\TestResults\jb-inspect.sarif" --build` and confirm the sarif has no error/warning entries.
+- [x] Run `jb cleanupcode Source\WorkManager.slnx` before the build.
+- [x] Run the production build `dotnet build Source/WorkManager.slnx -c Release` and confirm zero errors and zero warnings, with `TreatWarningsAsErrors` enabled in Debug and Release. (AC-17)
+- [x] Run the full test suite `dotnet test Source/WorkManager.slnx` and confirm green, with no skipped/ignored tests masking AC-2…AC-6 coverage. (AC-18)
+- [x] Run `dotnet format Source/WorkManager.slnx --verify-no-changes` and confirm clean.
+- [x] Run `jb inspectcode Source\WorkManager.slnx -o=".\TestResults\jb-inspect.sarif" --build` and confirm the sarif has no error/warning entries.
 
 ## Risks
 - Engine refactor regression: the Instance null-contract change (Task 3) touches code with no pre-existing automated net; Tasks 1–2 land the pure-logic test net first to mitigate silent behavior change (verification-driven, audit Risks).

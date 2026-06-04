@@ -1,6 +1,5 @@
 using System;
 using System.Reflection;
-using LordKuper.WorkManager;
 
 namespace LordKuper.WorkManager.Tests;
 
@@ -11,38 +10,28 @@ namespace LordKuper.WorkManager.Tests;
 [NonParallelizable]
 public abstract class StateIsolationTestBase
 {
-    private object? _snapshotGameComponent;
     private object? _snapshotDefaultRule;
     private object? _snapshotDefaultRulesByName;
+    private object? _snapshotGameComponent;
 
     /// <summary>
-    ///     Snapshots the relevant mutable static state before each test.
+    ///     Gets the value of a static field via reflection.
     /// </summary>
-    [SetUp]
-    public void SnapshotState()
+    private static object? GetStaticFieldValue(Type type, string fieldName)
     {
-        // Snapshot WorkManagerGameComponent.Instance
-        _snapshotGameComponent = GetWorkManagerGameComponentInstance();
-
-        // Snapshot WorkTypeAssignmentRule static caches
-        var workTypeAssignmentRuleType = GetWorkTypeAssignmentRuleType();
-        _snapshotDefaultRule = GetStaticFieldValue(workTypeAssignmentRuleType, "_defaultRule");
-        _snapshotDefaultRulesByName = GetStaticFieldValue(workTypeAssignmentRuleType, "_defaultRulesByName");
+        var field = type.GetField(fieldName, BindingFlags.Static | BindingFlags.NonPublic);
+        return field?.GetValue(null);
     }
 
     /// <summary>
-    ///     Restores the snapshotted mutable static state after each test.
+    ///     Gets the current value of WorkManagerGameComponent.Instance via reflection.
     /// </summary>
-    [TearDown]
-    public void RestoreState()
+    private static object? GetWorkManagerGameComponentInstance()
     {
-        // Restore WorkManagerGameComponent.Instance
-        SetWorkManagerGameComponentInstance(_snapshotGameComponent);
-
-        // Restore WorkTypeAssignmentRule static caches
-        var workTypeAssignmentRuleType = GetWorkTypeAssignmentRuleType();
-        SetStaticFieldValue(workTypeAssignmentRuleType, "_defaultRule", _snapshotDefaultRule);
-        SetStaticFieldValue(workTypeAssignmentRuleType, "_defaultRulesByName", _snapshotDefaultRulesByName);
+        var type = GetWorkManagerGameComponentType();
+        if (type == null) return null;
+        var property = type.GetProperty("Instance", BindingFlags.Static | BindingFlags.NonPublic);
+        return property?.GetValue(null);
     }
 
     /// <summary>
@@ -64,18 +53,28 @@ public abstract class StateIsolationTestBase
     }
 
     /// <summary>
-    ///     Gets the current value of WorkManagerGameComponent.Instance via reflection.
+    ///     Restores the snapshotted mutable static state after each test.
     /// </summary>
-    private static object? GetWorkManagerGameComponentInstance()
+    [TearDown]
+    public void RestoreState()
     {
-        var type = GetWorkManagerGameComponentType();
-        if (type == null) return null;
+        // Restore WorkManagerGameComponent.Instance
+        SetWorkManagerGameComponentInstance(_snapshotGameComponent);
 
-        var property = type.GetProperty(
-            "Instance",
-            BindingFlags.Static | BindingFlags.NonPublic);
+        // Restore WorkTypeAssignmentRule static caches
+        var workTypeAssignmentRuleType = GetWorkTypeAssignmentRuleType();
+        SetStaticFieldValue(workTypeAssignmentRuleType, "_defaultRule", _snapshotDefaultRule);
+        SetStaticFieldValue(workTypeAssignmentRuleType, "_defaultRulesByName",
+            _snapshotDefaultRulesByName);
+    }
 
-        return property?.GetValue(null);
+    /// <summary>
+    ///     Sets the value of a static field via reflection.
+    /// </summary>
+    private static void SetStaticFieldValue(Type type, string fieldName, object? value)
+    {
+        var field = type.GetField(fieldName, BindingFlags.Static | BindingFlags.NonPublic);
+        if (field != null) field.SetValue(null, value);
     }
 
     /// <summary>
@@ -85,41 +84,23 @@ public abstract class StateIsolationTestBase
     {
         var type = GetWorkManagerGameComponentType();
         if (type == null) return;
-
-        var property = type.GetProperty(
-            "Instance",
-            BindingFlags.Static | BindingFlags.NonPublic);
-
-        if (property?.GetSetMethod(nonPublic: true) != null)
-        {
-            property.SetValue(null, value);
-        }
+        var property = type.GetProperty("Instance", BindingFlags.Static | BindingFlags.NonPublic);
+        if (property?.GetSetMethod(true) != null) property.SetValue(null, value);
     }
 
     /// <summary>
-    ///     Gets the value of a static field via reflection.
+    ///     Snapshots the relevant mutable static state before each test.
     /// </summary>
-    private static object? GetStaticFieldValue(Type type, string fieldName)
+    [SetUp]
+    public void SnapshotState()
     {
-        var field = type.GetField(
-            fieldName,
-            BindingFlags.Static | BindingFlags.NonPublic);
+        // Snapshot WorkManagerGameComponent.Instance
+        _snapshotGameComponent = GetWorkManagerGameComponentInstance();
 
-        return field?.GetValue(null);
-    }
-
-    /// <summary>
-    ///     Sets the value of a static field via reflection.
-    /// </summary>
-    private static void SetStaticFieldValue(Type type, string fieldName, object? value)
-    {
-        var field = type.GetField(
-            fieldName,
-            BindingFlags.Static | BindingFlags.NonPublic);
-
-        if (field != null)
-        {
-            field.SetValue(null, value);
-        }
+        // Snapshot WorkTypeAssignmentRule static caches
+        var workTypeAssignmentRuleType = GetWorkTypeAssignmentRuleType();
+        _snapshotDefaultRule = GetStaticFieldValue(workTypeAssignmentRuleType, "_defaultRule");
+        _snapshotDefaultRulesByName =
+            GetStaticFieldValue(workTypeAssignmentRuleType, "_defaultRulesByName");
     }
 }

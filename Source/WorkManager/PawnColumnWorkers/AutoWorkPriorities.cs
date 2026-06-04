@@ -24,7 +24,8 @@ public class AutoWorkPriorities : PawnColumnWorker
         if (!WorkManagerGameComponent.IsInitialized) return;
         var component = WorkManagerGameComponent.Instance;
         Buttons.DoIconButtonToggle(new Rect(rect.center.x - 8, rect.center.y - 8, 16, 16),
-            () => component.GetPawnEnabled(pawn), newValue => component.SetPawnEnabled(pawn, newValue),
+            () => component.GetPawnEnabled(pawn),
+            newValue => component.SetPawnEnabled(pawn, newValue),
             Resources.Strings.PawnDisableTooltip, Resources.Textures.PawnToggleButtonEnabled,
             Resources.Strings.PawnEnableTooltip, Resources.Textures.PawnToggleButtonDisabled);
     }

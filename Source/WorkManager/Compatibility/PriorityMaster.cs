@@ -10,14 +10,14 @@ namespace LordKuper.WorkManager.Compatibility;
 internal static class PriorityMaster
 {
     /// <summary>
-    ///     Indicates whether the PriorityMaster compatibility has been initialized.
-    /// </summary>
-    private static bool _isInitialized;
-
-    /// <summary>
     ///     Indicates whether the PriorityMaster mod is active.
     /// </summary>
     internal static bool PriorityMasterActive;
+
+    /// <summary>
+    ///     Indicates whether the PriorityMaster compatibility has been initialized.
+    /// </summary>
+    private static bool _isInitialized;
 
     /// <summary>
     ///     Initializes PriorityMaster compatibility by reading the mod's configured maximum work priority.
@@ -39,9 +39,11 @@ internal static class PriorityMaster
         try
         {
             var modType = AccessTools.TypeByName("PriorityMod.Core.PriorityMaster") ??
-                          throw new InvalidOperationException("Could not find 'PriorityMod.Core.PriorityMaster' type.");
+                          throw new InvalidOperationException(
+                              "Could not find 'PriorityMod.Core.PriorityMaster' type.");
             var settings = AccessTools.Field(modType, "settings")?.GetValue(null) ??
-                           throw new InvalidOperationException("PriorityMaster settings are not loaded.");
+                           throw new InvalidOperationException(
+                               "PriorityMaster settings are not loaded.");
             var maxPriority = Traverse.Create(settings).Method("GetMaxPriority").GetValue<int>();
             if (maxPriority <= 0)
                 throw new InvalidOperationException("Invalid max priority.");

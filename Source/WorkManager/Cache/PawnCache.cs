@@ -146,7 +146,8 @@ internal class PawnCache(Pawn pawn)
         if (_allowedWorkTypes.TryGetValue(workType, out var allowed)) return allowed;
         if (Pawn.WorkTypeIsDisabled(workType))
             allowed = false;
-        else if (WorkManagerGameComponent.Instance.CombinedRulesDict.TryGetValue(workType, out var rule))
+        else if (WorkManagerGameComponent.Instance.CombinedRulesDict.TryGetValue(workType,
+                     out var rule))
             allowed = rule.IsAllowedWorker(Pawn);
         else
             allowed = false;
@@ -255,7 +256,8 @@ internal class PawnCache(Pawn pawn)
         var timetable = Pawn.timetable;
         for (var hour = 0; hour < 24; hour++)
         {
-            _workHours[hour] = timetable != null && timetable.GetAssignment(hour) == TimeAssignmentDefOf.Work;
+            _workHours[hour] = timetable != null &&
+                               timetable.GetAssignment(hour) == TimeAssignmentDefOf.Work;
         }
         Work.Update(time);
         Skill.Update(time);

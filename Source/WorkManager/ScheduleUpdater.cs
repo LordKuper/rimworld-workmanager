@@ -67,8 +67,8 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
     /// <param name="shifts">The eligible shifts for the group.</param>
     /// <param name="relevantSkills">Skills considered for coverage.</param>
     /// <param name="maxLevels">Maximum colony level per skill, used for normalization.</param>
-    private void AssignGroup(List<Pawn> pawns, List<WorkShift> shifts, List<SkillDef> relevantSkills,
-        Dictionary<SkillDef, int> maxLevels)
+    private void AssignGroup(List<Pawn> pawns, List<WorkShift> shifts,
+        List<SkillDef> relevantSkills, Dictionary<SkillDef, int> maxLevels)
     {
         if (pawns.Count == 0 || shifts.Count == 0) return;
         var shiftCount = shifts.Count;
@@ -81,7 +81,9 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
             foreach (var skill in relevantSkills)
             {
                 var max = maxLevels[skill];
-                var levelTerm = max > 0 ? LevelWeight * (pawn.skills.GetSkill(skill).Level / (float)max) : 0f;
+                var levelTerm = max > 0
+                    ? LevelWeight * (pawn.skills.GetSkill(skill).Level / (float)max)
+                    : 0f;
                 var learnTerm = LearnRateCoef * pawn.skills.GetSkill(skill).LearnRateFactor();
                 bySkill[skill] = levelTerm + learnTerm;
             }
@@ -92,8 +94,8 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
         var keyPawns = new Dictionary<SkillDef, HashSet<Pawn>>();
         foreach (var skill in relevantSkills)
         {
-            var top = pawns.OrderByDescending(pawn => scores[pawn][skill]).ThenBy(pawn => pawn.thingIDNumber)
-                .Take(shiftCount);
+            var top = pawns.OrderByDescending(pawn => scores[pawn][skill])
+                .ThenBy(pawn => pawn.thingIDNumber).Take(shiftCount);
             keyPawns[skill] = [.. top];
         }
 
@@ -111,7 +113,8 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
         foreach (var pawn in ordered)
         {
             var lovers = GetLovers(pawn);
-            var pawnKeySkills = relevantSkills.Where(skill => keyPawns[skill].Contains(pawn)).ToList();
+            var pawnKeySkills =
+                relevantSkills.Where(skill => keyPawns[skill].Contains(pawn)).ToList();
             WorkShift? bestShift = null;
             var bestScore = float.MinValue;
             foreach (var shift in shifts)
@@ -249,16 +252,20 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
             }
             var colonistCount = allPawns.Count(pawn => !pawn.story.traits.HasTrait(NightOwlTrait));
             var nightOwlCount = allPawns.Count - colonistCount;
-            var scheduled = allPawns.Where(pawn => WorkManagerGameComponent.Instance.GetPawnScheduleEnabled(pawn))
+            var scheduled = allPawns
+                .Where(pawn => WorkManagerGameComponent.Instance.GetPawnScheduleEnabled(pawn))
                 .ToList();
 
             // Two independent groups: regular colonists and night owls.
-            AssignGroup(scheduled.Where(pawn => !pawn.story.traits.HasTrait(NightOwlTrait)).ToList(),
-                WorkManagerMod.Settings.ColonistWorkShifts.Where(shift => shift.PawnThreshold <= colonistCount)
-                    .ToList(), relevantSkills, maxLevels);
+            AssignGroup(
+                scheduled.Where(pawn => !pawn.story.traits.HasTrait(NightOwlTrait)).ToList(),
+                WorkManagerMod.Settings.ColonistWorkShifts
+                    .Where(shift => shift.PawnThreshold <= colonistCount).ToList(), relevantSkills,
+                maxLevels);
             AssignGroup(scheduled.Where(pawn => pawn.story.traits.HasTrait(NightOwlTrait)).ToList(),
-                WorkManagerMod.Settings.NightOwlWorkShifts.Where(shift => shift.PawnThreshold <= nightOwlCount)
-                    .ToList(), relevantSkills, maxLevels);
+                WorkManagerMod.Settings.NightOwlWorkShifts
+                    .Where(shift => shift.PawnThreshold <= nightOwlCount).ToList(), relevantSkills,
+                maxLevels);
             foreach (var worker in _workers)
             {
                 for (var hour = 0; hour < 24; hour++)

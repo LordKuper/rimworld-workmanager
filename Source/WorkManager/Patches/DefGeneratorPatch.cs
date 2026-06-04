@@ -22,7 +22,8 @@ public static class DefGeneratorPatch
     /// <param name="column">The column to insert.</param>
     private static void InsertAfterLabel(PawnTableDef table, PawnColumnDef column)
     {
-        var labelIndex = table.columns.FindIndex(x => x.defName.Equals("Label", StringComparison.Ordinal));
+        var labelIndex =
+            table.columns.FindIndex(x => x.defName.Equals("Label", StringComparison.Ordinal));
         if (labelIndex < 0)
         {
             Logger.LogWarning(

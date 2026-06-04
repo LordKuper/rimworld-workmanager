@@ -10,11 +10,6 @@ namespace LordKuper.WorkManager.Compatibility;
 internal static class MoreThanCapable
 {
     /// <summary>
-    ///     Indicates whether the compatibility layer has been initialized.
-    /// </summary>
-    private static bool _isInitialized;
-
-    /// <summary>
     ///     Delegate to the MoreThanCapableMod.IsBadWork method.
     /// </summary>
     internal static IsBadWorkDelegate? IsBadWork;
@@ -23,6 +18,11 @@ internal static class MoreThanCapable
     ///     Indicates whether the More Than Capable mod is active.
     /// </summary>
     internal static bool MoreThanCapableActive;
+
+    /// <summary>
+    ///     Indicates whether the compatibility layer has been initialized.
+    /// </summary>
+    private static bool _isInitialized;
 
     /// <summary>
     ///     Initializes the compatibility layer for the MoreThanCapable mod.
@@ -34,7 +34,8 @@ internal static class MoreThanCapable
         _isInitialized = true;
         MoreThanCapableActive =
             LoadedModManager.RunningModsListForReading.Any(m =>
-                "notfood.MoreThanCapable".Equals(m.PackageId, StringComparison.OrdinalIgnoreCase)) ||
+                "notfood.MoreThanCapable".Equals(m.PackageId,
+                    StringComparison.OrdinalIgnoreCase)) ||
             LoadedModManager.RunningModsListForReading.Any(m =>
                 "void.MoreThanCapable".Equals(m.PackageId, StringComparison.OrdinalIgnoreCase));
         if (!MoreThanCapableActive) return;
@@ -44,9 +45,11 @@ internal static class MoreThanCapable
         try
         {
             IsBadWork = AccessTools.MethodDelegate<IsBadWorkDelegate>(
-                AccessTools.Method(AccessTools.TypeByName("MoreThanCapable.MoreThanCapableMod"), "IsBadWork"));
+                AccessTools.Method(AccessTools.TypeByName("MoreThanCapable.MoreThanCapableMod"),
+                    "IsBadWork"));
             if (IsBadWork == null)
-                throw new InvalidOperationException("Could not create 'IsBadWork' method delegate.");
+                throw new InvalidOperationException(
+                    "Could not create 'IsBadWork' method delegate.");
         }
         catch (Exception e)
         {

@@ -61,7 +61,8 @@ public static class WidgetsWorkPatch
         if (!component.PriorityManagementEnabled || !Find.PlaySettings.useWorkPriorities) return;
         Rect rect = new(x, y, 25f, 25f);
         var enabled = component.GetPawnWorkTypeEnabled(p, wType);
-        if (Event.current.type == EventType.MouseDown && Mouse.IsOver(rect) && Event.current.button == 2)
+        if (Event.current.type == EventType.MouseDown && Mouse.IsOver(rect) &&
+            Event.current.button == 2)
             component.SetPawnWorkTypeEnabled(p, wType, !enabled);
     }
 }

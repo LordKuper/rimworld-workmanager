@@ -10,12 +10,12 @@ namespace LordKuper.WorkManager;
 /// </summary>
 public class WorkShift : IExposable
 {
-    private List<string> _hours;
-
     /// <summary>
     ///     The minimum number of pawns required for this work shift to be used.
     /// </summary>
     public int PawnThreshold = 1;
+
+    private List<string> _hours;
 
     internal WorkShift()
     {
@@ -30,9 +30,11 @@ public class WorkShift : IExposable
     {
         _hours = [.. assignments];
         if (_hours.Count != 24)
-            throw new ArgumentException("Invalid schedule for creating work shift", nameof(assignments));
+            throw new ArgumentException("Invalid schedule for creating work shift",
+                nameof(assignments));
         if (pawnThreshold < 1)
-            throw new ArgumentException("Invalid pawn threshold for creating work shift", nameof(pawnThreshold));
+            throw new ArgumentException("Invalid pawn threshold for creating work shift",
+                nameof(pawnThreshold));
         PawnThreshold = pawnThreshold;
     }
 
