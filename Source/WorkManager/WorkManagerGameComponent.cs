@@ -118,8 +118,10 @@ public class WorkManagerGameComponent : GameComponent
     ///         <strong>Contract:</strong> <c>Instance</c> is valid only while a <c>Game</c> is loaded.
     ///         It is non-null on any game-scoped path (MapComponent ticks, cache updates) because a
     ///         <c>Map</c> can only exist when a <c>Game</c> — and therefore this component — exists.
-    ///         It may be null on game-less UI paths (mod-settings screen, main menu). Use
-    ///         <see cref="IsInitialized" /> to guard every UI-scoped entry point.
+    ///         It may be null on game-less UI paths (mod-settings screen, main menu), and retains its
+    ///         last value after a game is unloaded (quit to main menu) — a stale reference.
+    ///         Use <see cref="IsInitialized" /> to guard every UI-scoped entry point; do not
+    ///         dereference <c>Instance</c> unless <see cref="IsInitialized" /> returns <c>true</c>.
     ///     </para>
     /// </summary>
     internal static WorkManagerGameComponent Instance { get; private set; } = null!;
@@ -127,12 +129,15 @@ public class WorkManagerGameComponent : GameComponent
     /// <summary>
     ///     Gets a value indicating whether the game component has been initialized and
     ///     <see cref="Instance" /> is safe to dereference.
-    ///     Returns <c>true</c> while a <c>Game</c> is loaded; <c>false</c> on game-less UI paths
-    ///     (main menu, mod-settings screen opened without an active save).
+    ///     Returns <c>true</c> only when both an active <c>Game</c> is loaded
+    ///     (<c>Current.Game != null</c>) and <see cref="Instance" /> is non-null.
+    ///     Returns <c>false</c> on game-less UI paths (main menu, mod-settings screen opened
+    ///     without an active save) and after a game is unloaded (quit to main menu), even if
+    ///     <see cref="Instance" /> still holds a stale reference from the previous session.
     ///     Guard every UI-scoped entry point with <c>if (!IsInitialized) return;</c> before any
     ///     <see cref="Instance" /> dereference.
     /// </summary>
-    internal static bool IsInitialized => Instance is not null;
+    internal static bool IsInitialized => Current.Game != null && Instance is not null;
 
     /// <summary>
     ///     Gets a comparer for evaluating work type assignment rules.
