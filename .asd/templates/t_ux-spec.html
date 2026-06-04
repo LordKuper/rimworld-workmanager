@@ -1,0 +1,60 @@
+<!--
+responsibility:
+  owns: ux flows and ui mockups (sprint draft for full sprint scope, persistent for per-subsystem or project-wide ux)
+  excludes: requirements, accessibility (project-wide), design-system components and tokens
+  delegates_to: prd.html (requirements), accessibility.html (a11y), DESIGN.md (components and tokens)
+provenance: original          # original | reverse-engineered | migrated
+source: ""                    # optional path/URL when provenance != original
+-->
+
+<section id="flows" class="hero">
+  <h2>User flows</h2>
+  <pre class="mermaid">
+flowchart TD
+  A[start] --> B[step]
+  B --> C[end]
+  </pre>
+</section>
+
+<section id="ui-mockups">
+  <h2>UI mockups</h2>
+  <p class="lede">One article per implemented or modified screen. Each mockup uses tokens from DESIGN.md and renders an interactive preview of the actual interface.</p>
+
+  <article class="mockup">
+    <h3>{{screen name}}</h3>
+    <dl class="screen-meta">
+      <dt><b>Purpose</b></dt><dd>{{what user does here}}</dd>
+      <dt><b>Entry from</b></dt><dd>{{flow step or upstream screen}}</dd>
+      <dt><b>Exit to</b></dt><dd>{{next screen or terminal state}}</dd>
+    </dl>
+    <div class="mockup-preview">
+      <!-- inline html/css preview of the screen, built with DESIGN.md tokens -->
+    </div>
+    <p><b>Notes</b>: {{states, edge cases, empty/loading/error}}</p>
+  </article>
+</section>
+
+<section id="interaction-patterns">
+  <h2>Interaction patterns (optional)</h2>
+  <ul>
+    <li>{{pattern: how user interacts (drag, swipe, multi-step, etc.)}}</li>
+  </ul>
+</section>
+
+<section id="component-usage">
+  <h2>Component usage (optional)</h2>
+  <table>
+    <thead><tr><th>Component</th><th>Where used</th></tr></thead>
+    <tbody>
+      <tr><td><a href="../../design/ux/DESIGN.md">{{component}}</a></td><td>{{where used}}</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="new-components">
+  <h2>New components (optional)</h2>
+  <p>Proposed additions to DESIGN.md (also captured in design-md-delta.yaml).</p>
+  <ul class="pillar-grid">
+    <li><strong>{{name}}</strong>{{purpose}}</li>
+  </ul>
+</section>

@@ -1,0 +1,106 @@
+<!--
+responsibility:
+  owns: interactive visual reference of DESIGN.md tokens and components with live previews
+  excludes: source of truth for tokens (lives in DESIGN.md), a11y rules, ux flows
+  delegates_to: DESIGN.md (token source), accessibility.html (a11y)
+-->
+
+<section id="colors">
+  <h2>Colors</h2>
+  <p class="lede">One swatch per color token.</p>
+  <div class="swatch-grid">
+    <div class="swatch">
+      <div class="chip-color" style="background: {{hex}};"></div>
+      <code>{{token.path}}</code><br>
+      <small>{{hex}}</small>
+    </div>
+  </div>
+</section>
+
+<section id="typography">
+  <h2>Typography</h2>
+  <p class="lede">Each token rendered with its actual font, size, weight, line-height.</p>
+  <div class="type-samples">
+    <div style="font-family: {{family}}; font-size: {{size}}; font-weight: {{weight}}; line-height: {{lh}};">
+      Sample text — <code>{{token.path}}</code>
+    </div>
+  </div>
+</section>
+
+<section id="spacing">
+  <h2>Spacing</h2>
+  <p class="lede">Visual scale of spacing tokens.</p>
+  <div class="spacing-scale">
+    <div title="{{token.path}}" style="height: {{value}};"></div>
+  </div>
+</section>
+
+<section id="components">
+  <h2>Components</h2>
+  <p class="lede">Live preview of every component variant declared in DESIGN.md.</p>
+  <article class="component-preview">
+    <h3>{{component name}}</h3>
+    <div class="preview">
+      <!-- live html using applied tokens, agent renders actual element -->
+    </div>
+    <details><summary>tokens applied</summary>
+      <pre><code>{{token block from DESIGN.md}}</code></pre>
+    </details>
+  </article>
+</section>
+
+<section id="ui-composition-preview">
+  <h2>UI composition preview</h2>
+  <p class="lede">Generic window/panel composed from design-system tokens to evaluate overall design perception. Mandatory.</p>
+  <article class="component-preview">
+    <div class="preview" style="padding: 0;">
+      <div style="padding: 12px 16px; background: var(--code-bg); border-bottom: 1px solid var(--border);">
+        <strong>Sample panel title</strong>
+      </div>
+      <div style="padding: 16px;">
+        <h3>Heading sample</h3>
+        <p>Paragraph text sample to show typography in body context.</p>
+        <p><label>Field label <input type="text" placeholder="input"></label></p>
+        <p>
+          <button class="btn-primary">Primary action</button>
+          <button class="btn-secondary">Secondary</button>
+          <button class="btn-ghost">Ghost</button>
+          <button class="btn-danger">Destructive</button>
+          <button disabled>Disabled</button>
+        </p>
+        <table>
+          <thead><tr><th>Column A</th><th>Column B</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Row 1</td><td>Value</td><td><span class="chip prio-may">OK</span></td></tr>
+            <tr><td>Row 2</td><td>Value</td><td><span class="chip prio-should">WARN</span></td></tr>
+            <tr><td>Row 3</td><td>Value</td><td><span class="chip prio-must">ERR</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </article>
+</section>
+
+<section id="token-reference">
+  <h2>Token reference</h2>
+  <p class="lede">Full dump of all tokens defined in DESIGN.md. Mandatory.</p>
+  <table>
+    <thead><tr><th>Path</th><th>Value</th><th>Type</th></tr></thead>
+    <tbody>
+      <tr><td><code>{{token.path}}</code></td><td>{{value}}</td><td><span class="chip area">{{color | dimension | typography | reference}}</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="dos-and-donts">
+  <h2>Do's and Don'ts (optional)</h2>
+  <div class="consequences">
+    <div class="pros"><h3>Do</h3><ul><li>{{do}}</li></ul></div>
+    <div class="cons"><h3>Don't</h3><ul><li>{{don't}}</li></ul></div>
+  </div>
+</section>
+
+<section id="shapes-elevation">
+  <h2>Shapes / Elevation (optional)</h2>
+  <p>Promoted from DESIGN.md if defined.</p>
+</section>

@@ -1,0 +1,49 @@
+---
+responsibility:
+  owns: append-only chronology of approved decisions across project lifetime
+  excludes: sprint state, code review notes, custom rules
+  delegates_to: .asd/sprints/ (sprint state), reviews/ (review notes), custom-common-rules.md / custom-design-rules.md / custom-coding-rules.md (rules)
+---
+
+# Decisions Log
+
+Append-only. Never edited or removed. New entries appended below.
+
+## Entry format
+
+```markdown
+## YYYY-MM-DD — <one-line summary>
+
+- **Decision**: <what was decided>
+- **Rationale**: <why>
+- **Affected docs**: <links> (optional)
+```
+
+## Entries
+
+<!-- entries appended below this line -->
+
+## 2026-06-04 — ASD initialized for WorkManager
+
+- **Decision**: ASD workflow initialized. mode=brownfield, decomposition=disabled, diagram_tool=n/a, OS=windows. language chat=ru, docs=en. backward_compat=none. external_review=enabled (codex 0.136.0). git base_branch=master, gh_enabled=true, auto_pr=true.
+- **Rationale**: Existing RimWorld mod (C#/.NET, net472, NUnit tests). Single-project mod — subsystem decomposition unnecessary. Custom rules inherited from the upstream `LordKuper.Common` library and adapted to WorkManager's actual setup (consumes Common.dll; tests use NUnit Assert, no FluentAssertions/jb tooling).
+- **Affected docs**: .asd/project/config.yaml, commands.yaml, custom-common-rules.md, custom-design-rules.md, custom-coding-rules.md, CLAUDE.md
+
+## 2026-06-04 — Adopt parent FluentAssertions + jb tooling standards
+
+- **Decision**: WorkManager adopts the parent `LordKuper.Common` standards in full: tests use FluentAssertions 7.x (Apache-2.0, never 8.x) instead of NUnit `Assert`; lint/build flow runs `jb-cleanup` before build and `jb-inspect` after lint (sarif must be error/warning-clean). Added `jb-cleanup` and `jb-inspect` to commands.yaml.
+- **Rationale**: User directive — these must be used to the same extent as in the parent library. Existing `WorkManager.Tests` (NUnit Assert placeholder, no FA package, jb not wired) is treated as not-yet-migrated; the FA 7.x package is added on first real test.
+- **Affected docs**: .asd/project/commands.yaml, custom-coding-rules.md, custom-common-rules.md
+
+## 2026-06-04 — Concept reverse-engineered from brownfield
+
+- **Decision**: `design/product/concept.html` created via /asd-concept variant D (brownfield extraction). Sections: vision, target-users, value-proposition (required) + pillars, anti-pillars, constraints (optional). Optional sections core-identity, success-metrics, unique-hook omitted. Supported RimWorld range fixed at 1.1–1.6 (per About.xml/code, not README). Frontmatter provenance=reverse-engineered, source=About/About.xml.
+- **Rationale**: Existing RimWorld Work Manager mod had no concept doc; reconstructed from About.xml, README.md and Source/WorkManager code. User locked each required section (target-users revised to drop third-party mod names) and selected the optional set.
+- **Affected docs**: design/product/concept.html
+
+## 2026-06-04 — Tech stack reverse-engineered + test stack upgraded
+
+- **Decision**: `design/architecture/stack.html` created via /asd-stack variant D (brownfield). Stack: C# 14 (LangVersion=latest via SDK 10.0.300) on net472; prod deps Lib.Harmony 2.4.2 + RimWorld Assembly-CSharp/Unity modules + LordKuper.Common (all reference/compile-only). Test stack UPGRADED and applied to WorkManager.Tests.csproj now (user-authorized direct edit, outside a sprint): NUnit 4.2.2→4.6.1, NUnit3TestAdapter 4.6.0→6.2.0, Microsoft.NET.Test.Sdk 17.11.1→18.6.0, and FluentAssertions 7.2.2 added (Apache-2.0, 8.x forbidden) with global Usings for NUnit.Framework + FluentAssertions. Sections included: languages, frameworks, runtime-infrastructure, tooling, constraints, architecture-principles; layers-diagram omitted. Six tech-reference docs created (Lib.Harmony-2.4.2, NUnit-4.6.1, NUnit3TestAdapter-6.2.0, Microsoft.NET.Test.Sdk-18.6.0, FluentAssertions-7.2.2, LordKuper.Common-1.6); RimWorld-1.6 game-API reference deferred.
+- **Rationale**: Existing mod had no stack doc; reconstructed from manifests. User opted to adopt parent-library standards in full and upgrade the lagging test stack immediately. Major bumps (adapter 4→6, test-sdk 17→18) verified net472-supported via changelog WebFetch; `dotnet test` passes (1/1) after the bump. Knowledge-risk MEDIUM for test packages (latest releases post Jan-2026 cutoff) — mitigated by tech-reference docs.
+- **Affected docs**: design/architecture/stack.html, design/architecture/tech-reference/*.md, Source/WorkManager.Tests/WorkManager.Tests.csproj, Source/WorkManager.Tests/WorkShiftTests.cs
+

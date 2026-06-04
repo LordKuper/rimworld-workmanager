@@ -1,0 +1,71 @@
+<!--
+responsibility:
+  owns: api contracts for one subsystem (all endpoints) — or project-wide when decomposition disabled
+  excludes: architecture decisions, requirements, code
+  delegates_to: adr/ (decisions), requirements/ (requirements), code (impl)
+-->
+
+<section id="index">
+  <h2>Index</h2>
+  <table>
+    <thead><tr><th>Method</th><th>Path</th><th>Summary</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="http-method http-{{method-lower}}">{{METHOD}}</span></td>
+        <td><a href="#endpoint-{{slug}}"><code>{{path}}</code></a></td>
+        <td>{{one-line summary}}</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="auth">
+  <h2>Auth (optional)</h2>
+  <p>Subsystem-wide auth requirements (scheme, scopes, headers).</p>
+</section>
+
+<section id="errors">
+  <h2>Errors (optional)</h2>
+  <p>Common error model (codes, message shape, retry semantics).</p>
+  <table>
+    <thead><tr><th>Code</th><th>Meaning</th><th>Retryable</th></tr></thead>
+    <tbody>
+      <tr><td><code>{{code}}</code></td><td>{{meaning}}</td><td><span class="chip prio-may">{{yes/no}}</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="rate-limits">
+  <h2>Rate limits (optional)</h2>
+  <p>{{limits per scope}}</p>
+</section>
+
+<section id="versioning">
+  <h2>Versioning (optional)</h2>
+  <p>{{strategy: URL prefix / header / etc.}}</p>
+</section>
+
+<section id="endpoints">
+  <h2>Endpoints</h2>
+
+  <article class="endpoint" id="endpoint-{{slug}}">
+    <h3><span class="http-method http-{{method-lower}}">{{METHOD}}</span> <code>{{path}}</code></h3>
+    <p class="lede">{{one-line description}}</p>
+
+    <h4>Request</h4>
+    <dl class="def-list">
+      <dt>Params</dt><dd>{{path/query params}}</dd>
+      <dt>Headers</dt><dd>{{required headers}}</dd>
+    </dl>
+    <p><b>Body</b>:</p>
+    <pre><code>{{json schema or example}}</code></pre>
+
+    <h4>Response</h4>
+    <table>
+      <thead><tr><th>Status</th><th>Body</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>{{code}}</code></td><td><code>{{shape}}</code></td><td>{{notes}}</td></tr>
+      </tbody>
+    </table>
+  </article>
+</section>

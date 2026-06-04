@@ -1,0 +1,10 @@
+// LikeC4 views seed.
+// Extended by Architect as views are needed (per subsystem, dynamic flows, deployment).
+// Spec: https://likec4.dev
+
+views {
+  view index {
+    title 'Landscape'
+    include *
+  }
+}

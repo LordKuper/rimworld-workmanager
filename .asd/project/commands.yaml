@@ -1,0 +1,24 @@
+# commands.yaml — machine-only SSoT for project build/test/run commands
+# read by Backend Dev, Frontend Dev, Test Engineer, and review agents
+
+test: "dotnet test Source/WorkManager.slnx"
+lint: "dotnet format Source/WorkManager.slnx --verify-no-changes"
+build: "dotnet build Source/WorkManager.slnx -c Release"
+run: ""  # RimWorld mod — loaded into the game at runtime; no local app run
+
+custom:
+  # optional named commands beyond the required four
+  format: "dotnet format Source/WorkManager.slnx"
+
+  # JetBrains ReSharper CLI (jetbrains.resharper.globaltools, command `jb`).
+  # Run jb-cleanup before build; run jb-inspect after lint and verify the sarif has no error/warning.
+  jb-cleanup: "jb cleanupcode Source\\WorkManager.slnx"
+  jb-inspect: "jb inspectcode Source\\WorkManager.slnx -o=\".\\TestResults\\jb-inspect.sarif\" --build"
+
+  # design.md tooling (set by /asd-init per OS — Windows).
+  # Convention: linter is always invoked as `designmd-lint`. On Windows, run
+  # `designmd-install` once per session before first `designmd-lint`/`-diff`/`-export`.
+  designmd-install: "npm install @google/design.md"
+  designmd-lint: "node_modules\\.bin\\design.md.cmd lint design\\ux\\DESIGN.md"
+  designmd-diff: "node_modules\\.bin\\design.md.cmd diff"
+  designmd-export: "node_modules\\.bin\\design.md.cmd export --format json-tailwind design\\ux\\DESIGN.md"

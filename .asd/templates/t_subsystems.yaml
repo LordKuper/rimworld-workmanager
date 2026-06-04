@@ -1,0 +1,29 @@
+# Subsystem registry for mermaid mode (project.diagram_tool: mermaid).
+# Edited by Architect in design phase (draft) and design-promote (persistent).
+# Each entry is a system or container/component within the project.
+# New subsystems added only via design-promote phase with user approval.
+
+systems:
+  - id: project
+    type: system
+    name: "{{PROJECT_NAME}}"
+    description: "{{PROJECT_DESCRIPTION}}"
+    containers: []
+    # example container entry:
+    # containers:
+    #   - id: api
+    #     name: "API Service"
+    #     description: "..."
+    #     tech: "Node.js / Express"
+    #     components: []
+    #     relations:
+    #       - to: db
+    #         label: "reads/writes"
+
+actors:
+  - id: user
+    name: "User"
+    description: "project user"
+    relations:
+      - to: project
+        label: "uses"

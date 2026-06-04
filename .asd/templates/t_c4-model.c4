@@ -1,0 +1,26 @@
+// LikeC4 model seed.
+// Extended by Architect when design-promote approves new subsystems (containers/components).
+// Spec: https://likec4.dev
+
+specification {
+  element actor
+  element system
+  element container
+  element component
+
+  tag deprecated
+  tag external
+}
+
+model {
+  user = actor 'User' {
+    description 'project user'
+  }
+
+  project = system '{{PROJECT_NAME}}' {
+    description '{{PROJECT_DESCRIPTION}}'
+    // containers (subsystems) added here as design-promote approves them
+  }
+
+  user -> project 'uses'
+}

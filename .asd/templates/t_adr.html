@@ -1,0 +1,46 @@
+<!--
+responsibility:
+  owns: single architecture decision (or multiple repeated blocks in sprint draft)
+  excludes: requirements, ux, code
+  delegates_to: prd.html (requirements), ux-spec.html (ux), code (implementation)
+provenance: original          # original | reverse-engineered | migrated
+source: ""                    # optional path/URL when provenance != original
+-->
+
+<!-- repeat this <article> per decision in sprint draft; persistent file has one <article> -->
+
+<article class="adr">
+  <div class="meta">
+    <span class="status-chip status-proposed">{{proposed | accepted | superseded | deprecated}}</span>
+    <span class="chip area">subsystem: {{subsystem id, or "N/A"}}</span>
+    <span class="chip">{{ADR-NNNN}}</span>
+  </div>
+
+  <h2 id="context">Context</h2>
+  <p>{{why decision needed, forces in play, constraints}}</p>
+
+  <h2 id="decision">Decision</h2>
+  <p class="lede">{{what we decided to do}}</p>
+
+  <h2 id="consequences">Consequences</h2>
+  <div class="consequences">
+    <div class="pros">
+      <h3>Positive</h3>
+      <ul><li>{{benefit}}</li></ul>
+    </div>
+    <div class="cons">
+      <h3>Negative</h3>
+      <ul><li>{{cost or tradeoff}}</li></ul>
+    </div>
+  </div>
+
+  <h2 id="alternatives">Alternatives considered (optional)</h2>
+  <ul class="alt-list">
+    <li><strong>{{alternative}}</strong> — rejected because {{reason}}</li>
+  </ul>
+
+  <h2 id="related">Related ADRs (optional)</h2>
+  <ul>
+    <li><a href="../adr-NNNN-slug.html">ADR-NNNN</a>: {{relation}}</li>
+  </ul>
+</article>
