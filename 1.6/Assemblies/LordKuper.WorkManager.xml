@@ -10,6 +10,14 @@
                 managed work types, and capability status. Provides efficient access to work-related
                 data and supports periodic cache updates.
             </summary>
+            <remarks>
+                <strong>Invariant:</strong> <see cref="P:LordKuper.WorkManager.WorkManagerGameComponent.Instance" /> is non-null whenever
+                this cache is used. <see cref="T:LordKuper.WorkManager.Cache.PawnCache" /> is created and updated only from
+                <see cref="T:LordKuper.WorkManager.WorkPriorityUpdater" />, which is a <see cref="T:Verse.MapComponent" /> and therefore
+                runs only while a <see cref="T:Verse.Map" /> — and thus an active <see cref="T:Verse.Game" /> — exists.
+                The <see cref="T:LordKuper.WorkManager.WorkManagerGameComponent" /> constructor sets <c>Instance</c> when that game is
+                created, before any map tick can fire. No null guard is required or expected on these paths.
+            </remarks>
         </member>
         <member name="M:LordKuper.WorkManager.Cache.PawnCache.#ctor(Verse.Pawn)">
             <summary>
@@ -17,6 +25,14 @@
                 managed work types, and capability status. Provides efficient access to work-related
                 data and supports periodic cache updates.
             </summary>
+            <remarks>
+                <strong>Invariant:</strong> <see cref="P:LordKuper.WorkManager.WorkManagerGameComponent.Instance" /> is non-null whenever
+                this cache is used. <see cref="T:LordKuper.WorkManager.Cache.PawnCache" /> is created and updated only from
+                <see cref="T:LordKuper.WorkManager.WorkPriorityUpdater" />, which is a <see cref="T:Verse.MapComponent" /> and therefore
+                runs only while a <see cref="T:Verse.Map" /> — and thus an active <see cref="T:Verse.Game" /> — exists.
+                The <see cref="T:LordKuper.WorkManager.WorkManagerGameComponent" /> constructor sets <c>Instance</c> when that game is
+                created, before any map tick can fire. No null guard is required or expected on these paths.
+            </remarks>
         </member>
         <member name="F:LordKuper.WorkManager.Cache.PawnCache._allowedWorkTypes">
             <summary>
@@ -333,11 +349,6 @@
                 Provides compatibility integration with the MoreThanCapable mod.
             </summary>
         </member>
-        <member name="F:LordKuper.WorkManager.Compatibility.MoreThanCapable._isInitialized">
-            <summary>
-                Indicates whether the compatibility layer has been initialized.
-            </summary>
-        </member>
         <member name="F:LordKuper.WorkManager.Compatibility.MoreThanCapable.IsBadWork">
             <summary>
                 Delegate to the MoreThanCapableMod.IsBadWork method.
@@ -346,6 +357,11 @@
         <member name="F:LordKuper.WorkManager.Compatibility.MoreThanCapable.MoreThanCapableActive">
             <summary>
                 Indicates whether the More Than Capable mod is active.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Compatibility.MoreThanCapable._isInitialized">
+            <summary>
+                Indicates whether the compatibility layer has been initialized.
             </summary>
         </member>
         <member name="M:LordKuper.WorkManager.Compatibility.MoreThanCapable.Initialize">
@@ -367,14 +383,14 @@
                 Provides compatibility integration with the PriorityMaster mod, which expands the vanilla work priority range.
             </summary>
         </member>
-        <member name="F:LordKuper.WorkManager.Compatibility.PriorityMaster._isInitialized">
-            <summary>
-                Indicates whether the PriorityMaster compatibility has been initialized.
-            </summary>
-        </member>
         <member name="F:LordKuper.WorkManager.Compatibility.PriorityMaster.PriorityMasterActive">
             <summary>
                 Indicates whether the PriorityMaster mod is active.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Compatibility.PriorityMaster._isInitialized">
+            <summary>
+                Indicates whether the PriorityMaster compatibility has been initialized.
             </summary>
         </member>
         <member name="M:LordKuper.WorkManager.Compatibility.PriorityMaster.Initialize">
@@ -391,11 +407,6 @@
                 Provides compatibility integration with the WorkTab mod.
             </summary>
         </member>
-        <member name="F:LordKuper.WorkManager.Compatibility.WorkTab._isInitialized">
-            <summary>
-                Indicates whether the WorkTab compatibility has been initialized.
-            </summary>
-        </member>
         <member name="F:LordKuper.WorkManager.Compatibility.WorkTab.GetPriority">
             <summary>
                 Delegate for retrieving a pawn's work priority for a specific work type and hour.
@@ -409,6 +420,11 @@
         <member name="F:LordKuper.WorkManager.Compatibility.WorkTab.WorkTabActive">
             <summary>
                 Indicates whether the Work Tab mod is active.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Compatibility.WorkTab._isInitialized">
+            <summary>
+                Indicates whether the WorkTab compatibility has been initialized.
             </summary>
         </member>
         <member name="M:LordKuper.WorkManager.Compatibility.WorkTab.Initialize(HarmonyLib.Harmony)">
@@ -785,12 +801,26 @@
             <summary>
                 Map component that assigns pawn work schedules based on configured work shifts.
             </summary>
+            <remarks>
+                <strong>Invariant:</strong> <see cref="P:LordKuper.WorkManager.WorkManagerGameComponent.Instance" /> is non-null for the
+                entire lifetime of this component. A <see cref="T:Verse.MapComponent" /> can only exist while a
+                <see cref="T:Verse.Map" /> exists, which requires an active <see cref="T:Verse.Game" />; the
+                <see cref="T:LordKuper.WorkManager.WorkManagerGameComponent" /> constructor runs when that game is created and sets
+                <c>Instance</c> before any map tick can fire. No null guard is required or expected here.
+            </remarks>
             <param name="map">The map this component belongs to.</param>
         </member>
         <member name="M:LordKuper.WorkManager.ScheduleUpdater.#ctor(Verse.Map)">
             <summary>
                 Map component that assigns pawn work schedules based on configured work shifts.
             </summary>
+            <remarks>
+                <strong>Invariant:</strong> <see cref="P:LordKuper.WorkManager.WorkManagerGameComponent.Instance" /> is non-null for the
+                entire lifetime of this component. A <see cref="T:Verse.MapComponent" /> can only exist while a
+                <see cref="T:Verse.Map" /> exists, which requires an active <see cref="T:Verse.Game" />; the
+                <see cref="T:LordKuper.WorkManager.WorkManagerGameComponent" /> constructor runs when that game is created and sets
+                <c>Instance</c> before any map tick can fire. No null guard is required or expected here.
+            </remarks>
             <param name="map">The map this component belongs to.</param>
         </member>
         <member name="F:LordKuper.WorkManager.ScheduleUpdater.CoverageBonus">
@@ -925,11 +955,6 @@
                 The minimum allowed value for <see cref="F:LordKuper.WorkManager.DedicatedWorkerSettings.WorkTypeCountFactor" />.
             </summary>
         </member>
-        <member name="F:LordKuper.WorkManager.DedicatedWorkerSettings._mode">
-            <summary>
-                Represents the mode of operation for a dedicated worker.
-            </summary>
-        </member>
         <member name="F:LordKuper.WorkManager.DedicatedWorkerSettings.AllowDedicated">
             <summary>
                 Indicates whether dedicated workers are allowed.
@@ -963,6 +988,11 @@
         <member name="F:LordKuper.WorkManager.DedicatedWorkerSettings.WorkTypeCountFactor">
             <summary>
                 Multiplier for the work type count when calculating dedicated workers.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.DedicatedWorkerSettings._mode">
+            <summary>
+                Represents the mode of operation for a dedicated worker.
             </summary>
         </member>
         <member name="P:LordKuper.WorkManager.DedicatedWorkerSettings.Mode">
@@ -1184,9 +1214,6 @@
                 Maximum allowed threshold for major learning rate, depending on mod compatibility.
             </summary>
         </member>
-        <member name="F:LordKuper.WorkManager.Settings._workPrioritiesContentHeight">
-            <summary>Cached height of the work priorities content for UI layout.</summary>
-        </member>
         <member name="F:LordKuper.WorkManager.Settings.AssignAllWorkTypes">
             <summary>If true, assign all work types to pawns.</summary>
         </member>
@@ -1255,6 +1282,9 @@
         </member>
         <member name="F:LordKuper.WorkManager.Settings.WorkPrioritiesUpdateFrequency">
             <summary>Frequency at which work priorities are updated.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings._workPrioritiesContentHeight">
+            <summary>Cached height of the work priorities content for UI layout.</summary>
         </member>
         <member name="P:LordKuper.WorkManager.Settings.PassionPrioritiesDefault">
             <summary>
@@ -1330,14 +1360,14 @@
                 Provides a function to get the label for a dedicated worker mode.
             </summary>
         </member>
-        <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkerModesCache">
-            <summary>
-                Caches all available dedicated worker modes.
-            </summary>
-        </member>
         <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkerModeTooltip">
             <summary>
                 Provides a function to get the tooltip for a dedicated worker mode.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkerModesCache">
+            <summary>
+                Caches all available dedicated worker modes.
             </summary>
         </member>
         <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkerNullableModeLabel">
@@ -1345,14 +1375,14 @@
                 Provides a function to get the label for a nullable dedicated worker mode.
             </summary>
         </member>
-        <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkerNullableModesCache">
-            <summary>
-                Caches all available nullable dedicated worker modes.
-            </summary>
-        </member>
         <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkerNullableModeTooltip">
             <summary>
                 Provides a function to get the tooltip for a nullable dedicated worker mode.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkerNullableModesCache">
+            <summary>
+                Caches all available nullable dedicated worker modes.
             </summary>
         </member>
         <member name="F:LordKuper.WorkManager.Settings._allowedWorkers">
@@ -1573,6 +1603,11 @@
                 The default priority value for <see cref="F:LordKuper.WorkManager.WorkTypeAssignmentRule.AssignEveryonePriority" />.
             </summary>
         </member>
+        <member name="F:LordKuper.WorkManager.WorkTypeAssignmentRule.AllowedWorkersForbiddenPawnTypes">
+            <summary>
+                The forbidden pawn types for allowed workers.
+            </summary>
+        </member>
         <member name="F:LordKuper.WorkManager.WorkTypeAssignmentRule._defaultRule">
             <summary>
                 Cached default rule (the one with a <c>null</c> <see cref="P:LordKuper.Common.Cache.DefCache`1.DefName" />).
@@ -1581,11 +1616,6 @@
         <member name="F:LordKuper.WorkManager.WorkTypeAssignmentRule._defaultRulesByName">
             <summary>
                 Cached default rules keyed by work type def name, built once from <see cref="P:LordKuper.WorkManager.WorkTypeAssignmentRule.DefaultRules" />.
-            </summary>
-        </member>
-        <member name="F:LordKuper.WorkManager.WorkTypeAssignmentRule.AllowedWorkersForbiddenPawnTypes">
-            <summary>
-                The forbidden pawn types for allowed workers.
             </summary>
         </member>
         <member name="F:LordKuper.WorkManager.WorkTypeAssignmentRule.AllowedWorkers">
@@ -1722,11 +1752,6 @@
                 Handles enabling/disabling work types, pawn work assignments, and caches assignment rules.
             </summary>
         </member>
-        <member name="F:LordKuper.WorkManager.WorkManagerGameComponent._assignEveryoneWorkTypes">
-            <summary>
-                Dictionary of work types assigned to everyone, with their priorities.
-            </summary>
-        </member>
         <member name="F:LordKuper.WorkManager.WorkManagerGameComponent.CombinedRules">
             <summary>
                 Represents a collection of combined work type assignment rules, sorted according to a specified comparer.
@@ -1737,9 +1762,19 @@
                 Dictionary for O(1) lookup of combined rules by work type definition.
             </summary>
         </member>
-        <member name="F:LordKuper.WorkManager.WorkManagerGameComponent._disabledPawns">
+        <member name="F:LordKuper.WorkManager.WorkManagerGameComponent._assignEveryoneWorkTypes">
             <summary>
-                Set of pawns with disabled work assignments.
+                Dictionary of work types assigned to everyone, with their priorities.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkManagerGameComponent.PriorityManagementEnabled">
+            <summary>
+                Indicates if priority management is enabled.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkManagerGameComponent.ScheduleManagementEnabled">
+            <summary>
+                Indicates if schedule management is enabled.
             </summary>
         </member>
         <member name="F:LordKuper.WorkManager.WorkManagerGameComponent._disabledPawnSchedules">
@@ -1752,19 +1787,14 @@
                 Dictionary of pawns and their disabled work types.
             </summary>
         </member>
+        <member name="F:LordKuper.WorkManager.WorkManagerGameComponent._disabledPawns">
+            <summary>
+                Set of pawns with disabled work assignments.
+            </summary>
+        </member>
         <member name="F:LordKuper.WorkManager.WorkManagerGameComponent._disabledWorkTypes">
             <summary>
                 Set of disabled work types.
-            </summary>
-        </member>
-        <member name="F:LordKuper.WorkManager.WorkManagerGameComponent.PriorityManagementEnabled">
-            <summary>
-                Indicates if priority management is enabled.
-            </summary>
-        </member>
-        <member name="F:LordKuper.WorkManager.WorkManagerGameComponent.ScheduleManagementEnabled">
-            <summary>
-                Indicates if schedule management is enabled.
             </summary>
         </member>
         <member name="M:LordKuper.WorkManager.WorkManagerGameComponent.#ctor(Verse.Game)">
@@ -1788,11 +1818,6 @@
                 Gets the set of work types that configured to use dedicated workers.
             </summary>
         </member>
-        <member name="P:LordKuper.WorkManager.WorkManagerGameComponent.DisabledPawns">
-            <summary>
-                Gets the set of pawns with disabled work assignments.
-            </summary>
-        </member>
         <member name="P:LordKuper.WorkManager.WorkManagerGameComponent.DisabledPawnSchedules">
             <summary>
                 Gets the set of pawns with disabled schedules.
@@ -1803,6 +1828,11 @@
                 Gets the dictionary of pawns and their disabled work types.
             </summary>
         </member>
+        <member name="P:LordKuper.WorkManager.WorkManagerGameComponent.DisabledPawns">
+            <summary>
+                Gets the set of pawns with disabled work assignments.
+            </summary>
+        </member>
         <member name="P:LordKuper.WorkManager.WorkManagerGameComponent.DisabledWorkTypes">
             <summary>
                 Gets the set of disabled work types.
@@ -1811,6 +1841,28 @@
         <member name="P:LordKuper.WorkManager.WorkManagerGameComponent.Instance">
             <summary>
                 Gets the singleton instance of the <see cref="T:LordKuper.WorkManager.WorkManagerGameComponent" /> class.
+                <para>
+                    <strong>Contract:</strong> <c>Instance</c> is valid only while a <c>Game</c> is loaded.
+                    It is non-null on any game-scoped path (MapComponent ticks, cache updates) because a
+                    <c>Map</c> can only exist when a <c>Game</c> — and therefore this component — exists.
+                    It may be null on game-less UI paths (mod-settings screen, main menu), and retains its
+                    last value after a game is unloaded (quit to main menu) — a stale reference.
+                    Use <see cref="P:LordKuper.WorkManager.WorkManagerGameComponent.IsInitialized" /> to guard every UI-scoped entry point; do not
+                    dereference <c>Instance</c> unless <see cref="P:LordKuper.WorkManager.WorkManagerGameComponent.IsInitialized" /> returns <c>true</c>.
+                </para>
+            </summary>
+        </member>
+        <member name="P:LordKuper.WorkManager.WorkManagerGameComponent.IsInitialized">
+            <summary>
+                Gets a value indicating whether the game component has been initialized and
+                <see cref="P:LordKuper.WorkManager.WorkManagerGameComponent.Instance" /> is safe to dereference.
+                Returns <c>true</c> only when both an active <c>Game</c> is loaded
+                (<c>Current.Game != null</c>) and <see cref="P:LordKuper.WorkManager.WorkManagerGameComponent.Instance" /> is non-null.
+                Returns <c>false</c> on game-less UI paths (main menu, mod-settings screen opened
+                without an active save) and after a game is unloaded (quit to main menu), even if
+                <see cref="P:LordKuper.WorkManager.WorkManagerGameComponent.Instance" /> still holds a stale reference from the previous session.
+                Guard every UI-scoped entry point with <c>if (!IsInitialized) return;</c> before any
+                <see cref="P:LordKuper.WorkManager.WorkManagerGameComponent.Instance" /> dereference.
             </summary>
         </member>
         <member name="P:LordKuper.WorkManager.WorkManagerGameComponent.WorkTypeAssignmentRuleComparer">
@@ -2034,6 +2086,13 @@
                 various factors such as skill levels, passions, learning rates, and predefined rules. It ensures that work
                 priorities are optimized and aligned with the current game state and configuration settings. The updates are
                 performed periodically and take into account both global and pawn-specific conditions.
+                <para>
+                    <strong>Invariant:</strong> <see cref="P:LordKuper.WorkManager.WorkManagerGameComponent.Instance" /> is non-null for the
+                    entire lifetime of this component. A <see cref="T:Verse.MapComponent" /> can only exist while a
+                    <see cref="T:Verse.Map" /> exists, which requires an active <see cref="T:Verse.Game" />; the
+                    <see cref="T:LordKuper.WorkManager.WorkManagerGameComponent" /> constructor runs when that game is created and sets
+                    <c>Instance</c> before any map tick can fire. No null guard is required or expected here.
+                </para>
             </remarks>
             <param name="map"></param>
         </member>
@@ -2046,6 +2105,13 @@
                 various factors such as skill levels, passions, learning rates, and predefined rules. It ensures that work
                 priorities are optimized and aligned with the current game state and configuration settings. The updates are
                 performed periodically and take into account both global and pawn-specific conditions.
+                <para>
+                    <strong>Invariant:</strong> <see cref="P:LordKuper.WorkManager.WorkManagerGameComponent.Instance" /> is non-null for the
+                    entire lifetime of this component. A <see cref="T:Verse.MapComponent" /> can only exist while a
+                    <see cref="T:Verse.Map" /> exists, which requires an active <see cref="T:Verse.Game" />; the
+                    <see cref="T:LordKuper.WorkManager.WorkManagerGameComponent" /> constructor runs when that game is created and sets
+                    <c>Instance</c> before any map tick can fire. No null guard is required or expected here.
+                </para>
             </remarks>
             <param name="map"></param>
         </member>
@@ -2134,6 +2200,17 @@
                 settings.
             </summary>
         </member>
+        <member name="M:LordKuper.WorkManager.WorkPriorityUpdater.AssignWorkToIdlePawns">
+            <summary>
+                Assigns work priorities to pawns that are currently idle, based on managed work type rules and eligibility.
+            </summary>
+            <remarks>
+                This method identifies pawns that have been idle for a specified duration and assigns them
+                work priorities  for eligible work types. It ensures that only managed pawns and work types that meet specific
+                conditions  (e.g., allowed and not marked as bad work) are considered. If no idle pawns are found, the method
+                exits early.
+            </remarks>
+        </member>
         <member name="M:LordKuper.WorkManager.WorkPriorityUpdater.AssignWorkersByLearningRate">
             <summary>
                 Assigns work priorities to managed workers based on their learning rates for specific work types.
@@ -2165,17 +2242,6 @@
                 are most proficient,  following the rules defined in the managed work type configuration. Workers with higher
                 skill levels are prioritized,  and only those who meet the criteria for a specific task are considered. If no
                 workers or relevant rules are available,  the method exits without making any assignments.
-            </remarks>
-        </member>
-        <member name="M:LordKuper.WorkManager.WorkPriorityUpdater.AssignWorkToIdlePawns">
-            <summary>
-                Assigns work priorities to pawns that are currently idle, based on managed work type rules and eligibility.
-            </summary>
-            <remarks>
-                This method identifies pawns that have been idle for a specified duration and assigns them
-                work priorities  for eligible work types. It ensures that only managed pawns and work types that meet specific
-                conditions  (e.g., allowed and not marked as bad work) are considered. If no idle pawns are found, the method
-                exits early.
             </remarks>
         </member>
         <member name="M:LordKuper.WorkManager.WorkPriorityUpdater.GetDedicatedWorkersScores(System.Collections.Generic.IReadOnlyCollection{LordKuper.WorkManager.Cache.PawnCache},Verse.WorkTypeDef,System.Collections.Generic.IReadOnlyCollection{LordKuper.WorkManager.WorkTypeAssignmentRule})">
