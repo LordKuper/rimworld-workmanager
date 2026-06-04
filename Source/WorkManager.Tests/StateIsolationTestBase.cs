@@ -28,31 +28,11 @@ public abstract class StateIsolationTestBase
     /// </summary>
     private static object? GetWorkManagerGameComponentInstance()
     {
-        var type = GetWorkManagerGameComponentType();
+        var type = typeof(WorkManagerGameComponent);
         var property = type.GetProperty("Instance", BindingFlags.Static | BindingFlags.NonPublic)
                       ?? throw new InvalidOperationException(
                           "WorkManagerGameComponent.Instance property not found; test infrastructure may be out of sync with production code");
         return property.GetValue(null);
-    }
-
-    /// <summary>
-    ///     Gets the Type of WorkManagerGameComponent.
-    ///     Uses the direct typeof operator rather than string-based lookup, which only searches
-    ///     mscorlib and the calling assembly and would fail for types in other assemblies.
-    /// </summary>
-    private static Type GetWorkManagerGameComponentType()
-    {
-        return typeof(WorkManagerGameComponent);
-    }
-
-    /// <summary>
-    ///     Gets the Type of WorkTypeAssignmentRule.
-    ///     Uses the direct typeof operator rather than string-based lookup, which only searches
-    ///     mscorlib and the calling assembly and would fail for types in other assemblies.
-    /// </summary>
-    private static Type GetWorkTypeAssignmentRuleType()
-    {
-        return typeof(WorkTypeAssignmentRule);
     }
 
     /// <summary>
@@ -65,7 +45,7 @@ public abstract class StateIsolationTestBase
         SetWorkManagerGameComponentInstance(_snapshotGameComponent);
 
         // Restore WorkTypeAssignmentRule static caches
-        var workTypeAssignmentRuleType = GetWorkTypeAssignmentRuleType();
+        var workTypeAssignmentRuleType = typeof(WorkTypeAssignmentRule);
         SetStaticFieldValue(workTypeAssignmentRuleType, "_defaultRule", _snapshotDefaultRule);
         SetStaticFieldValue(workTypeAssignmentRuleType, "_defaultRulesByName",
             _snapshotDefaultRulesByName);
@@ -87,7 +67,7 @@ public abstract class StateIsolationTestBase
     /// </summary>
     private static void SetWorkManagerGameComponentInstance(object? value)
     {
-        var type = GetWorkManagerGameComponentType();
+        var type = typeof(WorkManagerGameComponent);
         var property = type.GetProperty("Instance", BindingFlags.Static | BindingFlags.NonPublic)
                       ?? throw new InvalidOperationException(
                           "WorkManagerGameComponent.Instance property not found; test infrastructure may be out of sync with production code");
@@ -107,7 +87,7 @@ public abstract class StateIsolationTestBase
         _snapshotGameComponent = GetWorkManagerGameComponentInstance();
 
         // Snapshot WorkTypeAssignmentRule static caches
-        var workTypeAssignmentRuleType = GetWorkTypeAssignmentRuleType();
+        var workTypeAssignmentRuleType = typeof(WorkTypeAssignmentRule);
         _snapshotDefaultRule = GetStaticFieldValue(workTypeAssignmentRuleType, "_defaultRule");
         _snapshotDefaultRulesByName =
             GetStaticFieldValue(workTypeAssignmentRuleType, "_defaultRulesByName");
