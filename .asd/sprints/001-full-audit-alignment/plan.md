@@ -91,11 +91,11 @@ The sprint is done when all of the following hold:
 - [x] Confirm no project or build file (`WorkManager.csproj`, `WorkManager.Tests.csproj`, `Directory.Build.props`, `WorkManager.slnx`) references the removed path; the only remaining Harmony reference is the `Lib.Harmony` 2.4.2 `PackageReference`. (AC-13)
 
 ### Task 6: Documentation alignment — AC-7, AC-8, AC-14, AC-15, AC-16
-- [ ] Update `README.md` version badges to include RimWorld 1.6 (full 1.1–1.6 support range), matching `About/About.xml` `supportedVersions`. (AC-14)
-- [ ] Expand the `README.md` description to mention schedule management and the Harmony + LordKuper.Common dependencies, consistent with `concept.html`; link to the SSoT instead of duplicating the full feature list. (AC-15)
-- [ ] After Tasks 1–5 land, re-verify `design/product/concept.html` and `design/architecture/stack.html` against current `Source/` + project files; confirm still accurate (no edit) or update in lockstep with `updated` bumped. (AC-16)
-- [ ] Update `About/About.xml` `<description>` to mention scheduling only if other description text is touched (low priority). (AC-16)
-- [ ] Verify-only: confirm `design/architecture/tech-reference/RimWorld-1.6.md` and `dotnet-framework-4.7.2.md` exist, are version-accurate, and that every technology in `stack.html` has a corresponding reference with no reference pointing to an unused version (these two docs were authored in design / design-promote per ADR-0004 — do not re-create). (AC-7, AC-8)
+- [x] Update `README.md` version badges to include RimWorld 1.6 (full 1.1–1.6 support range), matching `About/About.xml` `supportedVersions`. (AC-14)
+- [x] Expand the `README.md` description to mention schedule management and the Harmony + LordKuper.Common dependencies, consistent with `concept.html`; link to the SSoT instead of duplicating the full feature list. (AC-15)
+- [x] After Tasks 1–5 land, re-verify `design/product/concept.html` and `design/architecture/stack.html` against current `Source/` + project files; confirm still accurate (no edit) or update in lockstep with `updated` bumped. (AC-16)
+- [x] Update `About/About.xml` `<description>` to mention scheduling only if other description text is touched (low priority). (AC-16)
+- [x] Verify-only: confirm `design/architecture/tech-reference/RimWorld-1.6.md` and `dotnet-framework-4.7.2.md` exist, are version-accurate, and that every technology in `stack.html` has a corresponding reference with no reference pointing to an unused version (these two docs were authored in design / design-promote per ADR-0004 — do not re-create). (AC-7, AC-8)
 
 ### Task 7: Build + quality gate — AC-17, AC-18
 - [ ] Run `jb cleanupcode Source\WorkManager.slnx` before the build.
