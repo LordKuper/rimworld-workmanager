@@ -48,9 +48,9 @@ public abstract class StateIsolationTestBase
     /// <summary>
     ///     Gets the Type of WorkManagerGameComponent via reflection.
     /// </summary>
-    private static Type GetWorkManagerGameComponentType()
+    private static Type? GetWorkManagerGameComponentType()
     {
-        return Type.GetType("LordKuper.WorkManager.WorkManagerGameComponent")!;
+        return Type.GetType("LordKuper.WorkManager.WorkManagerGameComponent");
     }
 
     /// <summary>
@@ -67,6 +67,8 @@ public abstract class StateIsolationTestBase
     private static object? GetWorkManagerGameComponentInstance()
     {
         var type = GetWorkManagerGameComponentType();
+        if (type == null) return null;
+
         var property = type.GetProperty(
             "Instance",
             BindingFlags.Static | BindingFlags.NonPublic);
@@ -80,6 +82,8 @@ public abstract class StateIsolationTestBase
     private static void SetWorkManagerGameComponentInstance(object? value)
     {
         var type = GetWorkManagerGameComponentType();
+        if (type == null) return;
+
         var property = type.GetProperty(
             "Instance",
             BindingFlags.Static | BindingFlags.NonPublic);
