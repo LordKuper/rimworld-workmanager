@@ -51,10 +51,10 @@ public static class WorkTabPatch
     [SuppressMessage("ReSharper", "PossibleLossOfFraction")]
     public static void DoHeaderPrefix(PawnColumnWorker __instance, ref Rect rect)
     {
+        if (!WorkManagerGameComponent.IsInitialized) return;
         const int iconSize = 16;
         Rect buttonRect = new(rect.center.x - iconSize / 2, rect.yMax - iconSize - 4, iconSize, iconSize);
         var component = WorkManagerGameComponent.Instance;
-        if (component == null) return;
         Buttons.DoIconButtonToggle(buttonRect, () => component.GetWorkTypeEnabled(__instance.def.workType),
             newValue => component.SetWorkTypeEnabled(__instance.def.workType, newValue),
             Resources.Strings.WorkTypeDisableTooltip, Resources.Textures.WorkTypeToggleButtonEnabled,
@@ -76,8 +76,8 @@ public static class WorkTabPatch
     [UsedImplicitly]
     public static void DoWindowContentsPostfix(Rect rect)
     {
+        if (!WorkManagerGameComponent.IsInitialized) return;
         var component = WorkManagerGameComponent.Instance;
-        if (component == null) return;
         var buttonRow = new Rect(rect.xMin + Layout.ElementGapTiny, rect.yMin + Layout.ElementGapTiny,
             rect.width - Layout.ElementGapTiny * 2, Buttons.IconButtonSize);
         var buttonRect = Layout.GetLeftColumnRect(buttonRow, Buttons.IconButtonSize, out buttonRow);
@@ -108,8 +108,9 @@ public static class WorkTabPatch
     [SuppressMessage("ReSharper", "IdentifierTypo")]
     public static void DrawWorkTypeBoxForPostfix(Rect box, Pawn pawn, WorkTypeDef worktype)
     {
+        if (!WorkManagerGameComponent.IsInitialized) return;
         var component = WorkManagerGameComponent.Instance;
-        if (component == null || !component.PriorityManagementEnabled || !Find.PlaySettings.useWorkPriorities) return;
+        if (!component.PriorityManagementEnabled || !Find.PlaySettings.useWorkPriorities) return;
         var enabled = component.GetPawnWorkTypeEnabled(pawn, worktype);
         if (!enabled)
         {
@@ -145,8 +146,9 @@ public static class WorkTabPatch
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public static void HandleInteractionsDetailedPrefix(PawnColumnWorker __instance, Rect rect, Pawn pawn)
     {
+        if (!WorkManagerGameComponent.IsInitialized) return;
         var component = WorkManagerGameComponent.Instance;
-        if (component == null || !component.PriorityManagementEnabled || !Find.PlaySettings.useWorkPriorities) return;
+        if (!component.PriorityManagementEnabled || !Find.PlaySettings.useWorkPriorities) return;
         var workType = __instance.def.workType;
         var enabled = component.GetPawnWorkTypeEnabled(pawn, workType);
         if (Event.current.type == EventType.MouseDown && Mouse.IsOver(rect) && Event.current.button == 2)

@@ -21,6 +21,13 @@ namespace LordKuper.WorkManager;
 ///     various factors such as skill levels, passions, learning rates, and predefined rules. It ensures that work
 ///     priorities are optimized and aligned with the current game state and configuration settings. The updates are
 ///     performed periodically and take into account both global and pawn-specific conditions.
+///     <para>
+///         <strong>Invariant:</strong> <see cref="WorkManagerGameComponent.Instance" /> is non-null for the
+///         entire lifetime of this component. A <see cref="MapComponent" /> can only exist while a
+///         <see cref="Map" /> exists, which requires an active <see cref="Game" />; the
+///         <see cref="WorkManagerGameComponent" /> constructor runs when that game is created and sets
+///         <c>Instance</c> before any map tick can fire. No null guard is required or expected here.
+///     </para>
 /// </remarks>
 /// <param name="map"></param>
 [UsedImplicitly]

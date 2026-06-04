@@ -12,6 +12,14 @@ namespace LordKuper.WorkManager.Cache;
 ///     managed work types, and capability status. Provides efficient access to work-related
 ///     data and supports periodic cache updates.
 /// </summary>
+/// <remarks>
+///     <strong>Invariant:</strong> <see cref="WorkManagerGameComponent.Instance" /> is non-null whenever
+///     this cache is used. <see cref="PawnCache" /> is created and updated only from
+///     <see cref="WorkPriorityUpdater" />, which is a <see cref="Verse.MapComponent" /> and therefore
+///     runs only while a <see cref="Verse.Map" /> — and thus an active <see cref="Verse.Game" /> — exists.
+///     The <see cref="WorkManagerGameComponent" /> constructor sets <c>Instance</c> when that game is
+///     created, before any map tick can fire. No null guard is required or expected on these paths.
+/// </remarks>
 internal class PawnCache(Pawn pawn)
 {
     /// <summary>

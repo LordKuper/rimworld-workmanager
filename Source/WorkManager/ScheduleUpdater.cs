@@ -11,6 +11,13 @@ namespace LordKuper.WorkManager;
 /// <summary>
 ///     Map component that assigns pawn work schedules based on configured work shifts.
 /// </summary>
+/// <remarks>
+///     <strong>Invariant:</strong> <see cref="WorkManagerGameComponent.Instance" /> is non-null for the
+///     entire lifetime of this component. A <see cref="MapComponent" /> can only exist while a
+///     <see cref="Map" /> exists, which requires an active <see cref="Game" />; the
+///     <see cref="WorkManagerGameComponent" /> constructor runs when that game is created and sets
+///     <c>Instance</c> before any map tick can fire. No null guard is required or expected here.
+/// </remarks>
 /// <param name="map">The map this component belongs to.</param>
 [UsedImplicitly]
 public class ScheduleUpdater(Map map) : MapComponent(map)
@@ -207,7 +214,7 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
 
     internal void UpdateNow()
     {
-        if (WorkManagerGameComponent.Instance == null || !WorkManagerMod.Settings.ManageWorkSchedule ||
+        if (!WorkManagerMod.Settings.ManageWorkSchedule ||
             !WorkManagerGameComponent.Instance.ScheduleManagementEnabled) return;
         _scheduleUpdateTime = RimWorldTime.GetHomeTime();
         UpdateSchedule();

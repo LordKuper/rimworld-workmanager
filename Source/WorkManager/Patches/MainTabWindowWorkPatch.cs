@@ -21,8 +21,8 @@ public static class MainTabWindowWorkPatch
     [UsedImplicitly]
     private static void Postfix(Rect rect)
     {
+        if (!WorkManagerGameComponent.IsInitialized) return;
         var component = WorkManagerGameComponent.Instance;
-        if (component == null) return;
         var buttonRow = new Rect(rect.xMin + Layout.ElementGapTiny, rect.yMin + Layout.ElementGapTiny,
             rect.width - Layout.ElementGap - Layout.ElementGapTiny * 2, Buttons.IconButtonSize);
         var buttonRect = Layout.GetRightColumnRect(buttonRow, Buttons.IconButtonSize, out buttonRow);

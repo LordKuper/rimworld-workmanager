@@ -113,8 +113,25 @@ public class WorkManagerGameComponent : GameComponent
 
     /// <summary>
     ///     Gets the singleton instance of the <see cref="WorkManagerGameComponent" /> class.
+    ///     <para>
+    ///         <strong>Contract:</strong> <c>Instance</c> is valid only while a <c>Game</c> is loaded.
+    ///         It is non-null on any game-scoped path (MapComponent ticks, cache updates) because a
+    ///         <c>Map</c> can only exist when a <c>Game</c> — and therefore this component — exists.
+    ///         It may be null on game-less UI paths (mod-settings screen, main menu). Use
+    ///         <see cref="IsInitialized" /> to guard every UI-scoped entry point.
+    ///     </para>
     /// </summary>
     internal static WorkManagerGameComponent Instance { get; private set; } = null!;
+
+    /// <summary>
+    ///     Gets a value indicating whether the game component has been initialized and
+    ///     <see cref="Instance" /> is safe to dereference.
+    ///     Returns <c>true</c> while a <c>Game</c> is loaded; <c>false</c> on game-less UI paths
+    ///     (main menu, mod-settings screen opened without an active save).
+    ///     Guard every UI-scoped entry point with <c>if (!IsInitialized) return;</c> before any
+    ///     <see cref="Instance" /> dereference.
+    /// </summary>
+    internal static bool IsInitialized => Instance is not null;
 
     /// <summary>
     ///     Gets a comparer for evaluating work type assignment rules.

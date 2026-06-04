@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Reflection;
+using LordKuper.WorkManager;
 
 namespace LordKuper.WorkManager.Tests;
 
@@ -54,11 +54,13 @@ public abstract class StateIsolationTestBase
     }
 
     /// <summary>
-    ///     Gets the Type of WorkTypeAssignmentRule via reflection.
+    ///     Gets the Type of WorkTypeAssignmentRule.
+    ///     Uses the direct typeof operator rather than string-based lookup, which only searches
+    ///     mscorlib and the calling assembly and would fail for types in other assemblies.
     /// </summary>
     private static Type GetWorkTypeAssignmentRuleType()
     {
-        return Type.GetType("LordKuper.WorkManager.WorkTypeAssignmentRule")!;
+        return typeof(WorkTypeAssignmentRule);
     }
 
     /// <summary>

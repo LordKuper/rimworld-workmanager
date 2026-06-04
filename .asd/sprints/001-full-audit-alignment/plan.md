@@ -72,12 +72,12 @@ The sprint is done when all of the following hold:
 - [ ] Run `dotnet test Source/WorkManager.slnx` and confirm green.
 
 ### Task 3: Instance null-handling contract (ADR-0001) — AC-11, AC-12
-- [ ] Add a static `WorkManagerGameComponent.IsInitialized` helper returning `Instance is not null`; document the contract in XML doc ("Instance is valid only while a Game is loaded; non-null in game-scoped paths, may be null on game-less UI paths").
-- [ ] Guard every UI-scoped entry point with an early-out on `!IsInitialized` before any `Instance` dereference: the Harmony patches in `Source/WorkManager/Patches/**` (`WidgetsWorkPatch`, `WorkTabPatch`, `MainTabWindowWorkPatch`, `PawnColumnWorkerWorkPriorityPatch`) and the pawn columns `AutoWorkPriorities.DoCell` / `AutoWorkSchedule.DoCell` (and any header method).
-- [ ] Normalize the existing mixed guards (`?.`, `== null`) to the single `IsInitialized` entry-point idiom so all UI sites read uniformly (guard at entry point, not at every leaf).
-- [ ] Add an XML-doc invariant note to the game-scoped consumers that keep direct dereference — `WorkPriorityUpdater` and `ScheduleUpdater` (`MapComponent`) and `PawnCache` — stating that Instance is non-null by the Map⇒Game lifecycle; do not add guards to these hot paths.
-- [ ] Verify no UI call site dereferences `Instance` divergently from the contract (AC-11).
-- [ ] Confirm no `NullReferenceException` from `Instance` on game-less UI paths (AC-12) via the code-level guard audit; if a live-game integration test is infeasible, record AC-12 as a manual in-game verification note (see DoD).
+- [x] Add a static `WorkManagerGameComponent.IsInitialized` helper returning `Instance is not null`; document the contract in XML doc ("Instance is valid only while a Game is loaded; non-null in game-scoped paths, may be null on game-less UI paths").
+- [x] Guard every UI-scoped entry point with an early-out on `!IsInitialized` before any `Instance` dereference: the Harmony patches in `Source/WorkManager/Patches/**` (`WidgetsWorkPatch`, `WorkTabPatch`, `MainTabWindowWorkPatch`, `PawnColumnWorkerWorkPriorityPatch`) and the pawn columns `AutoWorkPriorities.DoCell` / `AutoWorkSchedule.DoCell` (and any header method).
+- [x] Normalize the existing mixed guards (`?.`, `== null`) to the single `IsInitialized` entry-point idiom so all UI sites read uniformly (guard at entry point, not at every leaf).
+- [x] Add an XML-doc invariant note to the game-scoped consumers that keep direct dereference — `WorkPriorityUpdater` and `ScheduleUpdater` (`MapComponent`) and `PawnCache` — stating that Instance is non-null by the Map⇒Game lifecycle; do not add guards to these hot paths.
+- [x] Verify no UI call site dereferences `Instance` divergently from the contract (AC-11).
+- [ ] Confirm no `NullReferenceException` from `Instance` on game-less UI paths (AC-12) via the code-level guard audit; if a live-game integration test is infeasible, record AC-12 as a manual in-game verification note (see DoD). — BLOCKED: MS-1
 
 ### Task 4: Localize work-shift labels (ADR-0005) — AC-9, AC-10
 - [ ] Replace the two hardcoded `"Work shift #{i + 1}"` strings in `Source/WorkManager/Settings/Settings_Schedules.cs` (lines 148 and 201) with a keyed lookup using `WorkManager.Settings_Schedule_WorkShiftLabel` via `.Translate()` and the 1-based shift index argument. (AC-9)
