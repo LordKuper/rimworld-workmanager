@@ -383,7 +383,7 @@
                 Provides compatibility integration with the PriorityMaster mod, which expands the vanilla work priority range.
             </summary>
         </member>
-        <member name="F:LordKuper.WorkManager.Compatibility.PriorityMaster.PriorityMasterActive">
+        <member name="F:LordKuper.WorkManager.Compatibility.PriorityMaster._priorityMasterActive">
             <summary>
                 Indicates whether the PriorityMaster mod is active.
             </summary>
@@ -1121,6 +1121,7 @@
         <member name="F:LordKuper.WorkManager.Settings.ColonistWorkShifts">
             <summary>
                 The work shifts used for regular colonists.
+                Nullable because <see cref="T:Verse.Scribe_Collections" /> can set this to null during loading.
             </summary>
         </member>
         <member name="F:LordKuper.WorkManager.Settings.ManageWorkSchedule">
@@ -1131,6 +1132,7 @@
         <member name="F:LordKuper.WorkManager.Settings.NightOwlWorkShifts">
             <summary>
                 The work shifts used for night owl colonists.
+                Nullable because <see cref="T:Verse.Scribe_Collections" /> can set this to null during loading.
             </summary>
         </member>
         <member name="F:LordKuper.WorkManager.Settings.ScheduleUpdateFrequency">
@@ -1263,7 +1265,10 @@
             <summary>Threshold for minor learning rate.</summary>
         </member>
         <member name="F:LordKuper.WorkManager.Settings.PassionPriorities">
-            <summary>Dictionary mapping passion def names to their priorities.</summary>
+            <summary>
+                Dictionary mapping passion def names to their priorities.
+                Nullable because <see cref="T:Verse.Scribe_Collections" /> can set this to null during loading.
+            </summary>
         </member>
         <member name="F:LordKuper.WorkManager.Settings.UseDedicatedWorkers">
             <summary>If true, use dedicated workers logic.</summary>
@@ -1413,19 +1418,10 @@
                 Cached height of the dedicated workers section content.
             </summary>
         </member>
-        <member name="F:LordKuper.WorkManager.Settings._selectedWorkTypeRule">
-            <summary>
-                Currently selected work type rule for editing.
-            </summary>
-        </member>
         <member name="F:LordKuper.WorkManager.Settings._workTypeRules">
             <summary>
                 List of work type assignment rules, initialized with default rules.
-            </summary>
-        </member>
-        <member name="F:LordKuper.WorkManager.Settings._workTypesBottomHeight">
-            <summary>
-                Cached height of the bottom part of the work types tab.
+                Nullable because <see cref="T:Verse.Scribe_Collections" /> can set this to null during loading.
             </summary>
         </member>
         <member name="F:LordKuper.WorkManager.Settings._workTypesScrollableContentHeight">
@@ -1624,6 +1620,7 @@
         <member name="F:LordKuper.WorkManager.WorkTypeAssignmentRule.AllowedWorkers">
             <summary>
                 The filter specifying which pawns are allowed to be assigned to this work type.
+                Nullable because <see cref="T:Verse.Scribe_Deep" /> can set this to null during loading.
             </summary>
         </member>
         <member name="F:LordKuper.WorkManager.WorkTypeAssignmentRule.AssignEveryone">
@@ -1639,6 +1636,7 @@
         <member name="F:LordKuper.WorkManager.WorkTypeAssignmentRule.DedicatedWorkerSettings">
             <summary>
                 The settings for dedicated workers for this work type.
+                Nullable because <see cref="T:Verse.Scribe_Deep" /> can set this to null during loading.
             </summary>
         </member>
         <member name="F:LordKuper.WorkManager.WorkTypeAssignmentRule.EnsureWorkerAssigned">
@@ -1783,21 +1781,25 @@
         <member name="F:LordKuper.WorkManager.WorkManagerGameComponent._disabledPawnSchedules">
             <summary>
                 Set of pawns with disabled schedules.
+                Nullable because <see cref="T:Verse.Scribe_Collections" /> can set this to null during loading.
             </summary>
         </member>
         <member name="F:LordKuper.WorkManager.WorkManagerGameComponent._disabledPawnWorkTypes">
             <summary>
                 Dictionary of pawns and their disabled work types.
+                Nullable because <see cref="T:Verse.Scribe_Collections" /> can set this to null during loading.
             </summary>
         </member>
         <member name="F:LordKuper.WorkManager.WorkManagerGameComponent._disabledPawns">
             <summary>
                 Set of pawns with disabled work assignments.
+                Nullable because <see cref="T:Verse.Scribe_Collections" /> can set this to null during loading.
             </summary>
         </member>
         <member name="F:LordKuper.WorkManager.WorkManagerGameComponent._disabledWorkTypes">
             <summary>
                 Set of disabled work types.
+                Nullable because <see cref="T:Verse.Scribe_Collections" /> can set this to null during loading.
             </summary>
         </member>
         <member name="M:LordKuper.WorkManager.WorkManagerGameComponent.#ctor(Verse.Game)">
