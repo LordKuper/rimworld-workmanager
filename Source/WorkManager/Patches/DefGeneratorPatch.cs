@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using HarmonyLib;
 using JetBrains.Annotations;
 using LordKuper.WorkManager.DefOfs;
@@ -15,32 +16,38 @@ namespace LordKuper.WorkManager.Patches;
 public static class DefGeneratorPatch
 {
     /// <summary>
-    ///     Inserts <paramref name="column" /> immediately after the "Label" column of <paramref name="table" />.
-    ///     If no "Label" column exists, the column is appended to the end instead of the start.
+    ///     Inserts <paramref name="column" /> immediately before the first column of <paramref name="table" /> matched by
+    ///     <paramref name="target" />. If no column matches, the column is appended to the end instead.
     /// </summary>
     /// <param name="table">The pawn table to modify.</param>
     /// <param name="column">The column to insert.</param>
-    private static void InsertAfterLabel(PawnTableDef table, PawnColumnDef column)
+    /// <param name="target">Predicate identifying the column to insert before.</param>
+    private static void InsertBefore(PawnTableDef table, PawnColumnDef column, Func<PawnColumnDef, bool> target)
     {
-        var labelIndex =
-            table.columns.FindIndex(x => x.defName.Equals("Label", StringComparison.Ordinal));
-        if (labelIndex < 0)
+        var targetIndex = table.columns.FindIndex(x => target(x));
+        if (targetIndex < 0)
         {
             Logger.LogWarning(
-                $"'Label' column not found in '{table.defName}' table; appending '{column.defName}' to the end.");
+                $"Target column not found in '{table.defName}' table; appending '{column.defName}' to the end." +
+                Environment.NewLine +
+                $"Registered columns: {string.Join(", ", table.columns.Select(c => c.defName))}");
             table.columns.Add(column);
             return;
         }
-        table.columns.Insert(labelIndex + 1, column);
+        table.columns.Insert(targetIndex, column);
     }
 
     /// <summary>
-    ///     Postfix method that inserts custom pawn columns into the Work and Restrict tables after the "Label" column.
+    ///     Postfix method that inserts custom pawn columns into the Work and Restrict tables.
+    ///     <see cref="PawnColumnDefOf.AutoWorkPriorities" /> is inserted before the first column whose defName starts with
+    ///     "WorkPriority"; <see cref="PawnColumnDefOf.AutoWorkSchedule" /> is inserted before the "Timetable" column.
     /// </summary>
     [UsedImplicitly]
     public static void Postfix()
     {
-        InsertAfterLabel(PawnTableDefOf.Work, PawnColumnDefOf.AutoWorkPriorities);
-        InsertAfterLabel(PawnTableDefOf.Restrict, PawnColumnDefOf.AutoWorkSchedule);
+        InsertBefore(PawnTableDefOf.Work, PawnColumnDefOf.AutoWorkPriorities,
+            x => x.defName.StartsWith("WorkPriority", StringComparison.Ordinal));
+        InsertBefore(PawnTableDefOf.Restrict, PawnColumnDefOf.AutoWorkSchedule,
+            x => x.defName.Equals("Timetable", StringComparison.Ordinal));
     }
 }

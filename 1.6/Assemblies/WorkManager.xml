@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
     <assembly>
-        <name>LordKuper.WorkManager</name>
+        <name>WorkManager</name>
     </assembly>
     <members>
         <member name="T:LordKuper.WorkManager.Cache.PawnCache">
@@ -574,17 +574,20 @@
                 Harmony patch for <see cref="M:RimWorld.DefGenerator.GenerateImpliedDefs_PreResolve(System.Boolean)" /> to inject custom pawn columns.
             </summary>
         </member>
-        <member name="M:LordKuper.WorkManager.Patches.DefGeneratorPatch.InsertAfterLabel(RimWorld.PawnTableDef,RimWorld.PawnColumnDef)">
+        <member name="M:LordKuper.WorkManager.Patches.DefGeneratorPatch.InsertBefore(RimWorld.PawnTableDef,RimWorld.PawnColumnDef,System.Func{RimWorld.PawnColumnDef,System.Boolean})">
             <summary>
-                Inserts <paramref name="column" /> immediately after the "Label" column of <paramref name="table" />.
-                If no "Label" column exists, the column is appended to the end instead of the start.
+                Inserts <paramref name="column" /> immediately before the first column of <paramref name="table" /> matched by
+                <paramref name="target" />. If no column matches, the column is appended to the end instead.
             </summary>
             <param name="table">The pawn table to modify.</param>
             <param name="column">The column to insert.</param>
+            <param name="target">Predicate identifying the column to insert before.</param>
         </member>
         <member name="M:LordKuper.WorkManager.Patches.DefGeneratorPatch.Postfix">
             <summary>
-                Postfix method that inserts custom pawn columns into the Work and Restrict tables after the "Label" column.
+                Postfix method that inserts custom pawn columns into the Work and Restrict tables.
+                <see cref="F:LordKuper.WorkManager.DefOfs.PawnColumnDefOf.AutoWorkPriorities" /> is inserted before the first column whose defName starts with
+                "WorkPriority"; <see cref="F:LordKuper.WorkManager.DefOfs.PawnColumnDefOf.AutoWorkSchedule" /> is inserted before the "Timetable" column.
             </summary>
         </member>
         <member name="T:LordKuper.WorkManager.Patches.MainTabWindowWorkPatch">
