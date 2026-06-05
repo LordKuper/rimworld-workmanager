@@ -22,7 +22,7 @@ public class AutoWorkPriorities : PawnColumnWorker
     {
         if (pawn.Dead || pawn.workSettings is not { EverWork: true }) return;
         if (!WorkManagerGameComponent.IsInitialized) return;
-        var component = WorkManagerGameComponent.Instance;
+        var component = WorkManagerGameComponent.Instance!;
         Buttons.DoIconButtonToggle(new Rect(rect.center.x - 8, rect.center.y - 8, 16, 16),
             () => component.GetPawnEnabled(pawn),
             newValue => component.SetPawnEnabled(pawn, newValue),

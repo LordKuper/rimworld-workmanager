@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using LordKuper.Common.Filters;
 
 namespace LordKuper.WorkManager.Tests;
@@ -209,10 +210,10 @@ public class DedicatedWorkerSettingsTests
     /// <summary>
     ///     Tests that Validate clamps ConstantWorkerCount to the valid range [ConstantWorkerCountMin, ConstantWorkerCountMax].
     /// </summary>
-    [TestCase(0, DedicatedWorkerSettingsTests.ConstantWorkerCountMin)]
-    [TestCase(-5, DedicatedWorkerSettingsTests.ConstantWorkerCountMin)]
-    [TestCase(11, DedicatedWorkerSettingsTests.ConstantWorkerCountMax)]
-    [TestCase(100, DedicatedWorkerSettingsTests.ConstantWorkerCountMax)]
+    [TestCase(0, ConstantWorkerCountMin)]
+    [TestCase(-5, ConstantWorkerCountMin)]
+    [TestCase(11, ConstantWorkerCountMax)]
+    [TestCase(100, ConstantWorkerCountMax)]
     public void Validate_ConstantWorkerCount_ClampedToRange(int outOfRangeValue, int expectedClamped)
     {
         var settings = new DedicatedWorkerSettings
@@ -224,8 +225,8 @@ public class DedicatedWorkerSettingsTests
 
         // Invoke private Validate method via reflection
         var validateMethod = typeof(DedicatedWorkerSettings)
-            .GetMethod("Validate", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-            ?? throw new System.InvalidOperationException("Validate method not found");
+            .GetMethod("Validate", BindingFlags.NonPublic | BindingFlags.Instance)
+            ?? throw new InvalidOperationException("Validate method not found");
         validateMethod.Invoke(settings, null);
 
         settings.ConstantWorkerCount.Should().Be(expectedClamped);
@@ -234,8 +235,8 @@ public class DedicatedWorkerSettingsTests
     /// <summary>
     ///     Tests that Validate clamps WorkTypeCountFactor to the valid range [WorkTypeCountFactorMin, WorkTypeCountFactorMax].
     /// </summary>
-    [TestCase(0.01f, DedicatedWorkerSettingsTests.WorkTypeCountFactorMin)]
-    [TestCase(3f, DedicatedWorkerSettingsTests.WorkTypeCountFactorMax)]
+    [TestCase(0.01f, WorkTypeCountFactorMin)]
+    [TestCase(3f, WorkTypeCountFactorMax)]
     public void Validate_WorkTypeCountFactor_ClampedToRange(float outOfRangeValue, float expectedClamped)
     {
         var settings = new DedicatedWorkerSettings
@@ -247,8 +248,8 @@ public class DedicatedWorkerSettingsTests
 
         // Invoke private Validate method via reflection
         var validateMethod = typeof(DedicatedWorkerSettings)
-            .GetMethod("Validate", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-            ?? throw new System.InvalidOperationException("Validate method not found");
+            .GetMethod("Validate", BindingFlags.NonPublic | BindingFlags.Instance)
+            ?? throw new InvalidOperationException("Validate method not found");
         validateMethod.Invoke(settings, null);
 
         settings.WorkTypeCountFactor.Should().BeApproximately(expectedClamped, 0.0001f);
@@ -257,8 +258,8 @@ public class DedicatedWorkerSettingsTests
     /// <summary>
     ///     Tests that Validate clamps CapablePawnRatioFactor to the valid range.
     /// </summary>
-    [TestCase(0.01f, DedicatedWorkerSettingsTests.CapablePawnRatioFactorMin)]
-    [TestCase(6f, DedicatedWorkerSettingsTests.CapablePawnRatioFactorMax)]
+    [TestCase(0.01f, CapablePawnRatioFactorMin)]
+    [TestCase(6f, CapablePawnRatioFactorMax)]
     public void Validate_CapablePawnRatioFactor_ClampedToRange(float outOfRangeValue, float expectedClamped)
     {
         var settings = new DedicatedWorkerSettings
@@ -270,8 +271,8 @@ public class DedicatedWorkerSettingsTests
 
         // Invoke private Validate method via reflection
         var validateMethod = typeof(DedicatedWorkerSettings)
-            .GetMethod("Validate", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-            ?? throw new System.InvalidOperationException("Validate method not found");
+            .GetMethod("Validate", BindingFlags.NonPublic | BindingFlags.Instance)
+            ?? throw new InvalidOperationException("Validate method not found");
         validateMethod.Invoke(settings, null);
 
         settings.CapablePawnRatioFactor.Should().BeApproximately(expectedClamped, 0.0001f);
@@ -280,8 +281,8 @@ public class DedicatedWorkerSettingsTests
     /// <summary>
     ///     Tests that Validate clamps PawnCountFactor to the valid range.
     /// </summary>
-    [TestCase(0.01f, DedicatedWorkerSettingsTests.PawnCountFactorMin)]
-    [TestCase(6f, DedicatedWorkerSettingsTests.PawnCountFactorMax)]
+    [TestCase(0.01f, PawnCountFactorMin)]
+    [TestCase(6f, PawnCountFactorMax)]
     public void Validate_PawnCountFactor_ClampedToRange(float outOfRangeValue, float expectedClamped)
     {
         var settings = new DedicatedWorkerSettings
@@ -289,13 +290,13 @@ public class DedicatedWorkerSettingsTests
             Mode = DedicatedWorkerMode.PawnCount,
             PawnCountFactor = outOfRangeValue,
             TriStateMode = false,
-            PawnCountFilter = new LordKuper.Common.Filters.PawnFilter()
+            PawnCountFilter = new PawnFilter()
         };
 
         // Invoke private Validate method via reflection
         var validateMethod = typeof(DedicatedWorkerSettings)
-            .GetMethod("Validate", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-            ?? throw new System.InvalidOperationException("Validate method not found");
+            .GetMethod("Validate", BindingFlags.NonPublic | BindingFlags.Instance)
+            ?? throw new InvalidOperationException("Validate method not found");
         validateMethod.Invoke(settings, null);
 
         settings.PawnCountFactor.Should().BeApproximately(expectedClamped, 0.0001f);

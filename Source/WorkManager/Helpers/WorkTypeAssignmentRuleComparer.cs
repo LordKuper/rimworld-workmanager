@@ -41,7 +41,7 @@ internal class WorkTypeAssignmentRuleComparer : IComparer<WorkTypeAssignmentRule
     ///         </item>
     ///     </list>
     /// </returns>
-    public int Compare(WorkTypeAssignmentRule x, WorkTypeAssignmentRule y)
+    public int Compare(WorkTypeAssignmentRule? x, WorkTypeAssignmentRule? y)
     {
         if (ReferenceEquals(x, y)) return 0;
         if (y is null) return 1;

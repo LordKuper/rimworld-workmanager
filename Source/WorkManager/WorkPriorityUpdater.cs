@@ -173,15 +173,16 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
     /// </remarks>
     private void AssignCommonWork()
     {
+        // ReSharper disable once RedundantSuppressNullableWarningExpression : Instance is non-null on this game-scoped path by the Map=>Game lifecycle invariant (ADR-0001); the compiler still requires the null-forgiving operator on the nullable property read.
+        var instance = WorkManagerGameComponent.Instance!;
 #if DEBUG
         Logger.LogMessage(
-            $"Assigning common work types ({string.Join(", ", WorkManagerGameComponent.Instance.AssignEveryoneWorkTypes.Select(workType => $"{workType.Key.defName}[{workType.Value}]"))})");
+            $"Assigning common work types ({string.Join(", ", instance.AssignEveryoneWorkTypes.Select(workType => $"{workType.Key.defName}[{workType.Value}]"))})");
 #endif
         var relevantWorkTypes =
-            new HashSet<WorkTypeDef>(WorkManagerGameComponent.Instance.AssignEveryoneWorkTypes
-                .Keys);
+            new HashSet<WorkTypeDef>(instance.AssignEveryoneWorkTypes.Keys);
         relevantWorkTypes.IntersectWith(_managedWorkTypeRules.Keys);
-        var priorities = WorkManagerGameComponent.Instance.AssignEveryoneWorkTypes;
+        var priorities = instance.AssignEveryoneWorkTypes;
         foreach (var pawnCache in _pawnCache.Values)
         {
             if (!pawnCache.IsManaged || !pawnCache.IsCapable)
@@ -212,7 +213,7 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
         Logger.LogMessage("Assigning dedicated workers...");
 #endif
         var relevantRules = new List<WorkTypeAssignmentRule>();
-        foreach (var workType in WorkManagerGameComponent.Instance.DedicatedWorkTypes)
+        foreach (var workType in WorkManagerGameComponent.Instance!.DedicatedWorkTypes)
         {
             if (_managedWorkTypeRules.TryGetValue(workType, out var rule)) relevantRules.Add(rule);
         }
@@ -248,7 +249,7 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
 #if DEBUG
         Logger.LogMessage($"Target dedicated workers for {rule.Label} = {targetWorkersCount}");
         Logger.LogMessage(
-            $"Allowed workers filter for {rule.Label}:\n{rule.AllowedWorkers.GetSummary(0)}");
+            $"Allowed workers filter for {rule.Label}:\n{rule.AllowedWorkers!.GetSummary(0)}");
 #endif
         var allowedWorkers = new List<PawnCache>(_capablePawns.Count);
         foreach (var pc in _capablePawns)
@@ -298,7 +299,7 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
         Logger.LogMessage("Assigning leftover work types...");
 #endif
         var workTypes = _managedWorkTypeRules.Keys
-            .Except(WorkManagerGameComponent.Instance.AssignEveryoneWorkTypes.Keys).ToArray();
+            .Except(WorkManagerGameComponent.Instance!.AssignEveryoneWorkTypes.Keys).ToArray();
         if (!WorkManagerMod.Settings.UseDedicatedWorkers)
         {
             var activeWorkMatrix =
@@ -434,7 +435,7 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
         var workTypes = new List<WorkTypeDef>();
         foreach (var wt in _managedWorkTypeRules.Keys)
         {
-            if (!WorkManagerGameComponent.Instance.AssignEveryoneWorkTypes.ContainsKey(wt))
+            if (!WorkManagerGameComponent.Instance!.AssignEveryoneWorkTypes.ContainsKey(wt))
                 workTypes.Add(wt);
         }
         foreach (var pc in idlePawns)
@@ -478,7 +479,7 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
             if (!pc.IsManaged) continue;
             foreach (var workType in _managedWorkTypeRules.Keys)
             {
-                if (WorkManagerGameComponent.Instance.AssignEveryoneWorkTypes.ContainsKey(workType))
+                if (WorkManagerGameComponent.Instance!.AssignEveryoneWorkTypes.ContainsKey(workType))
                     continue;
                 if (!pc.IsManagedWork(workType) || !pc.IsAllowedWorker(workType) ||
                     pc.IsBadWork(workType) || pc.IsDangerousWork(workType) ||
@@ -521,7 +522,7 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
             if (!pc.IsManaged) continue;
             foreach (var workType in _managedWorkTypeRules.Keys)
             {
-                if (WorkManagerGameComponent.Instance.AssignEveryoneWorkTypes.ContainsKey(workType))
+                if (WorkManagerGameComponent.Instance!.AssignEveryoneWorkTypes.ContainsKey(workType))
                     continue;
                 if (!pc.IsManagedWork(workType) || !pc.IsAllowedWorker(workType) ||
                     pc.IsBadWork(workType) || pc.IsDangerousWork(workType) ||
@@ -530,7 +531,7 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
                 var passionCache =
                     Common.Helpers.PassionHelper.GetPassionCache(pc.GetWorkPassion(workType));
                 if (passionCache == null) continue;
-                if (!WorkManagerMod.Settings.PassionPriorities.TryGetValue(passionCache.DefName,
+                if (!WorkManagerMod.Settings.PassionPriorities!.TryGetValue(passionCache.DefName,
                         out var priority))
                     continue;
                 if (priority <= 0) continue;
@@ -738,7 +739,7 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
     public override void MapComponentTick()
     {
         base.MapComponentTick();
-        if (!WorkManagerGameComponent.Instance.PriorityManagementEnabled) return;
+        if (!WorkManagerGameComponent.Instance!.PriorityManagementEnabled) return;
         if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused ||
             (Find.TickManager.TicksGame & UpdateTickMask) != 0) return;
         var time = RimWorldTime.GetHomeTime();
@@ -906,9 +907,11 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
     private void UpdateCache()
     {
         _managedWorkTypeRules.Clear();
-        foreach (var rule in WorkManagerGameComponent.Instance.CombinedRules)
+        // ReSharper disable once RedundantSuppressNullableWarningExpression : Instance is non-null on this game-scoped path by the Map=>Game lifecycle invariant (ADR-0001); the compiler still requires the null-forgiving operator on the nullable property read.
+        var instance = WorkManagerGameComponent.Instance!;
+        foreach (var rule in instance.CombinedRules)
         {
-            if (WorkManagerGameComponent.Instance.GetWorkTypeEnabled(rule.Def!))
+            if (instance.GetWorkTypeEnabled(rule.Def!))
                 _managedWorkTypeRules.Add(rule.Def!, rule);
         }
         _allPawns.Clear();

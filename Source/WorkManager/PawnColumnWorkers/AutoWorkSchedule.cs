@@ -22,7 +22,7 @@ public class AutoWorkSchedule : PawnColumnWorker
     {
         if (pawn.Dead) return;
         if (!WorkManagerGameComponent.IsInitialized) return;
-        var component = WorkManagerGameComponent.Instance;
+        var component = WorkManagerGameComponent.Instance!;
         var buttonRect = new Rect(rect.center.x - 8, rect.center.y - 8, 16, 16);
         if (component.ScheduleManagementEnabled)
         {

@@ -12,7 +12,7 @@ internal static class PriorityMaster
     /// <summary>
     ///     Indicates whether the PriorityMaster mod is active.
     /// </summary>
-    internal static bool PriorityMasterActive;
+    private static bool _priorityMasterActive;
 
     /// <summary>
     ///     Indicates whether the PriorityMaster compatibility has been initialized.
@@ -30,9 +30,9 @@ internal static class PriorityMaster
     {
         if (_isInitialized) return;
         _isInitialized = true;
-        PriorityMasterActive = LoadedModManager.RunningModsListForReading.Any(m =>
+        _priorityMasterActive = LoadedModManager.RunningModsListForReading.Any(m =>
             "Lauriichan.PriorityMaster".Equals(m.PackageId, StringComparison.OrdinalIgnoreCase));
-        if (!PriorityMasterActive) return;
+        if (!_priorityMasterActive) return;
 #if DEBUG
         Logger.LogMessage("PriorityMaster detected.");
 #endif
@@ -52,7 +52,7 @@ internal static class PriorityMaster
         catch (Exception e)
         {
             Logger.LogError("Failed to initialize PriorityMaster compatibility.", e);
-            PriorityMasterActive = false;
+            _priorityMasterActive = false;
         }
 #if DEBUG
         Logger.LogMessage($"Max priority is {WorkManagerMod.Settings.MaxWorkTypePriority}.");

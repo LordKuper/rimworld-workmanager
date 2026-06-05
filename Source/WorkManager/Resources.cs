@@ -631,8 +631,5 @@ internal static class Resources
 
         internal static readonly Texture2D WorkTypeToggleButtonEnabled =
             ContentFinder<Texture2D>.Get("work-manager-work-type-on");
-
-        internal static readonly Texture2D WorkTypeToggleButtonInactive =
-            ContentFinder<Texture2D>.Get("work-manager-work-type-inactive");
     }
 }

@@ -43,13 +43,15 @@ public class WorkManagerGameComponent : GameComponent
 
     /// <summary>
     ///     Set of pawns with disabled schedules.
+    ///     Nullable because <see cref="Verse.Scribe_Collections" /> can set this to null during loading.
     /// </summary>
-    private HashSet<Pawn> _disabledPawnSchedules = [];
+    private HashSet<Pawn>? _disabledPawnSchedules = [];
 
     /// <summary>
     ///     Dictionary of pawns and their disabled work types.
+    ///     Nullable because <see cref="Verse.Scribe_Collections" /> can set this to null during loading.
     /// </summary>
-    private Dictionary<Pawn, List<WorkTypeDef>> _disabledPawnWorkTypes = [];
+    private Dictionary<Pawn, List<WorkTypeDef>>? _disabledPawnWorkTypes = [];
 
     // Used only by Scribe to load/save _disabledPawnWorkTypes
     private List<Pawn>? _disabledPawnWorkTypesKeys;
@@ -57,13 +59,15 @@ public class WorkManagerGameComponent : GameComponent
 
     /// <summary>
     ///     Set of pawns with disabled work assignments.
+    ///     Nullable because <see cref="Verse.Scribe_Collections" /> can set this to null during loading.
     /// </summary>
-    private HashSet<Pawn> _disabledPawns = [];
+    private HashSet<Pawn>? _disabledPawns = [];
 
     /// <summary>
     ///     Set of disabled work types.
+    ///     Nullable because <see cref="Verse.Scribe_Collections" /> can set this to null during loading.
     /// </summary>
-    private HashSet<WorkTypeDef> _disabledWorkTypes = [];
+    private HashSet<WorkTypeDef>? _disabledWorkTypes = [];
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="WorkManagerGameComponent" /> class and sets the singleton instance.
@@ -94,23 +98,24 @@ public class WorkManagerGameComponent : GameComponent
     /// <summary>
     ///     Gets the set of pawns with disabled schedules.
     /// </summary>
-    public IReadOnlyCollection<Pawn> DisabledPawnSchedules => _disabledPawnSchedules;
+    public IReadOnlyCollection<Pawn> DisabledPawnSchedules =>
+        _disabledPawnSchedules ??= [];
 
     /// <summary>
     ///     Gets the dictionary of pawns and their disabled work types.
     /// </summary>
     public IReadOnlyDictionary<Pawn, List<WorkTypeDef>> DisabledPawnWorkTypes =>
-        _disabledPawnWorkTypes;
+        _disabledPawnWorkTypes ??= [];
 
     /// <summary>
     ///     Gets the set of pawns with disabled work assignments.
     /// </summary>
-    public IReadOnlyCollection<Pawn> DisabledPawns => _disabledPawns;
+    public IReadOnlyCollection<Pawn> DisabledPawns => _disabledPawns ??= [];
 
     /// <summary>
     ///     Gets the set of disabled work types.
     /// </summary>
-    public IReadOnlyCollection<WorkTypeDef> DisabledWorkTypes => _disabledWorkTypes;
+    public IReadOnlyCollection<WorkTypeDef> DisabledWorkTypes => _disabledWorkTypes ??= [];
 
     /// <summary>
     ///     Gets the singleton instance of the <see cref="WorkManagerGameComponent" /> class.
@@ -124,7 +129,7 @@ public class WorkManagerGameComponent : GameComponent
     ///         dereference <c>Instance</c> unless <see cref="IsInitialized" /> returns <c>true</c>.
     ///     </para>
     /// </summary>
-    internal static WorkManagerGameComponent Instance { get; private set; } = null!;
+    internal static WorkManagerGameComponent? Instance { get; private set; }
 
     /// <summary>
     ///     Gets a value indicating whether the game component has been initialized and
@@ -467,7 +472,7 @@ public class WorkManagerGameComponent : GameComponent
         DedicatedWorkTypes.Clear();
         foreach (var rule in CombinedRules)
         {
-            if (rule.DedicatedWorkerSettings.AllowDedicated == true)
+            if (rule.DedicatedWorkerSettings?.AllowDedicated == true)
                 DedicatedWorkTypes.Add(rule.Def!);
         }
     }

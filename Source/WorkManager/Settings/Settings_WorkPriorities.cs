@@ -121,8 +121,11 @@ public partial class Settings
     /// <summary>Threshold for minor learning rate.</summary>
     public float MinorLearningRateThreshold = MinorLearningRateThresholdDefault;
 
-    /// <summary>Dictionary mapping passion def names to their priorities.</summary>
-    public Dictionary<string, int> PassionPriorities = PassionPrioritiesDefault;
+    /// <summary>
+    ///     Dictionary mapping passion def names to their priorities.
+    ///     Nullable because <see cref="Verse.Scribe_Collections" /> can set this to null during loading.
+    /// </summary>
+    public Dictionary<string, int>? PassionPriorities = PassionPrioritiesDefault;
 
     /// <summary>If true, use dedicated workers logic.</summary>
     public bool UseDedicatedWorkers = true;
@@ -239,10 +242,10 @@ public partial class Settings
         if (UsePassionPriorities)
             foreach (var pc in PassionHelper.Passions)
             {
-                if (!PassionPriorities.TryGetValue(pc.DefName, out var priority)) continue;
+                if (!PassionPriorities!.TryGetValue(pc.DefName, out var priority)) continue;
                 y += Fields.DoLabeledIntegerSlider(remRect, 1, null, pc.Label, pc.Description,
                     ref priority, 0, MaxWorkTypePriority, 1, pc.Icon, out remRect);
-                PassionPriorities[pc.DefName] = priority;
+                PassionPriorities![pc.DefName] = priority;
             }
         y += Fields.DoLabeledCheckbox(remRect, 0, null, ref UseLearningRatesPriorities,
             Strings.UseLearningRatesPriorities, Strings.UseLearningRatesPrioritiesTooltip, null,
@@ -377,14 +380,14 @@ public partial class Settings
         IdlePriority = IdlePriority == 0
             ? IdlePriorityDefault
             : Mathf.Clamp(IdlePriority, 1, MaxWorkTypePriority);
-        if (PassionPriorities == null || PassionPriorities.Count == 0)
+        if (PassionPriorities == null || PassionPriorities!.Count == 0)
             PassionPriorities = PassionPrioritiesDefault;
         foreach (var passion in PassionHelper.Passions)
         {
-            if (PassionPriorities.TryGetValue(passion.DefName, out var priority))
-                PassionPriorities[passion.DefName] = Mathf.Clamp(priority, 0, MaxWorkTypePriority);
+            if (PassionPriorities!.TryGetValue(passion.DefName, out var priority))
+                PassionPriorities![passion.DefName] = Mathf.Clamp(priority, 0, MaxWorkTypePriority);
             else
-                PassionPriorities[passion.DefName] = 0;
+                PassionPriorities![passion.DefName] = 0;
         }
         MajorLearningRateThreshold = MajorLearningRateThreshold == 0
             ? MajorLearningRateThresholdDefault

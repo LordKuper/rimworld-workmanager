@@ -185,14 +185,12 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
     private static List<SkillDef> GetRelevantSkills()
     {
         var skills = new HashSet<SkillDef>();
-        var workTypes = DefDatabase<WorkTypeDef>.AllDefsListForReading;
-        for (var i = 0; i < workTypes.Count; i++)
+        foreach (var workType in DefDatabase<WorkTypeDef>.AllDefsListForReading)
         {
-            var workType = workTypes[i];
             if (!workType.visible || workType.relevantSkills == null) continue;
-            for (var j = 0; j < workType.relevantSkills.Count; j++)
+            foreach (var skill in workType.relevantSkills)
             {
-                skills.Add(workType.relevantSkills[j]);
+                skills.Add(skill);
             }
         }
         return [.. skills];
@@ -205,7 +203,7 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
     {
         base.MapComponentTick();
         if (!WorkManagerMod.Settings.ManageWorkSchedule) return;
-        if (!WorkManagerGameComponent.Instance.ScheduleManagementEnabled) return;
+        if (!WorkManagerGameComponent.Instance!.ScheduleManagementEnabled) return;
         if (Find.TickManager.CurTimeSpeed == TimeSpeed.Paused ||
             (Find.TickManager.TicksGame & UpdateTickMask) != 0) return;
         var time = RimWorldTime.GetHomeTime();
@@ -218,7 +216,7 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
     internal void UpdateNow()
     {
         if (!WorkManagerMod.Settings.ManageWorkSchedule ||
-            !WorkManagerGameComponent.Instance.ScheduleManagementEnabled) return;
+            !WorkManagerGameComponent.Instance!.ScheduleManagementEnabled) return;
         _scheduleUpdateTime = RimWorldTime.GetHomeTime();
         UpdateSchedule();
     }
@@ -232,8 +230,9 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
         {
             _workers.Clear();
             var allPawns = map.mapPawns.AllPawnsSpawned.Where(pawn =>
-                pawn.Faction == Faction.OfPlayer && pawn.story != null && pawn.timetable != null &&
-                pawn.skills != null && !pawn.RaceProps.IsMechanoid).ToList();
+                pawn.Faction == Faction.OfPlayer &&
+                pawn is { story: not null, timetable: not null, skills: not null } &&
+                !pawn.RaceProps.IsMechanoid).ToList();
 
             // Skills relevant to active (visible) work types.
             var relevantSkills = GetRelevantSkills();
@@ -253,17 +252,17 @@ public class ScheduleUpdater(Map map) : MapComponent(map)
             var colonistCount = allPawns.Count(pawn => !pawn.story.traits.HasTrait(NightOwlTrait));
             var nightOwlCount = allPawns.Count - colonistCount;
             var scheduled = allPawns
-                .Where(pawn => WorkManagerGameComponent.Instance.GetPawnScheduleEnabled(pawn))
+                .Where(pawn => WorkManagerGameComponent.Instance!.GetPawnScheduleEnabled(pawn))
                 .ToList();
 
             // Two independent groups: regular colonists and night owls.
             AssignGroup(
                 scheduled.Where(pawn => !pawn.story.traits.HasTrait(NightOwlTrait)).ToList(),
-                WorkManagerMod.Settings.ColonistWorkShifts
+                WorkManagerMod.Settings.ColonistWorkShifts!
                     .Where(shift => shift.PawnThreshold <= colonistCount).ToList(), relevantSkills,
                 maxLevels);
             AssignGroup(scheduled.Where(pawn => pawn.story.traits.HasTrait(NightOwlTrait)).ToList(),
-                WorkManagerMod.Settings.NightOwlWorkShifts
+                WorkManagerMod.Settings.NightOwlWorkShifts!
                     .Where(shift => shift.PawnThreshold <= nightOwlCount).ToList(), relevantSkills,
                 maxLevels);
             foreach (var worker in _workers)

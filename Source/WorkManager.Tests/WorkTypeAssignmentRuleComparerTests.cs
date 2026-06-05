@@ -240,7 +240,7 @@ public class WorkTypeAssignmentRuleComparerTests
         result.DefName.Should().Be("Doctor");
         result.EnsureWorkerAssigned.Should().Be(true);
         result.MinWorkerNumber.Should().Be(3);
-        result.DedicatedWorkerSettings.Mode.Should().Be(DedicatedWorkerMode.Constant);
+        result.DedicatedWorkerSettings!.Mode.Should().Be(DedicatedWorkerMode.Constant);
         result.DedicatedWorkerSettings.ConstantWorkerCount.Should().Be(2);
     }
 

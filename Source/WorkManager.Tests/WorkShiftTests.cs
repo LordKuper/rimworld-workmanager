@@ -17,7 +17,7 @@ public class WorkShiftTests
     public void Constructor_InvalidThreshold_Throws()
     {
         var schedule = Enumerable.Range(0, 24).Select(_ => "Anything").ToList();
-        Action act = () => new WorkShift(schedule, 0);
+        Action act = () => { _ = new WorkShift(schedule, 0); };
         act.Should().Throw<ArgumentException>().WithMessage("*Invalid pawn threshold*");
     }
 
@@ -28,7 +28,7 @@ public class WorkShiftTests
     public void Constructor_TooFewHours_Throws()
     {
         var schedule = new List<string> { "Anything" };
-        Action act = () => new WorkShift(schedule, 1);
+        Action act = () => { _ = new WorkShift(schedule, 1); };
         act.Should().Throw<ArgumentException>().WithMessage("*Invalid schedule*");
     }
 
@@ -39,7 +39,7 @@ public class WorkShiftTests
     public void Constructor_TooManyHours_Throws()
     {
         var schedule = Enumerable.Range(0, 25).Select(_ => "Anything").ToList();
-        Action act = () => new WorkShift(schedule, 1);
+        Action act = () => { _ = new WorkShift(schedule, 1); };
         act.Should().Throw<ArgumentException>().WithMessage("*Invalid schedule*");
     }
 
@@ -129,9 +129,9 @@ public class WorkShiftTests
         var schedule = new List<string>(24);
         for (var i = 0; i < 24; i++)
         {
-            if (i >= 0 && i < 8)
+            if (i is >= 0 and < 8)
                 schedule.Add("Sleep");
-            else if (i >= 8 && i < 18)
+            else if (i is >= 8 and < 18)
                 schedule.Add("Work");
             else
                 schedule.Add("Joy");

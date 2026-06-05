@@ -146,7 +146,7 @@ internal class PawnCache(Pawn pawn)
         if (_allowedWorkTypes.TryGetValue(workType, out var allowed)) return allowed;
         if (Pawn.WorkTypeIsDisabled(workType))
             allowed = false;
-        else if (WorkManagerGameComponent.Instance.CombinedRulesDict.TryGetValue(workType,
+        else if (WorkManagerGameComponent.Instance!.CombinedRulesDict.TryGetValue(workType,
                      out var rule))
             allowed = rule.IsAllowedWorker(Pawn);
         else
@@ -195,7 +195,7 @@ internal class PawnCache(Pawn pawn)
     {
         if (workType == null) throw new ArgumentNullException(nameof(workType));
         if (_managedWorkTypes.TryGetValue(workType, out var work)) return work;
-        var workManager = WorkManagerGameComponent.Instance;
+        var workManager = WorkManagerGameComponent.Instance!;
         var value = IsManaged && workManager.GetWorkTypeEnabled(workType) &&
                     workManager.GetPawnWorkTypeEnabled(Pawn, workType);
         _managedWorkTypes.Add(workType, value);
@@ -243,8 +243,8 @@ internal class PawnCache(Pawn pawn)
     /// <param name="time">The current RimWorld time.</param>
     public void Update(RimWorldTime time)
     {
-        IsCapable = !Pawn.Dead && !Pawn.InContainerEnclosed && !Pawn.InMentalState && !Pawn.Downed;
-        IsManaged = WorkManagerGameComponent.Instance.GetPawnEnabled(Pawn);
+        IsCapable = Pawn is { Dead: false, InContainerEnclosed: false, InMentalState: false, Downed: false };
+        IsManaged = WorkManagerGameComponent.Instance!.GetPawnEnabled(Pawn);
         _workPriorities.Clear();
         _managedWorkTypes.Clear();
         _allowedWorkTypes.Clear();

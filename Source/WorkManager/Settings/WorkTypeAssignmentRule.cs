@@ -48,8 +48,9 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
 
     /// <summary>
     ///     The filter specifying which pawns are allowed to be assigned to this work type.
+    ///     Nullable because <see cref="Verse.Scribe_Deep" /> can set this to null during loading.
     /// </summary>
-    public PawnFilter AllowedWorkers = new();
+    public PawnFilter? AllowedWorkers = new();
 
     /// <summary>
     ///     Indicates whether all pawns should be assigned to this work type.
@@ -63,8 +64,9 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
 
     /// <summary>
     ///     The settings for dedicated workers for this work type.
+    ///     Nullable because <see cref="Verse.Scribe_Deep" /> can set this to null during loading.
     /// </summary>
-    public DedicatedWorkerSettings DedicatedWorkerSettings = new();
+    public DedicatedWorkerSettings? DedicatedWorkerSettings = new();
 
     /// <summary>
     ///     Indicates whether at least one worker should always be assigned to this work type.
@@ -315,7 +317,7 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
                 stringBuilder.AppendLineIndented(
                     $"{Strings.DedicatedWorkerSettingsLabel}".Colorize(ColoredText
                         .ColonistCountColor), 1);
-                var dedicated = DedicatedWorkerSettings;
+                var dedicated = DedicatedWorkerSettings!;
                 if (dedicated.AllowDedicated.HasValue)
                 {
                     anyValue = true;
@@ -439,9 +441,9 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
             AssignEveryonePriority = main.AssignEveryone.HasValue
                 ? main.AssignEveryonePriority
                 : fallback.AssignEveryonePriority,
-            DedicatedWorkerSettings = DedicatedWorkerSettings.Combine(main.DedicatedWorkerSettings,
-                fallback.DedicatedWorkerSettings),
-            AllowedWorkers = PawnFilter.Combine(main.AllowedWorkers, fallback.AllowedWorkers)
+            DedicatedWorkerSettings = DedicatedWorkerSettings.Combine(main.DedicatedWorkerSettings!,
+                fallback.DedicatedWorkerSettings!),
+            AllowedWorkers = PawnFilter.Combine(main.AllowedWorkers!, fallback.AllowedWorkers!)
         };
     }
 
@@ -506,7 +508,7 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
     /// </exception>
     public int GetTargetWorkersCount(Map map, int capablePawnCount, int dedicatedWorkTypesCount)
     {
-        switch (DedicatedWorkerSettings.Mode)
+        switch (DedicatedWorkerSettings!.Mode)
         {
             case DedicatedWorkerMode.Constant:
                 return DedicatedWorkerSettings.ConstantWorkerCount;
@@ -549,7 +551,7 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
     public bool IsAllowedWorker(Pawn pawn)
     {
         if (pawn == null) throw new ArgumentNullException(nameof(pawn));
-        return AllowedWorkers.SatisfiesFilter(pawn, Def);
+        return AllowedWorkers!.SatisfiesFilter(pawn, Def);
     }
 
     /// <summary>
@@ -563,15 +565,13 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
         AllowedWorkers.Validate();
         AllowedWorkers.ForbiddenPawnTypes = [.. AllowedWorkersForbiddenPawnTypes];
         AllowedWorkers.ForbiddenPawnHealthStates = AllowedWorkersForbiddenPawnHealthStates;
-        if (AllowedWorkers.FilterPawnHealthStates == true &&
-            AllowedWorkers.AllowedPawnHealthStates == PawnHealthState.None)
+        if (AllowedWorkers is { FilterPawnHealthStates: true, AllowedPawnHealthStates: PawnHealthState.None })
             AllowedWorkers.AllowedPawnHealthStates =
-                defaultRule.AllowedWorkers.AllowedPawnHealthStates;
+                defaultRule.AllowedWorkers!.AllowedPawnHealthStates;
         if (AllowedWorkers.FilterPawnPrimaryWeaponTypes == true &&
-            (AllowedWorkers.AllowedPawnPrimaryWeaponTypes == null ||
-             AllowedWorkers.AllowedPawnPrimaryWeaponTypes.Count == 0))
+            AllowedWorkers.AllowedPawnPrimaryWeaponTypes.Count == 0)
             AllowedWorkers.AllowedPawnPrimaryWeaponTypes =
-                [.. defaultRule.AllowedWorkers.AllowedPawnPrimaryWeaponTypes];
+                [.. defaultRule.AllowedWorkers!.AllowedPawnPrimaryWeaponTypes];
         AssignEveryonePriority = Mathf.Clamp(AssignEveryonePriority, 0,
             WorkManagerMod.Settings.MaxWorkTypePriority);
         if (DefName == null)

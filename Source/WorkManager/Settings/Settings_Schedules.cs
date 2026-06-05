@@ -13,8 +13,9 @@ public partial class Settings
 {
     /// <summary>
     ///     The work shifts used for regular colonists.
+    ///     Nullable because <see cref="Verse.Scribe_Collections" /> can set this to null during loading.
     /// </summary>
-    public List<WorkShift> ColonistWorkShifts = [.. DefaultColonistWorkShifts];
+    public List<WorkShift>? ColonistWorkShifts = [.. DefaultColonistWorkShifts];
 
     /// <summary>
     ///     Indicates whether the work schedule is managed automatically.
@@ -23,8 +24,9 @@ public partial class Settings
 
     /// <summary>
     ///     The work shifts used for night owl colonists.
+    ///     Nullable because <see cref="Verse.Scribe_Collections" /> can set this to null during loading.
     /// </summary>
-    public List<WorkShift> NightOwlWorkShifts = [.. DefaultNightOwlWorkShifts];
+    public List<WorkShift>? NightOwlWorkShifts = [.. DefaultNightOwlWorkShifts];
 
     /// <summary>
     ///     The frequency (per day) at which the schedule is updated.
@@ -137,27 +139,27 @@ public partial class Settings
         var buttonRowRect = listing.GetRect(35f);
         Rect buttonRect = new(buttonRowRect.x, buttonRowRect.y, 150f, 35f);
         if (Widgets.ButtonText(buttonRect, Strings.AddWorkShift))
-            ColonistWorkShifts.Add(new WorkShift
-            { PawnThreshold = ColonistWorkShifts.Last().PawnThreshold });
+            ColonistWorkShifts!.Add(new WorkShift
+            { PawnThreshold = ColonistWorkShifts!.Last().PawnThreshold });
         buttonRect = new Rect(buttonRect.xMax + 10f, buttonRect.y, 150f, 35f);
         if (Widgets.ButtonText(buttonRect, Strings.DeleteWorkShift,
-                active: ColonistWorkShifts.Count > 1))
+                active: ColonistWorkShifts!.Count > 1))
         {
             List<FloatMenuOption> options = [];
-            for (var i = 1; i < ColonistWorkShifts.Count; i++)
+            for (var i = 1; i < ColonistWorkShifts!.Count; i++)
             {
-                var workShift = ColonistWorkShifts[i];
+                var workShift = ColonistWorkShifts![i];
                 options.Add(new FloatMenuOption(
                     "WorkManager.Settings_Schedule_WorkShiftLabel".Translate(i + 1),
-                    () => { ColonistWorkShifts.Remove(workShift); }));
+                    () => { ColonistWorkShifts!.Remove(workShift); }));
             }
             Find.WindowStack.Add(new FloatMenu(options));
         }
         buttonRect = new Rect(buttonRect.xMax + 10f, buttonRect.y, 150f, 35f);
         if (Widgets.ButtonText(buttonRect, Strings.ResetWorkShifts))
         {
-            ColonistWorkShifts.Clear();
-            ColonistWorkShifts.AddRange(DefaultColonistWorkShifts);
+            ColonistWorkShifts!.Clear();
+            ColonistWorkShifts!.AddRange(DefaultColonistWorkShifts);
         }
         var columnHeadersRect = listing.GetRect(Text.LineHeight * 2 + Text.SpaceBetweenLines);
         if (Math.Abs(columnHeadersRect.width - _workShiftTableWidth) > 0.1f)
@@ -166,9 +168,9 @@ public partial class Settings
             CalculateWorkShiftColumnsWidths(columnHeadersRect);
         }
         DoWorkShiftColumnsHeaders(columnHeadersRect);
-        for (var i = 0; i < ColonistWorkShifts.Count; i++)
+        for (var i = 0; i < ColonistWorkShifts!.Count; i++)
         {
-            var workShift = ColonistWorkShifts[i];
+            var workShift = ColonistWorkShifts![i];
             int minThreshold;
             int maxThreshold;
             if (i == 0)
@@ -178,10 +180,10 @@ public partial class Settings
             }
             else
             {
-                minThreshold = ColonistWorkShifts[i - 1].PawnThreshold;
-                maxThreshold = i == ColonistWorkShifts.Count - 1
+                minThreshold = ColonistWorkShifts![i - 1].PawnThreshold;
+                maxThreshold = i == ColonistWorkShifts!.Count - 1
                     ? 20
-                    : ColonistWorkShifts[i + 1].PawnThreshold;
+                    : ColonistWorkShifts![i + 1].PawnThreshold;
             }
             DoWorkShiftRow(listing.GetRect(35f), workShift, i, minThreshold, maxThreshold);
         }
@@ -195,27 +197,27 @@ public partial class Settings
         var buttonRowRect = listing.GetRect(35f);
         Rect buttonRect = new(buttonRowRect.x, buttonRowRect.y, 150f, 35f);
         if (Widgets.ButtonText(buttonRect, Strings.AddWorkShift))
-            NightOwlWorkShifts.Add(new WorkShift
-            { PawnThreshold = NightOwlWorkShifts.Last().PawnThreshold });
+            NightOwlWorkShifts!.Add(new WorkShift
+            { PawnThreshold = NightOwlWorkShifts!.Last().PawnThreshold });
         buttonRect = new Rect(buttonRect.xMax + 10f, buttonRect.y, 150f, 35f);
         if (Widgets.ButtonText(buttonRect, Strings.DeleteWorkShift,
-                active: NightOwlWorkShifts.Count > 1))
+                active: NightOwlWorkShifts!.Count > 1))
         {
             List<FloatMenuOption> options = [];
-            for (var i = 1; i < NightOwlWorkShifts.Count; i++)
+            for (var i = 1; i < NightOwlWorkShifts!.Count; i++)
             {
-                var workShift = NightOwlWorkShifts[i];
+                var workShift = NightOwlWorkShifts![i];
                 options.Add(new FloatMenuOption(
                     "WorkManager.Settings_Schedule_WorkShiftLabel".Translate(i + 1),
-                    () => { NightOwlWorkShifts.Remove(workShift); }));
+                    () => { NightOwlWorkShifts!.Remove(workShift); }));
             }
             Find.WindowStack.Add(new FloatMenu(options));
         }
         buttonRect = new Rect(buttonRect.xMax + 10f, buttonRect.y, 150f, 35f);
         if (Widgets.ButtonText(buttonRect, Strings.ResetWorkShifts))
         {
-            NightOwlWorkShifts.Clear();
-            NightOwlWorkShifts.AddRange(DefaultNightOwlWorkShifts);
+            NightOwlWorkShifts!.Clear();
+            NightOwlWorkShifts!.AddRange(DefaultNightOwlWorkShifts);
         }
         var columnHeadersRect = listing.GetRect(Text.LineHeight * 2 + Text.SpaceBetweenLines);
         if (Math.Abs(columnHeadersRect.width - _workShiftTableWidth) > 0.1f)
@@ -224,9 +226,9 @@ public partial class Settings
             CalculateWorkShiftColumnsWidths(columnHeadersRect);
         }
         DoWorkShiftColumnsHeaders(columnHeadersRect);
-        for (var i = 0; i < NightOwlWorkShifts.Count; i++)
+        for (var i = 0; i < NightOwlWorkShifts!.Count; i++)
         {
-            var workShift = NightOwlWorkShifts[i];
+            var workShift = NightOwlWorkShifts![i];
             int minThreshold;
             int maxThreshold;
             if (i == 0)
@@ -236,10 +238,10 @@ public partial class Settings
             }
             else
             {
-                minThreshold = NightOwlWorkShifts[i - 1].PawnThreshold;
-                maxThreshold = i == NightOwlWorkShifts.Count - 1
+                minThreshold = NightOwlWorkShifts![i - 1].PawnThreshold;
+                maxThreshold = i == NightOwlWorkShifts!.Count - 1
                     ? 20
-                    : NightOwlWorkShifts[i + 1].PawnThreshold;
+                    : NightOwlWorkShifts![i + 1].PawnThreshold;
             }
             DoWorkShiftRow(listing.GetRect(35f), workShift, i, minThreshold, maxThreshold);
         }
@@ -254,9 +256,9 @@ public partial class Settings
                      numericSettingsCount * (Text.LineHeight * 1.5f + listing.verticalSpacing) +
                      listing.verticalSpacing + Text.LineHeight * 1.5f + listing.verticalSpacing +
                      Text.LineHeight + 35f + Text.LineHeight * 2 + Text.SpaceBetweenLines +
-                     35 * ColonistWorkShifts.Count + listing.verticalSpacing + Text.LineHeight +
+                     35 * ColonistWorkShifts!.Count + listing.verticalSpacing + Text.LineHeight +
                      35f + Text.LineHeight * 2 + Text.SpaceBetweenLines +
-                     35 * NightOwlWorkShifts.Count;
+                     35 * NightOwlWorkShifts!.Count;
         Rect viewRect = new(rect.x, 0, rect.width - 16f, height);
         Widgets.BeginScrollView(rect, ref _scrollPosition, viewRect);
         listing.Begin(viewRect);
@@ -393,9 +395,9 @@ public partial class Settings
     {
         ManageWorkSchedule = true;
         ScheduleUpdateFrequency = 2;
-        ColonistWorkShifts.Clear();
-        ColonistWorkShifts.AddRange(DefaultColonistWorkShifts);
-        NightOwlWorkShifts.Clear();
-        NightOwlWorkShifts.AddRange(DefaultNightOwlWorkShifts);
+        ColonistWorkShifts!.Clear();
+        ColonistWorkShifts!.AddRange(DefaultColonistWorkShifts);
+        NightOwlWorkShifts!.Clear();
+        NightOwlWorkShifts!.AddRange(DefaultNightOwlWorkShifts);
     }
 }

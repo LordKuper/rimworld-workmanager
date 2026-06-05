@@ -59,7 +59,7 @@ public static class WorkTabPatch
         const int iconSize = 16;
         Rect buttonRect = new(rect.center.x - iconSize / 2, rect.yMax - iconSize - 4, iconSize,
             iconSize);
-        var component = WorkManagerGameComponent.Instance;
+        var component = WorkManagerGameComponent.Instance!;
         Buttons.DoIconButtonToggle(buttonRect,
             () => component.GetWorkTypeEnabled(__instance.def.workType),
             newValue => component.SetWorkTypeEnabled(__instance.def.workType, newValue),
@@ -84,7 +84,7 @@ public static class WorkTabPatch
     public static void DoWindowContentsPostfix(Rect rect)
     {
         if (!WorkManagerGameComponent.IsInitialized) return;
-        var component = WorkManagerGameComponent.Instance;
+        var component = WorkManagerGameComponent.Instance!;
         var buttonRow = new Rect(rect.xMin + Layout.ElementGapTiny,
             rect.yMin + Layout.ElementGapTiny, rect.width - Layout.ElementGapTiny * 2,
             Buttons.IconButtonSize);
@@ -118,7 +118,7 @@ public static class WorkTabPatch
     public static void DrawWorkTypeBoxForPostfix(Rect box, Pawn pawn, WorkTypeDef worktype)
     {
         if (!WorkManagerGameComponent.IsInitialized) return;
-        var component = WorkManagerGameComponent.Instance;
+        var component = WorkManagerGameComponent.Instance!;
         if (!component.PriorityManagementEnabled || !Find.PlaySettings.useWorkPriorities) return;
         var enabled = component.GetPawnWorkTypeEnabled(pawn, worktype);
         if (!enabled)
@@ -157,7 +157,7 @@ public static class WorkTabPatch
         Pawn pawn)
     {
         if (!WorkManagerGameComponent.IsInitialized) return;
-        var component = WorkManagerGameComponent.Instance;
+        var component = WorkManagerGameComponent.Instance!;
         if (!component.PriorityManagementEnabled || !Find.PlaySettings.useWorkPriorities) return;
         var workType = __instance.def.workType;
         var enabled = component.GetPawnWorkTypeEnabled(pawn, workType);

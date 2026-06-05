@@ -2,9 +2,13 @@ using System;
 using System.IO;
 using System.Reflection;
 
+namespace LordKuper.WorkManager.Tests;
+
 /// <summary>
-///     Global setup fixture that registers the RimWorld AssemblyResolve handler before any RimWorld-typed test loads.
-///     This fixture is in the global namespace to ensure it runs before any test type loads.
+///     Assembly-wide setup fixture that registers the RimWorld AssemblyResolve handler before any RimWorld-typed test
+///     loads. A <c>[SetUpFixture]</c> in the root test namespace runs its <c>[OneTimeSetUp]</c> method
+///     before any test in that namespace or its sub-namespaces, which is sufficient because all tests in this project
+///     are declared under <c>LordKuper.WorkManager.Tests</c>.
 ///     This is required because Assembly-CSharp and Unity modules are not NuGet packages but live in the local
 ///     RimWorld installation directory.
 /// </summary>

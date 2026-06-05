@@ -116,19 +116,10 @@ public partial class Settings
     private float _dedicatedWorkersSectionContentHeight;
 
     /// <summary>
-    ///     Currently selected work type rule for editing.
-    /// </summary>
-    private WorkTypeAssignmentRule? _selectedWorkTypeRule;
-
-    /// <summary>
     ///     List of work type assignment rules, initialized with default rules.
+    ///     Nullable because <see cref="Verse.Scribe_Collections" /> can set this to null during loading.
     /// </summary>
-    private List<WorkTypeAssignmentRule> _workTypeRules = [.. WorkTypeAssignmentRule.DefaultRules];
-
-    /// <summary>
-    ///     Cached height of the bottom part of the work types tab.
-    /// </summary>
-    private float _workTypesBottomHeight;
+    private List<WorkTypeAssignmentRule>? _workTypeRules = [.. WorkTypeAssignmentRule.DefaultRules];
 
     /// <summary>
     ///     Cached height of the scrollable content in the work types tab.
@@ -146,11 +137,11 @@ public partial class Settings
     /// </summary>
     private WorkTypeAssignmentRule? SelectedWorkTypeRule
     {
-        get => _selectedWorkTypeRule;
+        get;
         set
         {
-            if (Equals(_selectedWorkTypeRule, value)) return;
-            _selectedWorkTypeRule = value;
+            if (Equals(field, value)) return;
+            field = value;
             UpdateAllowedWorkers();
         }
     }
@@ -158,7 +149,7 @@ public partial class Settings
     /// <summary>
     ///     Gets the list of work type assignment rules as a read-only list.
     /// </summary>
-    internal IReadOnlyList<WorkTypeAssignmentRule> WorkTypeRules => _workTypeRules;
+    internal IReadOnlyList<WorkTypeAssignmentRule> WorkTypeRules => _workTypeRules ??= [.. WorkTypeAssignmentRule.DefaultRules];
 
     /// <summary>
     ///     Gets the height of the bottom part of the work types tab, calculating if not cached.
@@ -167,10 +158,10 @@ public partial class Settings
     {
         get
         {
-            if (_workTypesBottomHeight <= 0f)
-                _workTypesBottomHeight = PawnBox.GetPawnBoxHeight(2) + Labels.SectionHeaderHeight +
-                                         Layout.ElementGap;
-            return _workTypesBottomHeight;
+            if (field <= 0f)
+                field = PawnBox.GetPawnBoxHeight(2) + Labels.SectionHeaderHeight +
+                        Layout.ElementGap;
+            return field;
         }
     }
 
@@ -204,7 +195,7 @@ public partial class Settings
             Strings.AllowedWorkersLabel, Strings.AllowedWorkersTooltip, out var allowedWorkersRect,
             out remRect);
         var allowedWorkersContentHeight = PawnFilterWidget.DoPawnFilter(allowedWorkersRect,
-            SelectedWorkTypeRule!.AllowedWorkers, PawnFilterSections.All,
+            SelectedWorkTypeRule!.AllowedWorkers!, PawnFilterSections.All,
             WorkManagerMod.GetModInputId(AllowedWorkersPawnSkillInputLocalId),
             WorkManagerMod.GetModInputId(AllowedWorkersPawnStatInputLocalId),
             WorkManagerMod.GetModInputId(AllowedWorkersPawnCapacityInputLocalId),
@@ -299,7 +290,7 @@ public partial class Settings
         var dedicatedWorkersContentHeight = 0f;
         if (defaultRule)
         {
-            var value = rule.DedicatedWorkerSettings.AllowDedicated == true;
+            var value = rule.DedicatedWorkerSettings!.AllowDedicated == true;
             dedicatedWorkersContentHeight += Fields.DoLabeledCheckbox(dedicatedWorkersRect, 0, null,
                 ref value, Strings.AllowDedicatedWorkerLabel,
                 Strings.GetAllowDedicatedWorkerTooltip(false), null, out dedicatedWorkersRect);
@@ -308,7 +299,7 @@ public partial class Settings
         else
         {
             dedicatedWorkersContentHeight += Fields.DoLabeledCheckbox(dedicatedWorkersRect, 0, null,
-                ref rule.DedicatedWorkerSettings.AllowDedicated, Strings.AllowDedicatedWorkerLabel,
+                ref rule.DedicatedWorkerSettings!.AllowDedicated, Strings.AllowDedicatedWorkerLabel,
                 Strings.GetAllowDedicatedWorkerTooltip(true), null, out dedicatedWorkersRect);
         }
         if (rule.DedicatedWorkerSettings.AllowDedicated == true)
@@ -466,7 +457,7 @@ public partial class Settings
     /// <param name="rect">The rectangular area within which the UI elements are rendered.</param>
     private void DoWorkTypesTabTopPart(Rect rect)
     {
-        var workTypeRules = _workTypeRules;
+        var workTypeRules = _workTypeRules!;
         var workTypeRulesCount = workTypeRules.Count;
         var allDefs = DefDatabase<WorkTypeDef>.AllDefsListForReading;
         List<WorkTypeDef> addableDefs;
@@ -567,7 +558,7 @@ public partial class Settings
     /// </remarks>
     private void ResetWorkTypes()
     {
-        _workTypeRules.Clear();
+        _workTypeRules!.Clear();
         _workTypeRules.AddRange(WorkTypeAssignmentRule.DefaultRules);
         SelectedWorkTypeRule = null;
     }
