@@ -16,14 +16,10 @@ namespace LordKuper.WorkManager;
 public class WorkManagerGameComponent : GameComponent
 {
     /// <summary>
-    ///     Dictionary of work types assigned to everyone, with their priorities.
-    /// </summary>
-    private readonly Dictionary<WorkTypeDef, int> _assignEveryoneWorkTypes = [];
-
-    /// <summary>
     ///     Represents a collection of combined work type assignment rules, sorted according to a specified comparer.
     /// </summary>
-    internal readonly SortedSet<WorkTypeAssignmentRule> CombinedRules = new(WorkTypeAssignmentRuleComparer);
+    internal readonly SortedSet<WorkTypeAssignmentRule> CombinedRules =
+        new(WorkTypeAssignmentRuleComparer);
 
     /// <summary>
     ///     Dictionary for O(1) lookup of combined rules by work type definition.
@@ -31,28 +27,9 @@ public class WorkManagerGameComponent : GameComponent
     internal readonly Dictionary<WorkTypeDef, WorkTypeAssignmentRule> CombinedRulesDict = [];
 
     /// <summary>
-    ///     Set of pawns with disabled work assignments.
+    ///     Dictionary of work types assigned to everyone, with their priorities.
     /// </summary>
-    private HashSet<Pawn> _disabledPawns = [];
-
-    /// <summary>
-    ///     Set of pawns with disabled schedules.
-    /// </summary>
-    private HashSet<Pawn> _disabledPawnSchedules = [];
-
-    /// <summary>
-    ///     Dictionary of pawns and their disabled work types.
-    /// </summary>
-    private Dictionary<Pawn, List<WorkTypeDef>> _disabledPawnWorkTypes = [];
-
-    // Used only by Scribe to load/save _disabledPawnWorkTypes
-    private List<Pawn>? _disabledPawnWorkTypesKeys;
-    private List<List<WorkTypeDef>>? _disabledPawnWorkTypesValues;
-
-    /// <summary>
-    ///     Set of disabled work types.
-    /// </summary>
-    private HashSet<WorkTypeDef> _disabledWorkTypes = [];
+    private readonly Dictionary<WorkTypeDef, int> _assignEveryoneWorkTypes = [];
 
     /// <summary>
     ///     Indicates if priority management is enabled.
@@ -63,6 +40,34 @@ public class WorkManagerGameComponent : GameComponent
     ///     Indicates if schedule management is enabled.
     /// </summary>
     public bool ScheduleManagementEnabled = true;
+
+    /// <summary>
+    ///     Set of pawns with disabled schedules.
+    ///     Nullable because <see cref="Verse.Scribe_Collections" /> can set this to null during loading.
+    /// </summary>
+    private HashSet<Pawn>? _disabledPawnSchedules = [];
+
+    /// <summary>
+    ///     Dictionary of pawns and their disabled work types.
+    ///     Nullable because <see cref="Verse.Scribe_Collections" /> can set this to null during loading.
+    /// </summary>
+    private Dictionary<Pawn, List<WorkTypeDef>>? _disabledPawnWorkTypes = [];
+
+    // Used only by Scribe to load/save _disabledPawnWorkTypes
+    private List<Pawn>? _disabledPawnWorkTypesKeys;
+    private List<List<WorkTypeDef>>? _disabledPawnWorkTypesValues;
+
+    /// <summary>
+    ///     Set of pawns with disabled work assignments.
+    ///     Nullable because <see cref="Verse.Scribe_Collections" /> can set this to null during loading.
+    /// </summary>
+    private HashSet<Pawn>? _disabledPawns = [];
+
+    /// <summary>
+    ///     Set of disabled work types.
+    ///     Nullable because <see cref="Verse.Scribe_Collections" /> can set this to null during loading.
+    /// </summary>
+    private HashSet<WorkTypeDef>? _disabledWorkTypes = [];
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="WorkManagerGameComponent" /> class and sets the singleton instance.
@@ -91,30 +96,53 @@ public class WorkManagerGameComponent : GameComponent
     internal HashSet<WorkTypeDef> DedicatedWorkTypes { get; } = [];
 
     /// <summary>
-    ///     Gets the set of pawns with disabled work assignments.
-    /// </summary>
-    public IReadOnlyCollection<Pawn> DisabledPawns => _disabledPawns;
-
-    /// <summary>
     ///     Gets the set of pawns with disabled schedules.
     /// </summary>
-    public IReadOnlyCollection<Pawn> DisabledPawnSchedules => _disabledPawnSchedules;
+    public IReadOnlyCollection<Pawn> DisabledPawnSchedules =>
+        _disabledPawnSchedules ??= [];
 
     /// <summary>
     ///     Gets the dictionary of pawns and their disabled work types.
     /// </summary>
     public IReadOnlyDictionary<Pawn, List<WorkTypeDef>> DisabledPawnWorkTypes =>
-        _disabledPawnWorkTypes;
+        _disabledPawnWorkTypes ??= [];
+
+    /// <summary>
+    ///     Gets the set of pawns with disabled work assignments.
+    /// </summary>
+    public IReadOnlyCollection<Pawn> DisabledPawns => _disabledPawns ??= [];
 
     /// <summary>
     ///     Gets the set of disabled work types.
     /// </summary>
-    public IReadOnlyCollection<WorkTypeDef> DisabledWorkTypes => _disabledWorkTypes;
+    public IReadOnlyCollection<WorkTypeDef> DisabledWorkTypes => _disabledWorkTypes ??= [];
 
     /// <summary>
     ///     Gets the singleton instance of the <see cref="WorkManagerGameComponent" /> class.
+    ///     <para>
+    ///         <strong>Contract:</strong> <c>Instance</c> is valid only while a <c>Game</c> is loaded.
+    ///         It is non-null on any game-scoped path (MapComponent ticks, cache updates) because a
+    ///         <c>Map</c> can only exist when a <c>Game</c> — and therefore this component — exists.
+    ///         It may be null on game-less UI paths (mod-settings screen, main menu), and retains its
+    ///         last value after a game is unloaded (quit to main menu) — a stale reference.
+    ///         Use <see cref="IsInitialized" /> to guard every UI-scoped entry point; do not
+    ///         dereference <c>Instance</c> unless <see cref="IsInitialized" /> returns <c>true</c>.
+    ///     </para>
     /// </summary>
-    internal static WorkManagerGameComponent Instance { get; private set; } = null!;
+    internal static WorkManagerGameComponent? Instance { get; private set; }
+
+    /// <summary>
+    ///     Gets a value indicating whether the game component has been initialized and
+    ///     <see cref="Instance" /> is safe to dereference.
+    ///     Returns <c>true</c> only when both an active <c>Game</c> is loaded
+    ///     (<c>Current.Game != null</c>) and <see cref="Instance" /> is non-null.
+    ///     Returns <c>false</c> on game-less UI paths (main menu, mod-settings screen opened
+    ///     without an active save) and after a game is unloaded (quit to main menu), even if
+    ///     <see cref="Instance" /> still holds a stale reference from the previous session.
+    ///     Guard every UI-scoped entry point with <c>if (!IsInitialized) return;</c> before any
+    ///     <see cref="Instance" /> dereference.
+    /// </summary>
+    internal static bool IsInitialized => Current.Game != null && Instance is not null;
 
     /// <summary>
     ///     Gets a comparer for evaluating work type assignment rules.
@@ -132,9 +160,11 @@ public class WorkManagerGameComponent : GameComponent
         Scribe_Values.Look(ref ScheduleManagementEnabled, nameof(ScheduleManagementEnabled), true);
         Scribe_Collections.Look(ref _disabledWorkTypes, nameof(DisabledWorkTypes), LookMode.Def);
         Scribe_Collections.Look(ref _disabledPawns, nameof(DisabledPawns), LookMode.Reference);
-        Scribe_Collections.Look(ref _disabledPawnWorkTypes, nameof(DisabledPawnWorkTypes), LookMode.Reference,
-            LookMode.Def, ref _disabledPawnWorkTypesKeys, ref _disabledPawnWorkTypesValues);
-        Scribe_Collections.Look(ref _disabledPawnSchedules, nameof(DisabledPawnSchedules), LookMode.Reference);
+        Scribe_Collections.Look(ref _disabledPawnWorkTypes, nameof(DisabledPawnWorkTypes),
+            LookMode.Reference, LookMode.Def, ref _disabledPawnWorkTypesKeys,
+            ref _disabledPawnWorkTypesValues);
+        Scribe_Collections.Look(ref _disabledPawnSchedules, nameof(DisabledPawnSchedules),
+            LookMode.Reference);
     }
 
     /// <summary>
@@ -219,7 +249,8 @@ public class WorkManagerGameComponent : GameComponent
         if (pawn == null) throw new ArgumentNullException(nameof(pawn));
         if (workType == null) throw new ArgumentNullException(nameof(workType));
         _disabledPawnWorkTypes ??= [];
-        return !_disabledPawnWorkTypes.TryGetValue(pawn, out var workTypes) || !workTypes.Contains(workType);
+        return !_disabledPawnWorkTypes.TryGetValue(pawn, out var workTypes) ||
+               !workTypes.Contains(workType);
     }
 
     /// <summary>
@@ -441,7 +472,7 @@ public class WorkManagerGameComponent : GameComponent
         DedicatedWorkTypes.Clear();
         foreach (var rule in CombinedRules)
         {
-            if (rule.DedicatedWorkerSettings.AllowDedicated == true)
+            if (rule.DedicatedWorkerSettings?.AllowDedicated == true)
                 DedicatedWorkTypes.Add(rule.Def!);
         }
     }
@@ -472,18 +503,20 @@ public class WorkManagerGameComponent : GameComponent
     {
         _disabledPawns?.RemoveWhere(pawn => pawn?.Destroyed ?? true);
         _disabledPawnSchedules?.RemoveWhere(pawn => pawn?.Destroyed ?? true);
-        _disabledWorkTypes?.RemoveWhere(workType => !DefDatabase<WorkTypeDef>.AllDefsListForReading.Contains(workType));
+        _disabledWorkTypes?.RemoveWhere(workType =>
+            !DefDatabase<WorkTypeDef>.AllDefsListForReading.Contains(workType));
         if (_disabledPawnWorkTypes != null)
         {
-            var pawnsToRemove = _disabledPawnWorkTypes.Where(kv => kv.Key?.Destroyed ?? true).Select(kv => kv.Key)
-                .ToList();
+            var pawnsToRemove = _disabledPawnWorkTypes.Where(kv => kv.Key?.Destroyed ?? true)
+                .Select(kv => kv.Key).ToList();
             foreach (var pawn in pawnsToRemove)
             {
                 _disabledPawnWorkTypes.Remove(pawn);
             }
             foreach (var kv in _disabledPawnWorkTypes)
             {
-                kv.Value.RemoveAll(workType => !DefDatabase<WorkTypeDef>.AllDefsListForReading.Contains(workType));
+                kv.Value.RemoveAll(workType =>
+                    !DefDatabase<WorkTypeDef>.AllDefsListForReading.Contains(workType));
             }
         }
     }

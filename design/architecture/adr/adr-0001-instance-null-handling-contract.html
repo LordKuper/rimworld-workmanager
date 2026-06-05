@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<!--
+responsibility:
+  owns: single architecture decision — WorkManagerGameComponent.Instance null-handling contract
+  excludes: requirements, ux, code
+  delegates_to: prd (requirements), code (implementation)
+provenance: original
+source: ""
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="generator" content="ASD workflow">
+  <meta name="doc-type" content="ADR">
+  <meta name="subsystem" content="N/A">
+  <meta name="sprint-id" content="001-full-audit-alignment">
+  <meta name="status" content="accepted">
+  <meta name="updated" content="2026-06-05">
+  <meta name="responsibility" content="owns: WorkManagerGameComponent.Instance null-handling contract; excludes: requirements, ux, code">
+  <meta name="provenance" content="original">
+  <meta name="source" content="">
+  <title>ADR-0001 · Instance null-handling contract</title>
+  <style>
+    :root {
+      --fg: #1a1c1e; --bg: #fff; --muted: #5b6770; --accent: #0066cc;
+      --code-bg: #f4f6f8; --border: #d0d7de; --max: 1040px;
+      --card-bg: #fafbfc;
+      --ok: #1f883d; --warn: #b35900; --danger: #cf222e; --info: #0969da; --neutral: #5b6770;
+      --chip-must-bg: #ffebe9; --chip-must-fg: #cf222e;
+      --chip-should-bg: #fff5e1; --chip-should-fg: #9a6700;
+      --chip-may-bg: #ddf4ff; --chip-may-fg: #0969da;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --fg: #e6e6e6; --bg: #0e1116; --muted: #9aa4ad; --code-bg: #161b22; --border: #30363d;
+        --card-bg: #161b22;
+        --chip-must-bg: #3b1416; --chip-must-fg: #ff7b72;
+        --chip-should-bg: #2d2410; --chip-should-fg: #e3b341;
+        --chip-may-bg: #0d2538; --chip-may-fg: #58a6ff;
+      }
+    }
+    html, body { margin: 0; padding: 0; }
+    * { box-sizing: border-box; }
+    body { font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--fg); background: var(--bg); }
+    .layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); min-height: 100vh; }
+    .content { min-width: 0; }
+    header, main, footer { max-width: var(--max); margin: 0 auto; padding: 16px 24px; }
+    header { border-bottom: 1px solid var(--border); }
+    header h1 { margin: 4px 0 8px; font-size: 1.9rem; }
+    .badges span { display: inline-block; padding: 2px 8px; margin-right: 6px; font-size: 0.75rem; border: 1px solid var(--border); border-radius: 4px; color: var(--muted); background: var(--bg); }
+    .badges .provenance-original { display: none; }
+    .badges .status-proposed { color: var(--warn); border-color: var(--warn); }
+    .badges .status-accepted { color: var(--ok); border-color: var(--ok); }
+    .stats { margin-top: 6px; font-size: 0.85rem; color: var(--muted); }
+    .stats .chip { display: inline-block; padding: 1px 8px; margin-right: 6px; border-radius: 10px; background: var(--code-bg); border: 1px solid var(--border); }
+    nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 18px 14px; border-right: 1px solid var(--border); background: var(--card-bg); font-size: 0.9rem; }
+    nav.toc .toc-title { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 8px; padding-left: 6px; }
+    nav.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: tocn; }
+    nav.toc li { margin: 2px 0; counter-increment: tocn; }
+    nav.toc a { display: block; padding: 4px 8px; border-radius: 4px; color: var(--fg); text-decoration: none; border-left: 2px solid transparent; }
+    nav.toc a:hover { background: var(--code-bg); color: var(--accent); }
+    nav.toc a.active { background: var(--code-bg); color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+    nav.toc a::before { content: counter(tocn) ". "; color: var(--muted); font-variant-numeric: tabular-nums; }
+    @media (max-width: 880px) {
+      .layout { grid-template-columns: 1fr; }
+      nav.toc { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--border); }
+    }
+    h2, h3, h4 { line-height: 1.25; margin-top: 1.6em; }
+    h2 { border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+    a { color: var(--accent); }
+    code, pre { font-family: ui-monospace, "Cascadia Code", Menlo, monospace; }
+    code { background: var(--code-bg); padding: 1px 5px; border-radius: 3px; font-size: 0.9em; }
+    pre { background: var(--code-bg); padding: 12px; border-radius: 6px; overflow-x: auto; }
+    pre code { background: none; padding: 0; }
+    .chip { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 0.78rem; border: 1px solid var(--border); }
+    .chip.area { background: var(--code-bg); color: var(--muted); }
+    footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 32px; }
+    .lede { font-size: 1.08rem; color: var(--fg); }
+
+    .adr { border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; margin: 18px 0; background: var(--card-bg); }
+    .adr > .meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 6px; }
+    .adr h2 { margin-top: 1.1em; border-bottom: none; font-size: 1.15rem; }
+    .adr h3 { margin-top: 1em; font-size: 1rem; color: var(--muted); }
+    .status-chip { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.78rem; border: 1px solid var(--border); }
+    .status-proposed   { color: var(--warn);    border-color: var(--warn);    background: var(--chip-should-bg); }
+    .status-accepted   { color: var(--ok);      border-color: var(--ok);      background: rgba(31,136,61,0.10); }
+    .status-superseded { color: var(--muted);   border-color: var(--muted);   background: var(--code-bg); text-decoration: line-through; }
+    .status-deprecated { color: var(--danger);  border-color: var(--danger);  background: var(--chip-must-bg); }
+    .consequences { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .consequences .pros, .consequences .cons { padding: 10px 14px; border-radius: 6px; border: 1px solid var(--border); }
+    .consequences .pros { background: rgba(31,136,61,0.07); border-left: 3px solid var(--ok); }
+    .consequences .cons { background: rgba(207,34,46,0.06); border-left: 3px solid var(--danger); }
+    .consequences h3 { margin: 0 0 4px; }
+    .consequences ul { margin: 0; padding-left: 20px; }
+    @media (max-width: 720px) { .consequences { grid-template-columns: 1fr; } }
+    ul.alt-list li { margin: 4px 0; }
+    ul.alt-list li strong { color: var(--fg); }
+    .traces { font-size: 0.85rem; color: var(--muted); margin-top: 6px; }
+    .traces .chip { background: var(--chip-may-bg); color: var(--chip-may-fg); border-color: var(--chip-may-fg); }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <nav class="toc" aria-label="Table of contents">
+      <p class="toc-title">Contents</p>
+      <ol>
+        <li><a href="#context">Context</a></li>
+        <li><a href="#decision">Decision</a></li>
+        <li><a href="#consequences">Consequences</a></li>
+        <li><a href="#alternatives">Alternatives considered</a></li>
+        <li><a href="#related">Related ADRs</a></li>
+      </ol>
+    </nav>
+    <div class="content">
+      <header>
+        <div class="badges">
+          <span>ADR</span>
+          <span>N/A</span>
+          <span class="status-accepted">accepted</span>
+          <span class="provenance-original">original</span>
+        </div>
+        <h1>ADR-0001 · Instance null-handling contract</h1>
+        <div class="stats">
+          <span class="chip">accepted</span>
+          <span class="chip">subsystem N/A</span>
+          <span class="chip">updated 2026-06-05</span>
+        </div>
+      </header>
+      <main>
+
+<article class="adr" id="adr-0001">
+  <div class="meta">
+    <span class="status-chip status-accepted">accepted</span>
+    <span class="chip area">subsystem: N/A (Game state + UI patches)</span>
+    <span class="chip">ADR-0001</span>
+  </div>
+  <h2 id="context">Context</h2>
+  <p><code>WorkManagerGameComponent.Instance</code> is a static singleton typed <code>null!</code> and assigned in the component constructor (<code>WorkManagerGameComponent.cs:117,79</code>). The constructor only runs when RimWorld builds a <code>Game</code> and attaches its game components, so the field is <em>null before any game has loaded</em> — the main menu and the mod-config screen on a fresh launch. Crucially, the field is a <code>static</code> that is <strong>never cleared on game unload</strong>: after a game is loaded and then quit to the main menu, <code>Instance</code> keeps pointing at the previous (now disposed) <code>Game</code>'s component — a <em>stale reference</em>. So a null <code>Instance</code> is <strong>not</strong> the only "no active game" signal: on any game-less screen reached after a prior session, <code>Instance</code> is non-null but invalid. The canonical RimWorld signal for "a game is currently loaded" is <code>Current.Game != null</code>, which any reliable guard must consult in addition to the null check.</p>
+  <p>The audit (G4) found the field dereferenced inconsistently across ~25 call sites. Two distinct categories exist:</p>
+  <ul>
+    <li><strong>Game-scoped consumers</strong> — <code>WorkPriorityUpdater</code> and <code>ScheduleUpdater</code> (both <code>MapComponent</code>) and <code>PawnCache</code>. These execute only when a <code>Map</code> exists, which guarantees a <code>Game</code> exists, which guarantees <code>Instance</code> is non-null. Their unguarded dereferences are <em>safe by construction</em> but are not self-documenting as such.</li>
+    <li><strong>UI-scoped consumers</strong> — the Harmony patches in <code>Patches/</code> (<code>WidgetsWorkPatch</code>, <code>WorkTabPatch</code>, <code>MainTabWindowWorkPatch</code>, <code>PawnColumnWorkerWorkPriorityPatch</code>) and the pawn columns (<code>AutoWorkPriorities</code>, <code>AutoWorkSchedule</code>). RimWorld can invoke these on screens with no active game, so they <em>can</em> hit a null <code>Instance</code>. Some already guard (<code>?.</code> in <code>WorkManagerMod</code>; <code>== null</code> in <code>ScheduleUpdater.UpdateNow</code> and some patches); others dereference directly (e.g. <code>WidgetsWorkPatch.DrawWorkBoxForPostfix:29</code>, <code>PawnColumnWorkerWorkPriorityPatch:31</code>, both pawn columns). The inconsistency is the defect.</li>
+  </ul>
+  <p>Forces: must not throw a <code>NullReferenceException</code> on game-less screens (AC-12); must be one uniform, documented contract (AC-11); must respect the Simplicity Default — no new layer or DI without approval; must stay consistent with the existing <code>?.</code>/<code>== null</code> idiom and with <code>LordKuper.Common</code> conventions (guard clauses at boundaries, no service-locator abstraction).</p>
+
+  <h2 id="decision">Decision</h2>
+  <p class="lede">Keep <code>Instance</code> as the single access point, typed non-null, with an explicit documented contract: <em>"<code>Instance</code> is valid only while a <code>Game</code> is loaded; it is non-null inside any game-scoped component path, may be null on game-less UI paths before any game has loaded, and — because it is set in the constructor and never cleared on unload — retains a <strong>stale (disposed-game) reference</strong> after quitting to the main menu."</em> Add one static helper, <code>WorkManagerGameComponent.IsInitialized</code>, which returns <code>Current.Game != null &amp;&amp; Instance is not null</code>. Both terms are required: <code>Instance is not null</code> rules out the never-initialized case, while <code>Current.Game != null</code> — the canonical RimWorld "a game is loaded" signal — rules out the stale-reference case, where <code>Instance</code> still points at the previous session's disposed game after a quit-to-menu. Without the <code>Current.Game</code> term, <code>IsInitialized</code> would report <code>true</code> on game-less screens reached after a prior game, allowing stale-state access (the very failure AC-12 forbids). Require every <strong>UI-scoped entry point</strong> (each patch method and each <code>PawnColumnWorker.DoCell</code>/header) to early-out via that guard before any dereference. <strong>Game-scoped consumers</strong> (<code>MapComponent</code> ticks, <code>PawnCache</code>) keep direct dereference — their non-nullness is guaranteed by the <code>Map</code>&rArr;<code>Game</code> lifecycle — and gain an XML-doc note stating the invariant. No new field, type, interface, or dependency is introduced; <code>IsInitialized</code> is a one-line convenience over the existing field so guards read uniformly.</p>
+  <p>The guard placement rule is: <em>guard at the entry point, not at every leaf access</em>. Once an entry point has early-returned on <code>!IsInitialized</code>, the rest of that call (including helper calls and cache reads) may dereference freely, matching how <code>DrawWorkBoxForPrefix</code> already null-checks its arguments once at the top.</p>
+
+  <h2 id="consequences">Consequences</h2>
+  <div class="consequences">
+    <div class="pros">
+      <h3>Positive</h3>
+      <ul>
+        <li>No <code>NRE</code> possible from <code>Instance</code> on game-less screens — every reachable-without-game path early-outs (satisfies AC-12).</li>
+        <li>Guards against <em>stale-state access</em> after quit-to-menu: because <code>Instance</code> is not cleared on unload, the <code>Current.Game != null</code> term in <code>IsInitialized</code> is what makes UI entry points no-op on game-less screens reached after a prior session, rather than operating on a disposed game (satisfies AC-12).</li>
+        <li>One uniform, documented contract applied identically at all UI entry points (satisfies AC-11).</li>
+        <li>Zero new abstraction: keeps the existing static-singleton shape the whole codebase already assumes; honours the Simplicity Default.</li>
+        <li>Self-documenting: <code>IsInitialized</code> names the invariant that <code>?.</code>/<code>== null</code> scattering obscured; game-scoped XML-doc notes record why direct access is safe there.</li>
+        <li>Behaviour-preserving inside an active game — the only changed behaviour is graceful no-op on game-less paths that previously risked throwing.</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h3>Negative</h3>
+      <ul>
+        <li>Relies on developer discipline: a future UI entry point that forgets the guard reintroduces the risk (no compiler enforcement, since the field stays non-null-typed).</li>
+        <li>Two slightly different rules (guard at UI entry points; trust the lifecycle in game-scoped code) must be understood; a single blanket rule would be simpler to state but would add dead guards to hot tick/cache paths.</li>
+        <li>Adds one tiny static member (<code>IsInitialized</code>) to the public-ish surface of the component.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2 id="alternatives">Alternatives considered</h2>
+  <ul class="alt-list">
+    <li><strong>Type <code>Instance</code> as nullable (<code>WorkManagerGameComponent?</code>) and force <code>?.</code> / null-checks everywhere</strong> — rejected: makes the nullable warning the compiler's enforcement (a real plus), but spreads <code>?.</code> into hot tick/cache loops (<code>WorkPriorityUpdater</code> dereferences <code>Instance</code> ~10 times per update) where null is impossible, hurting readability and adding redundant checks against a value the lifecycle guarantees. It also churns far more lines than the defect requires.</li>
+    <li><strong>Introduce a <code>TryGetInstance(out &hellip;)</code> / <code>Current</code> accessor pattern</strong> — rejected: a second access path competes with the existing <code>Instance</code> field that 25 sites already use, and <code>TryGet</code> at every leaf is noisier than a single entry-point guard. Adds surface without removing the underlying static-singleton coupling. Fails the Simplicity Default (new API for no behaviour gain over an entry-point guard).</li>
+    <li><strong>Lazy-initialize <code>Instance</code> on first access</strong> — rejected and unsafe: a <code>GameComponent</code> must be created by RimWorld and bound to the live <code>Game</code>; fabricating one on demand would desync from save/load (<code>Scribe</code>) state and is semantically wrong. The absence of a live game (whether <code>Instance</code> is null pre-load, or a stale non-null reference post-quit) genuinely means "no game", which callers must respect via the <code>Current.Game</code> check, not paper over.</li>
+    <li><strong>Blanket guard at every single access site (no game-scoped exemption)</strong> — rejected: simplest rule to state, but adds provably-dead null checks to the most performance-sensitive code with no reliability gain, and would mislead readers into thinking those paths can be game-less.</li>
+  </ul>
+
+  <h2 id="related">Related ADRs</h2>
+  <ul>
+    <li><a href="adr-0002-test-isolation-infrastructure.html">ADR-0002</a>: the test infrastructure that snapshots/restores <code>Instance</code> and other static state, enabling tests of the guarded paths.</li>
+  </ul>
+
+  <p class="traces"><span class="chip">satisfies</span> <a href="../../../.asd/sprints/001-full-audit-alignment/design/prd.html#AC-11">AC-11</a>, <a href="../../../.asd/sprints/001-full-audit-alignment/design/prd.html#AC-12">AC-12</a> · <span class="chip">story</span> <a href="../../../.asd/sprints/001-full-audit-alignment/design/prd.html#US-2">US-2</a> · <span class="chip">audit</span> G4 · <span class="chip">stack</span> <a href="../stack.html">stack.html</a> · <span class="chip">tech-ref</span> <a href="../tech-reference/RimWorld-1.6.md">RimWorld-1.6</a></p>
+</article>
+
+      </main>
+      <footer>by asd-architect | 2026-06-05 | sprint 001-full-audit-alignment</footer>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const links = Array.from(document.querySelectorAll('nav.toc a[href^="#"]'));
+      if (!links.length) return;
+      const map = new Map();
+      links.forEach(a => { const el = document.getElementById(a.getAttribute('href').slice(1)); if (el) map.set(el, a); });
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(a => a.classList.remove('active'));
+            const a = map.get(e.target);
+            if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '-30% 0px -65% 0px', threshold: 0 });
+      map.forEach((_a, el) => io.observe(el));
+    })();
+  </script>
+</body>
+</html>

@@ -8,6 +8,8 @@
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <!-- Surface RimWorldManagedDir to test assembly via AssemblyMetadata attribute -->
+    <RimWorldManagedDirForTests>$(RimWorldManagedDir)</RimWorldManagedDirForTests>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,7 +25,21 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AssemblyMetadata Include="RimWorldManagedDir" Value="$(RimWorldManagedDirForTests)" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\WorkManager\WorkManager.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="LordKuper.Common">
+      <HintPath>$(LordKuperCommonAssembliesDir)\LordKuper.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(RimWorldManagedDir)\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
 
 </Project>

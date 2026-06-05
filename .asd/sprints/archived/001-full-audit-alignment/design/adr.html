@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<!--
+responsibility:
+  owns: architecture decisions for sprint 001-full-audit-alignment (multiple repeated <article> blocks)
+  excludes: requirements, ux, code
+  delegates_to: prd.html (requirements), code (implementation)
+provenance: original
+source: ""
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="generator" content="ASD workflow">
+  <meta name="doc-type" content="ADR">
+  <meta name="subsystem" content="sprint">
+  <meta name="sprint-id" content="001-full-audit-alignment">
+  <meta name="status" content="proposed">
+  <meta name="updated" content="2026-06-04">
+  <meta name="responsibility" content="owns: architecture decisions for sprint 001; excludes: requirements, ux, code">
+  <meta name="provenance" content="original">
+  <meta name="source" content="">
+  <title>ADR — Sprint 001 Full Audit Alignment</title>
+  <style>
+    :root {
+      --fg: #1a1c1e; --bg: #fff; --muted: #5b6770; --accent: #0066cc;
+      --code-bg: #f4f6f8; --border: #d0d7de; --max: 1040px;
+      --card-bg: #fafbfc;
+      --ok: #1f883d; --warn: #b35900; --danger: #cf222e; --info: #0969da; --neutral: #5b6770;
+      --chip-must-bg: #ffebe9; --chip-must-fg: #cf222e;
+      --chip-should-bg: #fff5e1; --chip-should-fg: #9a6700;
+      --chip-may-bg: #ddf4ff; --chip-may-fg: #0969da;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --fg: #e6e6e6; --bg: #0e1116; --muted: #9aa4ad; --code-bg: #161b22; --border: #30363d;
+        --card-bg: #161b22;
+        --chip-must-bg: #3b1416; --chip-must-fg: #ff7b72;
+        --chip-should-bg: #2d2410; --chip-should-fg: #e3b341;
+        --chip-may-bg: #0d2538; --chip-may-fg: #58a6ff;
+      }
+    }
+    html, body { margin: 0; padding: 0; }
+    * { box-sizing: border-box; }
+    body { font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--fg); background: var(--bg); }
+    .layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); min-height: 100vh; }
+    .content { min-width: 0; }
+    header, main, footer { max-width: var(--max); margin: 0 auto; padding: 16px 24px; }
+    header { border-bottom: 1px solid var(--border); }
+    header h1 { margin: 4px 0 8px; font-size: 1.9rem; }
+    .badges span { display: inline-block; padding: 2px 8px; margin-right: 6px; font-size: 0.75rem; border: 1px solid var(--border); border-radius: 4px; color: var(--muted); background: var(--bg); }
+    .badges .provenance-original { display: none; }
+    .badges .status-proposed { color: var(--warn); border-color: var(--warn); }
+    .badges .status-accepted { color: var(--ok); border-color: var(--ok); }
+    .stats { margin-top: 6px; font-size: 0.85rem; color: var(--muted); }
+    .stats .chip { display: inline-block; padding: 1px 8px; margin-right: 6px; border-radius: 10px; background: var(--code-bg); border: 1px solid var(--border); }
+    nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 18px 14px; border-right: 1px solid var(--border); background: var(--card-bg); font-size: 0.9rem; }
+    nav.toc .toc-title { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 8px; padding-left: 6px; }
+    nav.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: tocn; }
+    nav.toc li { margin: 2px 0; counter-increment: tocn; }
+    nav.toc a { display: block; padding: 4px 8px; border-radius: 4px; color: var(--fg); text-decoration: none; border-left: 2px solid transparent; }
+    nav.toc a:hover { background: var(--code-bg); color: var(--accent); }
+    nav.toc a.active { background: var(--code-bg); color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+    nav.toc a::before { content: counter(tocn) ". "; color: var(--muted); font-variant-numeric: tabular-nums; }
+    @media (max-width: 880px) {
+      .layout { grid-template-columns: 1fr; }
+      nav.toc { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--border); }
+    }
+    h2, h3, h4 { line-height: 1.25; margin-top: 1.6em; }
+    h2 { border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+    a { color: var(--accent); }
+    code, pre { font-family: ui-monospace, "Cascadia Code", Menlo, monospace; }
+    code { background: var(--code-bg); padding: 1px 5px; border-radius: 3px; font-size: 0.9em; }
+    pre { background: var(--code-bg); padding: 12px; border-radius: 6px; overflow-x: auto; }
+    pre code { background: none; padding: 0; }
+    .chip { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 0.78rem; border: 1px solid var(--border); }
+    .chip.area { background: var(--code-bg); color: var(--muted); }
+    footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 32px; }
+    .lede { font-size: 1.08rem; color: var(--fg); }
+
+    .adr { border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; margin: 18px 0; background: var(--card-bg); }
+    .adr > .meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 6px; }
+    .adr h2 { margin-top: 1.1em; border-bottom: none; font-size: 1.15rem; }
+    .adr h3 { margin-top: 1em; font-size: 1rem; color: var(--muted); }
+    .status-chip { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.78rem; border: 1px solid var(--border); }
+    .status-proposed   { color: var(--warn);    border-color: var(--warn);    background: var(--chip-should-bg); }
+    .status-accepted   { color: var(--ok);      border-color: var(--ok);      background: rgba(31,136,61,0.10); }
+    .status-superseded { color: var(--muted);   border-color: var(--muted);   background: var(--code-bg); text-decoration: line-through; }
+    .status-deprecated { color: var(--danger);  border-color: var(--danger);  background: var(--chip-must-bg); }
+    .consequences { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .consequences .pros, .consequences .cons { padding: 10px 14px; border-radius: 6px; border: 1px solid var(--border); }
+    .consequences .pros { background: rgba(31,136,61,0.07); border-left: 3px solid var(--ok); }
+    .consequences .cons { background: rgba(207,34,46,0.06); border-left: 3px solid var(--danger); }
+    .consequences h3 { margin: 0 0 4px; }
+    .consequences ul { margin: 0; padding-left: 20px; }
+    @media (max-width: 720px) { .consequences { grid-template-columns: 1fr; } }
+    ul.alt-list li { margin: 4px 0; }
+    ul.alt-list li strong { color: var(--fg); }
+    .traces { font-size: 0.85rem; color: var(--muted); margin-top: 6px; }
+    .traces .chip { background: var(--chip-may-bg); color: var(--chip-may-fg); border-color: var(--chip-may-fg); }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <nav class="toc" aria-label="Table of contents">
+      <p class="toc-title">Contents</p>
+      <ol>
+        <li><a href="#adr-0001">ADR-0001 · Instance null-handling contract</a></li>
+        <li><a href="#adr-0002">ADR-0002 · Test isolation infrastructure</a></li>
+        <li><a href="#adr-0003">ADR-0003 · Remove vendored Lib.Harmony 2.3.6</a></li>
+        <li><a href="#adr-0004">ADR-0004 · Tech-reference coverage policy</a></li>
+        <li><a href="#adr-0005">ADR-0005 · Localize work-shift labels</a></li>
+      </ol>
+    </nav>
+    <div class="content">
+      <header>
+        <div class="badges">
+          <span>ADR</span>
+          <span>sprint</span>
+          <span class="status-proposed">proposed</span>
+          <span class="provenance-original">original</span>
+        </div>
+        <h1>ADR — Sprint 001 Full Audit Alignment</h1>
+        <div class="stats">
+          <span class="chip">5 decisions</span>
+          <span class="chip">proposed</span>
+          <span class="chip">sprint</span>
+          <span class="chip">updated 2026-06-04</span>
+        </div>
+      </header>
+      <main>
+
+<p class="lede">Five decisions arising from the full audit (<a href="../audit.md">audit.md</a> G1–G4 + cleanup), tracing to the sprint PRD (<a href="prd.html">prd.html</a>). Each decision is behavior-preserving; the sprint changes no mod feature or visible text.</p>
+
+<article class="adr" id="adr-0001">
+  <div class="meta">
+    <span class="status-chip status-proposed">proposed</span>
+    <span class="chip area">subsystem: N/A (Game state + UI patches)</span>
+    <span class="chip">ADR-0001</span>
+  </div>
+  <h2 id="ctx-1">Context</h2>
+  <p><code>WorkManagerGameComponent.Instance</code> is a static singleton typed <code>null!</code> and assigned in the component constructor (<code>WorkManagerGameComponent.cs:117,79</code>). The constructor only runs when RimWorld builds a <code>Game</code> and attaches its game components, so the field is <em>null whenever no game is loaded</em> — the main menu, the mod-config screen, and any UI drawn outside an active game.</p>
+  <p>The audit (G4) found the field dereferenced inconsistently across ~25 call sites. Two distinct categories exist:</p>
+  <ul>
+    <li><strong>Game-scoped consumers</strong> — <code>WorkPriorityUpdater</code> and <code>ScheduleUpdater</code> (both <code>MapComponent</code>) and <code>PawnCache</code>. These execute only when a <code>Map</code> exists, which guarantees a <code>Game</code> exists, which guarantees <code>Instance</code> is non-null. Their unguarded dereferences are <em>safe by construction</em> but are not self-documenting as such.</li>
+    <li><strong>UI-scoped consumers</strong> — the Harmony patches in <code>Patches/</code> (<code>WidgetsWorkPatch</code>, <code>WorkTabPatch</code>, <code>MainTabWindowWorkPatch</code>, <code>PawnColumnWorkerWorkPriorityPatch</code>) and the pawn columns (<code>AutoWorkPriorities</code>, <code>AutoWorkSchedule</code>). RimWorld can invoke these on screens with no active game, so they <em>can</em> hit a null <code>Instance</code>. Some already guard (<code>?.</code> in <code>WorkManagerMod</code>; <code>== null</code> in <code>ScheduleUpdater.UpdateNow</code> and some patches); others dereference directly (e.g. <code>WidgetsWorkPatch.DrawWorkBoxForPostfix:29</code>, <code>PawnColumnWorkerWorkPriorityPatch:31</code>, both pawn columns). The inconsistency is the defect.</p></li>
+  </ul>
+  <p>Forces: must not throw a <code>NullReferenceException</code> on game-less screens (AC-12); must be one uniform, documented contract (AC-11); must respect the Simplicity Default — no new layer or DI without approval; must stay consistent with the existing <code>?.</code>/<code>== null</code> idiom and with <code>LordKuper.Common</code> conventions (guard clauses at boundaries, no service-locator abstraction).</p>
+
+  <h2 id="dec-1">Decision</h2>
+  <p class="lede">Keep <code>Instance</code> as the single access point, typed non-null, with an explicit documented contract: <em>"<code>Instance</code> is valid only while a <code>Game</code> is loaded; it is non-null inside any game-scoped component path and may be null on game-less UI paths."</em> Add one static helper, <code>WorkManagerGameComponent.IsInitialized</code> (returns <code>Instance is not null</code>), and require every <strong>UI-scoped entry point</strong> (each patch method and each <code>PawnColumnWorker.DoCell</code>/header) to early-out via that guard before any dereference. <strong>Game-scoped consumers</strong> (<code>MapComponent</code> ticks, <code>PawnCache</code>) keep direct dereference — their non-nullness is guaranteed by the <code>Map</code>⇒<code>Game</code> lifecycle — and gain an XML-doc note stating the invariant. No new field, type, interface, or dependency is introduced; <code>IsInitialized</code> is a one-line convenience over the existing field so guards read uniformly.</p>
+  <p>The guard placement rule is: <em>guard at the entry point, not at every leaf access</em>. Once an entry point has early-returned on <code>!IsInitialized</code>, the rest of that call (including helper calls and cache reads) may dereference freely, matching how <code>DrawWorkBoxForPrefix</code> already null-checks its arguments once at the top.</p>
+
+  <h2 id="con-1">Consequences</h2>
+  <div class="consequences">
+    <div class="pros">
+      <h3>Positive</h3>
+      <ul>
+        <li>No <code>NRE</code> possible from <code>Instance</code> on game-less screens — every reachable-without-game path early-outs (satisfies AC-12).</li>
+        <li>One uniform, documented contract applied identically at all UI entry points (satisfies AC-11).</li>
+        <li>Zero new abstraction: keeps the existing static-singleton shape the whole codebase already assumes; honours the Simplicity Default.</li>
+        <li>Self-documenting: <code>IsInitialized</code> names the invariant that <code>?.</code>/<code>== null</code> scattering obscured; game-scoped XML-doc notes record why direct access is safe there.</li>
+        <li>Behaviour-preserving inside an active game — the only changed behaviour is graceful no-op on game-less paths that previously risked throwing.</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h3>Negative</h3>
+      <ul>
+        <li>Relies on developer discipline: a future UI entry point that forgets the guard reintroduces the risk (no compiler enforcement, since the field stays non-null-typed).</li>
+        <li>Two slightly different rules (guard at UI entry points; trust the lifecycle in game-scoped code) must be understood; a single blanket rule would be simpler to state but would add dead guards to hot tick/cache paths.</li>
+        <li>Adds one tiny static member (<code>IsInitialized</code>) to the public-ish surface of the component.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2 id="alt-1">Alternatives considered</h2>
+  <ul class="alt-list">
+    <li><strong>Type <code>Instance</code> as nullable (<code>WorkManagerGameComponent?</code>) and force <code>?.</code> / null-checks everywhere</strong> — rejected: makes the nullable warning the compiler's enforcement (a real plus), but spreads <code>?.</code> into hot tick/cache loops (<code>WorkPriorityUpdater</code> dereferences <code>Instance</code> ~10 times per update) where null is impossible, hurting readability and adding redundant checks against a value the lifecycle guarantees. It also churns far more lines than the defect requires.</li>
+    <li><strong>Introduce a <code>TryGetInstance(out …)</code> / <code>Current</code> accessor pattern</strong> — rejected: a second access path competes with the existing <code>Instance</code> field that 25 sites already use, and <code>TryGet</code> at every leaf is noisier than a single entry-point guard. Adds surface without removing the underlying static-singleton coupling. Fails the Simplicity Default (new API for no behaviour gain over an entry-point guard).</li>
+    <li><strong>Lazy-initialize <code>Instance</code> on first access</strong> — rejected and unsafe: a <code>GameComponent</code> must be created by RimWorld and bound to the live <code>Game</code>; fabricating one on demand would desync from save/load (<code>Scribe</code>) state and is semantically wrong. Null genuinely means "no game", which callers must respect, not paper over.</li>
+    <li><strong>Blanket guard at every single access site (no game-scoped exemption)</strong> — rejected: simplest rule to state, but adds provably-dead null checks to the most performance-sensitive code with no reliability gain, and would mislead readers into thinking those paths can be game-less.</li>
+  </ul>
+
+  <p class="traces"><span class="chip">satisfies</span> <a href="prd.html#AC-11">AC-11</a>, <a href="prd.html#AC-12">AC-12</a> · <span class="chip">story</span> <a href="prd.html#US-2">US-2</a> · <span class="chip">audit</span> G4</p>
+</article>
+
+<article class="adr" id="adr-0002">
+  <div class="meta">
+    <span class="status-chip status-proposed">proposed</span>
+    <span class="chip area">subsystem: N/A (test project)</span>
+    <span class="chip">ADR-0002</span>
+  </div>
+  <h2 id="ctx-2">Context</h2>
+  <p>The test project (<code>Source/WorkManager.Tests/</code>) holds a single <code>Assert.Pass()</code> placeholder (audit G1) — no real coverage and no test infrastructure. Two structural problems block real tests:</p>
+  <ul>
+    <li><strong>RimWorld type loading.</strong> Many testable units transitively reference RimWorld types (<code>WorkTypeDef</code>, <code>Pawn</code>, <code>TimeAssignmentDef</code>) from <code>Assembly-CSharp</code>, which is not a NuGet package — it lives in the local RimWorld install (<code>$(RimWorldManagedDir)</code>). Without an <code>AppDomain.AssemblyResolve</code> handler, the test host throws <code>FileNotFoundException</code> the moment such a type loads. The <code>LordKuper.Common-1.6.md</code> reference already records this requirement (a global <code>[SetUpFixture]</code> registering the resolver before any RimWorld-typed test loads).</li>
+    <li><strong>Static state bleed.</strong> Production code uses static singletons and caches (<code>WorkManagerGameComponent.Instance</code>, <code>WorkManagerMod.Settings</code>, RimWorld <code>DefDatabase&lt;T&gt;</code> / <code>*Of</code> static caches). Tests mutating these would leak state across tests, producing order-dependent flakiness.</li>
+  </ul>
+  <p>Forces: assertions must be FluentAssertions 7.x only — no <code>Assert.*</code> (custom coding rules + AC-1, license-pinned per <code>FluentAssertions-7.2.2.md</code>); isolation must be deterministic; infrastructure must be minimal, not a test framework of its own (Simplicity Default).</p>
+
+  <h2 id="dec-2">Decision</h2>
+  <p class="lede">Adopt a two-part test infrastructure: (1) a global <code>[SetUpFixture]</code> (assembly-scope, no namespace) that registers the RimWorld <code>AppDomain.CurrentDomain.AssemblyResolve</code> handler in its <code>[OneTimeSetUp]</code>, resolving <code>Assembly-CSharp</code> and Unity modules from <code>$(RimWorldManagedDir)</code> (surfaced to the test assembly via an MSBuild-emitted constant/config so the handler knows the path), before any RimWorld-typed test type loads; and (2) an abstract base class (e.g. <code>StateIsolationTestBase</code>) that snapshots the relevant mutable static state in <code>[SetUp]</code> and restores it in <code>[TearDown]</code>. Tests of pure-logic units that need no RimWorld types may skip the base class; tests that touch static state or RimWorld defs derive from it. All assertions use FluentAssertions <code>.Should()</code>; the <code>Assert.Pass()</code> placeholder is deleted. No mocking framework is added — the audit-named units (AC-2…AC-6) are pure enough to test with constructed inputs.</p>
+
+  <h2 id="con-2">Consequences</h2>
+  <div class="consequences">
+    <div class="pros">
+      <h3>Positive</h3>
+      <ul>
+        <li>RimWorld-typed tests load reliably without bundling <code>Assembly-CSharp</code> (resolver-based, per the established Common convention).</li>
+        <li>Deterministic, order-independent tests via snapshot/restore — protects the untested assignment/schedule engines during the G4 refactor (risk mitigation from audit Risks).</li>
+        <li>FluentAssertions-only keeps the assertion surface single and license-clean (AC-1).</li>
+        <li>Minimal footprint: two well-known NUnit primitives (<code>[SetUpFixture]</code> + a base class), no new test dependency.</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h3>Negative</h3>
+      <ul>
+        <li>Tests requiring RimWorld types only run where <code>$(RimWorldManagedDir)</code> resolves (a local RimWorld install) — CI without the game can only run the pure-logic subset. This is inherent to modding, not a choice this ADR creates.</li>
+        <li>The base class must enumerate every static field it snapshots; a missed field can still bleed — coverage of the snapshot set must be maintained as new statics appear.</li>
+        <li>Two test "shapes" (with/without base class) require a documented rule for which to use.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2 id="alt-2">Alternatives considered</h2>
+  <ul class="alt-list">
+    <li><strong>Copy <code>Assembly-CSharp</code> / Unity DLLs into the test project</strong> — rejected: redistributes game binaries (license-incompatible, large, version-fragile) and contradicts the stack's "compile against, never ship, the host" principle. The resolver approach is the project-standard already documented for Common.</li>
+    <li><strong>No isolation base class; rely on test ordering / fresh process per test</strong> — rejected: order-dependent and slow; NUnit shares an AppDomain, so static bleed is real. Snapshot/restore is the cheapest deterministic fix.</li>
+    <li><strong>Introduce a mocking framework (e.g. Moq/NSubstitute) to fake RimWorld types</strong> — rejected for this sprint: the AC-named units are pure (hour mapping, comparer ordering, clamping, score normalization, count modes) and testable with plain constructed inputs; a mocking dependency is unjustified surface (Simplicity Default) and would itself need a tech-reference. Reconsider only if a later sprint tests game-coupled paths.</li>
+  </ul>
+
+  <p class="traces"><span class="chip">satisfies</span> <a href="prd.html#AC-1">AC-1</a> (enables AC-2…AC-6) · <span class="chip">story</span> <a href="prd.html#US-1">US-1</a> · <span class="chip">audit</span> G1</p>
+</article>
+
+<article class="adr" id="adr-0003">
+  <div class="meta">
+    <span class="status-chip status-proposed">proposed</span>
+    <span class="chip area">subsystem: N/A (build/repo)</span>
+    <span class="chip">ADR-0003</span>
+  </div>
+  <h2 id="ctx-3">Context</h2>
+  <p>The repository contains a vendored package tree <code>Source/packages/Lib.Harmony.2.3.6/</code> (DLLs, nupkg, pdbs, README) (audit, doc #14). Both projects consume Harmony via a <code>Lib.Harmony</code> <strong>2.4.2</strong> <code>PackageReference</code> (compile-only: <code>PrivateAssets=all</code>, <code>ExcludeAssets=runtime</code>); NuGet restore supplies the compile-time assembly. No project, props, or targets file references the <code>packages/</code> tree. It is dead weight that contradicts the pinned 2.4.2 stack and the documented "no bundled runtime deps" constraint.</p>
+
+  <h2 id="dec-3">Decision</h2>
+  <p class="lede">Delete the entire <code>Source/packages/Lib.Harmony.2.3.6/</code> directory from the repository. The only Harmony reference that remains is the <code>Lib.Harmony</code> 2.4.2 <code>PackageReference</code> resolved by NuGet restore. No build, props, or targets edit is required because nothing references the deleted tree.</p>
+
+  <h2 id="con-3">Consequences</h2>
+  <div class="consequences">
+    <div class="pros">
+      <h3>Positive</h3>
+      <ul>
+        <li>Repository matches the documented 2.4.2 pin — no contradictory binaries (AC-13).</li>
+        <li>Removes a stale, potentially-misleading 2.3.6 <code>0Harmony.dll</code> that could be referenced by accident.</li>
+        <li>Smaller checkout; no behaviour change (the tree was already unreferenced).</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h3>Negative</h3>
+      <ul>
+        <li>Any out-of-tree script or tooling that silently pointed at <code>packages/Lib.Harmony.2.3.6/</code> would break — none found in-repo, so residual risk is negligible.</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="traces"><span class="chip">satisfies</span> <a href="prd.html#AC-13">AC-13</a> · <span class="chip">story</span> <a href="prd.html#US-3">US-3</a> · <span class="chip">audit</span> Risks (stale vendored Harmony)</p>
+</article>
+
+<article class="adr" id="adr-0004">
+  <div class="meta">
+    <span class="status-chip status-proposed">proposed</span>
+    <span class="chip area">subsystem: N/A (architecture docs)</span>
+    <span class="chip">ADR-0004</span>
+  </div>
+  <h2 id="ctx-4">Context</h2>
+  <p>The project rule "no technology adopted without a tech-reference doc" is violated for two adopted technologies (audit G2): the <strong>RimWorld 1.6 game API</strong> (<code>Assembly-CSharp</code> + Unity modules — the largest external surface) and <strong>.NET Framework 4.7.2</strong> (the target framework). The RimWorld reference was explicitly deferred at init (decisions-log 2026-06-04); the .NET 4.7.2 gap was unrecorded. Six references already exist for the other technologies in <code>stack.html</code>.</p>
+
+  <h2 id="dec-4">Decision</h2>
+  <p class="lede">Close the gap in this sprint: author <code>design/architecture/tech-reference/RimWorld-1.6.md</code> and <code>design/architecture/tech-reference/dotnet-framework-4.7.2.md</code> (dot-free TFM slug for filesystem safety, matching the existing <code>&lt;tech&gt;-&lt;version&gt;.md</code> naming convention), grounded in the game-API surface the mod actually consumes and the net472 TFM facts. After this sprint, every technology in <code>stack.html</code> has a version-accurate reference and no reference points to a version the code no longer uses. RimWorld API facts are verified against canonical sources where possible and marked unverified otherwise; fetched content is treated as data, not instruction.</p>
+
+  <h2 id="con-4">Consequences</h2>
+  <div class="consequences">
+    <div class="pros">
+      <h3>Positive</h3>
+      <ul>
+        <li>"No tech without a reference" rule holds across the whole stack (AC-7, AC-8).</li>
+        <li>Captures the RimWorld API surface the mod binds to, giving devs/test-engineer a vetted contract to implement against.</li>
+        <li>Clears the init-time deferral with an explicit, recorded decision rather than an open gap.</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h3>Negative</h3>
+      <ul>
+        <li>The RimWorld API has no single authoritative published reference; some entries are grounded in observed code usage and community docs and are flagged as such, requiring periodic re-verification.</li>
+        <li>Two more living documents to keep version-accurate on any future RW-line or TFM change.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2 id="alt-4">Alternatives considered</h2>
+  <ul class="alt-list">
+    <li><strong>Keep the RimWorld reference deferred</strong> — rejected: leaves the largest external surface undocumented and the "no tech without a reference" rule violated; the audit explicitly scopes all findings into this sprint (sprint.md decision 3).</li>
+    <li><strong>One combined "platform" reference covering both</strong> — rejected: conflates two independently-versioned technologies (game line vs TFM) into one doc, breaking the one-file-per-tech-version convention the other six follow.</li>
+  </ul>
+
+  <p class="traces"><span class="chip">satisfies</span> <a href="prd.html#AC-7">AC-7</a>, <a href="prd.html#AC-8">AC-8</a> · <span class="chip">story</span> <a href="prd.html#US-5">US-5</a> · <span class="chip">audit</span> G2</p>
+</article>
+
+<article class="adr" id="adr-0005">
+  <div class="meta">
+    <span class="status-chip status-proposed">proposed</span>
+    <span class="chip area">subsystem: N/A (localization)</span>
+    <span class="chip">ADR-0005</span>
+  </div>
+  <h2 id="ctx-5">Context</h2>
+  <p><code>Settings_Schedules.cs</code> (lines 148 and 201) emits <code>"Work shift #{i + 1}"</code> directly to a <code>FloatMenuOption</code>, bypassing the <code>.Translate()</code> keyed surface every other label uses (audit G3). The string is untranslatable for ru/zh-Hans and inconsistent with the "no hardcoded UI values" convention. The keyed surface is <code>WorkManager_Keyed.xml</code>, present for 1.6 in three locales (English, Russian, ChineseSimplified) and English-only for legacy 1.1–1.5.</p>
+
+  <h2 id="dec-5">Decision</h2>
+  <p class="lede">Move the two strings onto the keyed surface. Add one keyed entry following the existing schedule-settings naming convention already used in <code>WorkManager_Keyed.xml</code> — the <code>WorkManager.Settings_Schedule_&lt;Name&gt;</code> prefix (e.g. <code>WorkManager.Settings_Schedule_AddWorkShift</code>, <code>...ColonistWorkShifts</code> are present today), so the new key is <code>WorkManager.Settings_Schedule_WorkShiftLabel</code> — a single parameterized entry with a positional argument for the shift number, rendered via <code>.Translate(i + 1)</code>. The English value reproduces the current visible text byte-for-byte (<code>"Work shift #{0}"</code>). Add the key to all three 1.6 locales and to English in the legacy 1.1–1.5 folders. No other text, key, or layout changes. The exact key name is confirmed against the existing file's convention at write time.</p>
+
+  <h2 id="con-5">Consequences</h2>
+  <div class="consequences">
+    <div class="pros">
+      <h3>Positive</h3>
+      <ul>
+        <li>Shift labels become translatable like every other label (AC-9); ru/zh-Hans can localize them.</li>
+        <li>Removes the last hardcoded user-facing string, aligning with the localization convention.</li>
+        <li>English output is unchanged (byte-for-byte), so no visible regression (AC-9).</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h3>Negative</h3>
+      <ul>
+        <li>Adds a key to four+ language files; the ru/zh-Hans values ship as the English string until a translator localizes them (coverage parity is a follow-on localization task, not blocking).</li>
+        <li>A missing key at runtime would surface the raw key text — mitigated by adding it to every shipped locale (AC-10).</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="traces"><span class="chip">satisfies</span> <a href="prd.html#AC-9">AC-9</a>, <a href="prd.html#AC-10">AC-10</a> · <span class="chip">story</span> <a href="prd.html#US-6">US-6</a> · <span class="chip">audit</span> G3</p>
+</article>
+
+      </main>
+      <footer>by asd-architect | 2026-06-04 | sprint 001-full-audit-alignment</footer>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const links = Array.from(document.querySelectorAll('nav.toc a[href^="#"]'));
+      if (!links.length) return;
+      const map = new Map();
+      links.forEach(a => { const el = document.getElementById(a.getAttribute('href').slice(1)); if (el) map.set(el, a); });
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(a => a.classList.remove('active'));
+            const a = map.get(e.target);
+            if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '-30% 0px -65% 0px', threshold: 0 });
+      map.forEach((_a, el) => io.observe(el));
+    })();
+  </script>
+</body>
+</html>

@@ -21,14 +21,17 @@ public class AutoWorkSchedule : PawnColumnWorker
     public override void DoCell(Rect rect, Pawn pawn, PawnTable table)
     {
         if (pawn.Dead) return;
-        var component = WorkManagerGameComponent.Instance;
+        if (!WorkManagerGameComponent.IsInitialized) return;
+        var component = WorkManagerGameComponent.Instance!;
         var buttonRect = new Rect(rect.center.x - 8, rect.center.y - 8, 16, 16);
         if (component.ScheduleManagementEnabled)
         {
             Buttons.DoIconButtonToggle(buttonRect, () => component.GetPawnScheduleEnabled(pawn),
                 newValue => component.SetPawnScheduleEnabled(pawn, newValue),
-                Resources.Strings.PawnScheduleDisableTooltip, Resources.Textures.ScheduleToggleButtonEnabled,
-                Resources.Strings.PawnScheduleEnableTooltip, Resources.Textures.ScheduleToggleButtonDisabled);
+                Resources.Strings.PawnScheduleDisableTooltip,
+                Resources.Textures.ScheduleToggleButtonEnabled,
+                Resources.Strings.PawnScheduleEnableTooltip,
+                Resources.Textures.ScheduleToggleButtonDisabled);
         }
         else
         {

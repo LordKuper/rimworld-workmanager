@@ -26,13 +26,17 @@ public static class PawnColumnWorkerWorkPriorityPatch
     [HarmonyPostfix]
     private static void DoHeaderPostfix(PawnColumnWorker_WorkPriority __instance, Rect rect)
     {
+        if (!WorkManagerGameComponent.IsInitialized) return;
         const int iconSize = 16;
-        Rect buttonRect = new(rect.center.x - iconSize / 2f + 1, rect.yMax - iconSize - 4, iconSize, iconSize);
-        var component = WorkManagerGameComponent.Instance;
-        Buttons.DoIconButtonToggle(buttonRect, () => component.GetWorkTypeEnabled(__instance.def.workType),
+        Rect buttonRect = new(rect.center.x - iconSize / 2f + 1, rect.yMax - iconSize - 4, iconSize,
+            iconSize);
+        var component = WorkManagerGameComponent.Instance!;
+        Buttons.DoIconButtonToggle(buttonRect,
+            () => component.GetWorkTypeEnabled(__instance.def.workType),
             newValue => component.SetWorkTypeEnabled(__instance.def.workType, newValue),
-            Resources.Strings.WorkTypeDisableTooltip, Resources.Textures.WorkTypeToggleButtonEnabled,
-            Resources.Strings.WorkTypeEnableTooltip, Resources.Textures.WorkTypeToggleButtonDisabled);
+            Resources.Strings.WorkTypeDisableTooltip,
+            Resources.Textures.WorkTypeToggleButtonEnabled, Resources.Strings.WorkTypeEnableTooltip,
+            Resources.Textures.WorkTypeToggleButtonDisabled);
     }
 
     /// <summary>

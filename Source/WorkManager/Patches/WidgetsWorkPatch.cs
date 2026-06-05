@@ -26,7 +26,8 @@ public static class WidgetsWorkPatch
     [HarmonyPostfix]
     private static void DrawWorkBoxForPostfix(float x, float y, Pawn p, WorkTypeDef wType)
     {
-        var component = WorkManagerGameComponent.Instance;
+        if (!WorkManagerGameComponent.IsInitialized) return;
+        var component = WorkManagerGameComponent.Instance!;
         if (!component.PriorityManagementEnabled || !Find.PlaySettings.useWorkPriorities) return;
         Rect rect = new(x, y, 25f, 25f);
         var enabled = component.GetPawnWorkTypeEnabled(p, wType);
@@ -55,11 +56,13 @@ public static class WidgetsWorkPatch
     private static void DrawWorkBoxForPrefix(float x, float y, Pawn? p, WorkTypeDef? wType)
     {
         if (p == null || wType == null) return;
-        var component = WorkManagerGameComponent.Instance;
+        if (!WorkManagerGameComponent.IsInitialized) return;
+        var component = WorkManagerGameComponent.Instance!;
         if (!component.PriorityManagementEnabled || !Find.PlaySettings.useWorkPriorities) return;
         Rect rect = new(x, y, 25f, 25f);
         var enabled = component.GetPawnWorkTypeEnabled(p, wType);
-        if (Event.current.type == EventType.MouseDown && Mouse.IsOver(rect) && Event.current.button == 2)
+        if (Event.current.type == EventType.MouseDown && Mouse.IsOver(rect) &&
+            Event.current.button == 2)
             component.SetPawnWorkTypeEnabled(p, wType, !enabled);
     }
 }

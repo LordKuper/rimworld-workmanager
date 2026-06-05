@@ -41,7 +41,7 @@ internal class WorkTypeAssignmentRuleComparer : IComparer<WorkTypeAssignmentRule
     ///         </item>
     ///     </list>
     /// </returns>
-    public int Compare(WorkTypeAssignmentRule x, WorkTypeAssignmentRule y)
+    public int Compare(WorkTypeAssignmentRule? x, WorkTypeAssignmentRule? y)
     {
         if (ReferenceEquals(x, y)) return 0;
         if (y is null) return 1;
@@ -50,7 +50,8 @@ internal class WorkTypeAssignmentRuleComparer : IComparer<WorkTypeAssignmentRule
         var yDef = y.Def;
         if (xDef != null && yDef != null)
         {
-            var skillCountComparison = (yDef.relevantSkills?.Count ?? 0).CompareTo(xDef.relevantSkills?.Count ?? 0);
+            var skillCountComparison =
+                (yDef.relevantSkills?.Count ?? 0).CompareTo(xDef.relevantSkills?.Count ?? 0);
             if (skillCountComparison != 0)
                 return skillCountComparison;
             var priorityComparison = yDef.naturalPriority.CompareTo(xDef.naturalPriority);

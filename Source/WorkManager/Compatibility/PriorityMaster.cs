@@ -10,14 +10,14 @@ namespace LordKuper.WorkManager.Compatibility;
 internal static class PriorityMaster
 {
     /// <summary>
+    ///     Indicates whether the PriorityMaster mod is active.
+    /// </summary>
+    private static bool _priorityMasterActive;
+
+    /// <summary>
     ///     Indicates whether the PriorityMaster compatibility has been initialized.
     /// </summary>
     private static bool _isInitialized;
-
-    /// <summary>
-    ///     Indicates whether the PriorityMaster mod is active.
-    /// </summary>
-    internal static bool PriorityMasterActive;
 
     /// <summary>
     ///     Initializes PriorityMaster compatibility by reading the mod's configured maximum work priority.
@@ -30,18 +30,20 @@ internal static class PriorityMaster
     {
         if (_isInitialized) return;
         _isInitialized = true;
-        PriorityMasterActive = LoadedModManager.RunningModsListForReading.Any(m =>
+        _priorityMasterActive = LoadedModManager.RunningModsListForReading.Any(m =>
             "Lauriichan.PriorityMaster".Equals(m.PackageId, StringComparison.OrdinalIgnoreCase));
-        if (!PriorityMasterActive) return;
+        if (!_priorityMasterActive) return;
 #if DEBUG
         Logger.LogMessage("PriorityMaster detected.");
 #endif
         try
         {
             var modType = AccessTools.TypeByName("PriorityMod.Core.PriorityMaster") ??
-                          throw new InvalidOperationException("Could not find 'PriorityMod.Core.PriorityMaster' type.");
+                          throw new InvalidOperationException(
+                              "Could not find 'PriorityMod.Core.PriorityMaster' type.");
             var settings = AccessTools.Field(modType, "settings")?.GetValue(null) ??
-                           throw new InvalidOperationException("PriorityMaster settings are not loaded.");
+                           throw new InvalidOperationException(
+                               "PriorityMaster settings are not loaded.");
             var maxPriority = Traverse.Create(settings).Method("GetMaxPriority").GetValue<int>();
             if (maxPriority <= 0)
                 throw new InvalidOperationException("Invalid max priority.");
@@ -50,7 +52,7 @@ internal static class PriorityMaster
         catch (Exception e)
         {
             Logger.LogError("Failed to initialize PriorityMaster compatibility.", e);
-            PriorityMasterActive = false;
+            _priorityMasterActive = false;
         }
 #if DEBUG
         Logger.LogMessage($"Max priority is {WorkManagerMod.Settings.MaxWorkTypePriority}.");

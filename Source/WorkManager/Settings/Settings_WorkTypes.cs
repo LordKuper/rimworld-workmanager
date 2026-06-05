@@ -25,27 +25,32 @@ public partial class Settings
     /// <summary>
     ///     Local input ID for allowed workers pawn skill.
     /// </summary>
-    private const int AllowedWorkersPawnSkillInputLocalId = AllowedWorkersPawnCapacityInputLocalId + 100;
+    private const int AllowedWorkersPawnSkillInputLocalId =
+        AllowedWorkersPawnCapacityInputLocalId + 100;
 
     /// <summary>
     ///     Local input ID for allowed workers pawn stat.
     /// </summary>
-    private const int AllowedWorkersPawnStatInputLocalId = AllowedWorkersPawnSkillInputLocalId + 100;
+    private const int AllowedWorkersPawnStatInputLocalId =
+        AllowedWorkersPawnSkillInputLocalId + 100;
 
     /// <summary>
     ///     Local input ID for dedicated workers pawn capacity.
     /// </summary>
-    private const int DedicatedWorkersPawnCapacityInputLocalId = AllowedWorkersPawnCapacityInputLocalId + 50;
+    private const int DedicatedWorkersPawnCapacityInputLocalId =
+        AllowedWorkersPawnCapacityInputLocalId + 50;
 
     /// <summary>
     ///     Local input ID for dedicated workers pawn skill.
     /// </summary>
-    private const int DedicatedWorkersPawnSkillInputLocalId = DedicatedWorkersPawnCapacityInputLocalId + 100;
+    private const int DedicatedWorkersPawnSkillInputLocalId =
+        DedicatedWorkersPawnCapacityInputLocalId + 100;
 
     /// <summary>
     ///     Local input ID for dedicated workers pawn stat.
     /// </summary>
-    private const int DedicatedWorkersPawnStatInputLocalId = DedicatedWorkersPawnSkillInputLocalId + 100;
+    private const int DedicatedWorkersPawnStatInputLocalId =
+        DedicatedWorkersPawnSkillInputLocalId + 100;
 
     /// <summary>
     ///     Provides a function to get the label for a dedicated worker mode.
@@ -54,16 +59,16 @@ public partial class Settings
         Resources.Strings.DedicatedWorkerMode.GetDedicatedWorkerModeLabel;
 
     /// <summary>
-    ///     Caches all available dedicated worker modes.
-    /// </summary>
-    private static readonly List<DedicatedWorkerMode> DedicatedWorkerModesCache =
-        Enum.GetValues(typeof(DedicatedWorkerMode)).Cast<DedicatedWorkerMode>().ToList();
-
-    /// <summary>
     ///     Provides a function to get the tooltip for a dedicated worker mode.
     /// </summary>
     private static readonly Func<DedicatedWorkerMode, string> DedicatedWorkerModeTooltip =
         Resources.Strings.DedicatedWorkerMode.GetDedicatedWorkerModeTooltip;
+
+    /// <summary>
+    ///     Caches all available dedicated worker modes.
+    /// </summary>
+    private static readonly List<DedicatedWorkerMode> DedicatedWorkerModesCache =
+        Enum.GetValues(typeof(DedicatedWorkerMode)).Cast<DedicatedWorkerMode>().ToList();
 
     /// <summary>
     ///     Provides a function to get the label for a nullable dedicated worker mode.
@@ -72,17 +77,18 @@ public partial class Settings
         Resources.Strings.DedicatedWorkerMode.GetDedicatedWorkerModeLabel;
 
     /// <summary>
-    ///     Caches all available nullable dedicated worker modes.
-    /// </summary>
-    private static readonly List<DedicatedWorkerMode?> DedicatedWorkerNullableModesCache =
-        new DedicatedWorkerMode?[] { null }
-            .Concat(Enum.GetValues(typeof(DedicatedWorkerMode)).Cast<DedicatedWorkerMode?>()).ToList();
-
-    /// <summary>
     ///     Provides a function to get the tooltip for a nullable dedicated worker mode.
     /// </summary>
     private static readonly Func<DedicatedWorkerMode?, string> DedicatedWorkerNullableModeTooltip =
         Resources.Strings.DedicatedWorkerMode.GetDedicatedWorkerModeTooltip;
+
+    /// <summary>
+    ///     Caches all available nullable dedicated worker modes.
+    /// </summary>
+    private static readonly List<DedicatedWorkerMode?> DedicatedWorkerNullableModesCache =
+        new DedicatedWorkerMode?[] { null }
+            .Concat(Enum.GetValues(typeof(DedicatedWorkerMode)).Cast<DedicatedWorkerMode?>())
+            .ToList();
 
     /// <summary>
     ///     List of pawns allowed to work for the selected work type rule.
@@ -110,19 +116,10 @@ public partial class Settings
     private float _dedicatedWorkersSectionContentHeight;
 
     /// <summary>
-    ///     Currently selected work type rule for editing.
-    /// </summary>
-    private WorkTypeAssignmentRule? _selectedWorkTypeRule;
-
-    /// <summary>
     ///     List of work type assignment rules, initialized with default rules.
+    ///     Nullable because <see cref="Verse.Scribe_Collections" /> can set this to null during loading.
     /// </summary>
-    private List<WorkTypeAssignmentRule> _workTypeRules = [.. WorkTypeAssignmentRule.DefaultRules];
-
-    /// <summary>
-    ///     Cached height of the bottom part of the work types tab.
-    /// </summary>
-    private float _workTypesBottomHeight;
+    private List<WorkTypeAssignmentRule>? _workTypeRules = [.. WorkTypeAssignmentRule.DefaultRules];
 
     /// <summary>
     ///     Cached height of the scrollable content in the work types tab.
@@ -140,11 +137,11 @@ public partial class Settings
     /// </summary>
     private WorkTypeAssignmentRule? SelectedWorkTypeRule
     {
-        get => _selectedWorkTypeRule;
+        get;
         set
         {
-            if (Equals(_selectedWorkTypeRule, value)) return;
-            _selectedWorkTypeRule = value;
+            if (Equals(field, value)) return;
+            field = value;
             UpdateAllowedWorkers();
         }
     }
@@ -152,7 +149,7 @@ public partial class Settings
     /// <summary>
     ///     Gets the list of work type assignment rules as a read-only list.
     /// </summary>
-    internal IReadOnlyList<WorkTypeAssignmentRule> WorkTypeRules => _workTypeRules;
+    internal IReadOnlyList<WorkTypeAssignmentRule> WorkTypeRules => _workTypeRules ??= [.. WorkTypeAssignmentRule.DefaultRules];
 
     /// <summary>
     ///     Gets the height of the bottom part of the work types tab, calculating if not cached.
@@ -161,9 +158,10 @@ public partial class Settings
     {
         get
         {
-            if (_workTypesBottomHeight <= 0f)
-                _workTypesBottomHeight = PawnBox.GetPawnBoxHeight(2) + Labels.SectionHeaderHeight + Layout.ElementGap;
-            return _workTypesBottomHeight;
+            if (field <= 0f)
+                field = PawnBox.GetPawnBoxHeight(2) + Labels.SectionHeaderHeight +
+                        Layout.ElementGap;
+            return field;
         }
     }
 
@@ -193,13 +191,15 @@ public partial class Settings
     /// </returns>
     private float DoRuleAllowedWorkers(Rect rect, out Rect remRect)
     {
-        var y = Sections.DoLabeledSectionBox(rect, _allowedWorkersSectionContentHeight, Strings.AllowedWorkersLabel,
-            Strings.AllowedWorkersTooltip, out var allowedWorkersRect, out remRect);
+        var y = Sections.DoLabeledSectionBox(rect, _allowedWorkersSectionContentHeight,
+            Strings.AllowedWorkersLabel, Strings.AllowedWorkersTooltip, out var allowedWorkersRect,
+            out remRect);
         var allowedWorkersContentHeight = PawnFilterWidget.DoPawnFilter(allowedWorkersRect,
-            SelectedWorkTypeRule!.AllowedWorkers, PawnFilterSections.All,
+            SelectedWorkTypeRule!.AllowedWorkers!, PawnFilterSections.All,
             WorkManagerMod.GetModInputId(AllowedWorkersPawnSkillInputLocalId),
             WorkManagerMod.GetModInputId(AllowedWorkersPawnStatInputLocalId),
-            WorkManagerMod.GetModInputId(AllowedWorkersPawnCapacityInputLocalId), UpdateAllowedWorkers, out _);
+            WorkManagerMod.GetModInputId(AllowedWorkersPawnCapacityInputLocalId),
+            UpdateAllowedWorkers, out _);
         if (Event.current.type == EventType.Layout)
             _allowedWorkersSectionContentHeight = allowedWorkersContentHeight;
         return y;
@@ -219,45 +219,49 @@ public partial class Settings
     private float DoRuleAssignmentSettings(Rect rect, bool defaultRule, out Rect remRect)
     {
         var rule = SelectedWorkTypeRule!;
-        var y = Sections.DoLabeledSectionBox(rect, _assignmentSectionContentHeight, Strings.AssignmentSettingsLabel,
-            Strings.AssignmentSettingsTooltip, out var assignmentRect, out remRect);
+        var y = Sections.DoLabeledSectionBox(rect, _assignmentSectionContentHeight,
+            Strings.AssignmentSettingsLabel, Strings.AssignmentSettingsTooltip,
+            out var assignmentRect, out remRect);
         var assignmentContentHeight = 0f;
         if (defaultRule)
         {
             var value = rule.EnsureWorkerAssigned == true;
             assignmentContentHeight += Fields.DoLabeledCheckbox(assignmentRect, 0, null, ref value,
-                Strings.EnsureWorkerAssignedLabel, Strings.GetEnsureWorkerAssignedTooltip(false), null,
-                out assignmentRect);
+                Strings.EnsureWorkerAssignedLabel, Strings.GetEnsureWorkerAssignedTooltip(false),
+                null, out assignmentRect);
             rule.EnsureWorkerAssigned = value;
         }
         else
         {
-            assignmentContentHeight += Fields.DoLabeledCheckbox(assignmentRect, 0, null, ref rule.EnsureWorkerAssigned,
-                Strings.EnsureWorkerAssignedLabel, Strings.GetEnsureWorkerAssignedTooltip(true), null,
-                out assignmentRect);
+            assignmentContentHeight += Fields.DoLabeledCheckbox(assignmentRect, 0, null,
+                ref rule.EnsureWorkerAssigned, Strings.EnsureWorkerAssignedLabel,
+                Strings.GetEnsureWorkerAssignedTooltip(true), null, out assignmentRect);
         }
         if (rule.EnsureWorkerAssigned == true)
             assignmentContentHeight += Fields.DoLabeledIntegerSlider(assignmentRect, 1, null,
-                Strings.MinWorkerNumberLabel, Strings.MinWorkerNumberTooltip, ref rule.MinWorkerNumber, 1, 10, 1, null,
-                out assignmentRect);
+                Strings.MinWorkerNumberLabel, Strings.MinWorkerNumberTooltip,
+                ref rule.MinWorkerNumber, 1, 10, 1, null, out assignmentRect);
         if (defaultRule)
         {
             var value = rule.AssignEveryone == true;
             assignmentContentHeight += Fields.DoLabeledCheckbox(assignmentRect, 0, null, ref value,
-                Strings.AssignEveryoneLabel, Strings.GetAssignEveryoneTooltip(false), null, out assignmentRect);
+                Strings.AssignEveryoneLabel, Strings.GetAssignEveryoneTooltip(false), null,
+                out assignmentRect);
             rule.AssignEveryone = value;
         }
         else
         {
             var value = rule.AssignEveryone;
             assignmentContentHeight += Fields.DoLabeledCheckbox(assignmentRect, 0, null, ref value,
-                Strings.AssignEveryoneLabel, Strings.GetAssignEveryoneTooltip(true), null, out assignmentRect);
+                Strings.AssignEveryoneLabel, Strings.GetAssignEveryoneTooltip(true), null,
+                out assignmentRect);
             rule.AssignEveryone = value;
         }
         if (rule.AssignEveryone == true)
             assignmentContentHeight += Fields.DoLabeledIntegerSlider(assignmentRect, 1, null,
                 Strings.AssignEveryonePriorityLabel, Strings.AssignEveryonePriorityTooltip,
-                ref rule.AssignEveryonePriority, 0, MaxWorkTypePriority, 1, null, out assignmentRect);
+                ref rule.AssignEveryonePriority, 0, MaxWorkTypePriority, 1, null,
+                out assignmentRect);
         if (Event.current.type == EventType.Layout)
             _assignmentSectionContentHeight = assignmentContentHeight;
         return y;
@@ -281,71 +285,84 @@ public partial class Settings
     {
         var rule = SelectedWorkTypeRule!;
         var y = Sections.DoLabeledSectionBox(rect, _dedicatedWorkersSectionContentHeight,
-            Strings.DedicatedWorkerSettingsLabel, Strings.DedicatedWorkerSettingsTooltip, out var dedicatedWorkersRect,
-            out remRect);
+            Strings.DedicatedWorkerSettingsLabel, Strings.DedicatedWorkerSettingsTooltip,
+            out var dedicatedWorkersRect, out remRect);
         var dedicatedWorkersContentHeight = 0f;
         if (defaultRule)
         {
-            var value = rule.DedicatedWorkerSettings.AllowDedicated == true;
-            dedicatedWorkersContentHeight += Fields.DoLabeledCheckbox(dedicatedWorkersRect, 0, null, ref value,
-                Strings.AllowDedicatedWorkerLabel, Strings.GetAllowDedicatedWorkerTooltip(false), null,
-                out dedicatedWorkersRect);
+            var value = rule.DedicatedWorkerSettings!.AllowDedicated == true;
+            dedicatedWorkersContentHeight += Fields.DoLabeledCheckbox(dedicatedWorkersRect, 0, null,
+                ref value, Strings.AllowDedicatedWorkerLabel,
+                Strings.GetAllowDedicatedWorkerTooltip(false), null, out dedicatedWorkersRect);
             rule.DedicatedWorkerSettings.AllowDedicated = value;
         }
         else
         {
             dedicatedWorkersContentHeight += Fields.DoLabeledCheckbox(dedicatedWorkersRect, 0, null,
-                ref rule.DedicatedWorkerSettings.AllowDedicated, Strings.AllowDedicatedWorkerLabel,
+                ref rule.DedicatedWorkerSettings!.AllowDedicated, Strings.AllowDedicatedWorkerLabel,
                 Strings.GetAllowDedicatedWorkerTooltip(true), null, out dedicatedWorkersRect);
         }
         if (rule.DedicatedWorkerSettings.AllowDedicated == true)
         {
             var mode = rule.DedicatedWorkerSettings.Mode;
             if (defaultRule)
-                dedicatedWorkersContentHeight += Fields.DoLabeledSelector(dedicatedWorkersRect, 1, null,
-                    Strings.DedicatedWorkerModeLabel, Strings.DedicatedWorkerModeTooltip,
-                    mode ?? DedicatedWorkerMode.Constant, DedicatedWorkerModesCache, DedicatedWorkerModeLabel,
-                    DedicatedWorkerModeTooltip, m => { rule.DedicatedWorkerSettings.Mode = m; }, null,
+                dedicatedWorkersContentHeight += Fields.DoLabeledSelector(dedicatedWorkersRect, 1,
+                    null, Strings.DedicatedWorkerModeLabel, Strings.DedicatedWorkerModeTooltip,
+                    mode ?? DedicatedWorkerMode.Constant, DedicatedWorkerModesCache,
+                    DedicatedWorkerModeLabel, DedicatedWorkerModeTooltip,
+                    m => { rule.DedicatedWorkerSettings.Mode = m; }, null,
                     out dedicatedWorkersRect);
             else
-                dedicatedWorkersContentHeight += Fields.DoLabeledSelector(dedicatedWorkersRect, 1, null,
-                    Strings.DedicatedWorkerModeLabel, Strings.DedicatedWorkerModeTooltip, mode,
-                    DedicatedWorkerNullableModesCache, DedicatedWorkerNullableModeLabel,
-                    DedicatedWorkerNullableModeTooltip, m => { rule.DedicatedWorkerSettings.Mode = m; }, null,
+                dedicatedWorkersContentHeight += Fields.DoLabeledSelector(dedicatedWorkersRect, 1,
+                    null, Strings.DedicatedWorkerModeLabel, Strings.DedicatedWorkerModeTooltip,
+                    mode, DedicatedWorkerNullableModesCache, DedicatedWorkerNullableModeLabel,
+                    DedicatedWorkerNullableModeTooltip,
+                    m => { rule.DedicatedWorkerSettings.Mode = m; }, null,
                     out dedicatedWorkersRect);
             switch (rule.DedicatedWorkerSettings.Mode)
             {
                 case DedicatedWorkerMode.Constant:
-                    dedicatedWorkersContentHeight += Fields.DoLabeledIntegerSlider(dedicatedWorkersRect, 1, null,
-                        Strings.ConstantWorkerCountLabel, Strings.ConstantWorkerCountTooltip,
+                    dedicatedWorkersContentHeight += Fields.DoLabeledIntegerSlider(
+                        dedicatedWorkersRect, 1, null, Strings.ConstantWorkerCountLabel,
+                        Strings.ConstantWorkerCountTooltip,
                         ref rule.DedicatedWorkerSettings.ConstantWorkerCount,
-                        DedicatedWorkerSettings.ConstantWorkerCountMin, DedicatedWorkerSettings.ConstantWorkerCountMax,
-                        1, null, out dedicatedWorkersRect);
+                        DedicatedWorkerSettings.ConstantWorkerCountMin,
+                        DedicatedWorkerSettings.ConstantWorkerCountMax, 1, null,
+                        out dedicatedWorkersRect);
                     break;
                 case DedicatedWorkerMode.WorkTypeCount:
-                    dedicatedWorkersContentHeight += Fields.DoLabeledFloatSlider(dedicatedWorkersRect, 1, null,
-                        Strings.WorkTypeCountFactorLabel, Strings.WorkTypeCountFactorTooltip,
+                    dedicatedWorkersContentHeight += Fields.DoLabeledFloatSlider(
+                        dedicatedWorkersRect, 1, null, Strings.WorkTypeCountFactorLabel,
+                        Strings.WorkTypeCountFactorTooltip,
                         ref rule.DedicatedWorkerSettings.WorkTypeCountFactor,
-                        DedicatedWorkerSettings.WorkTypeCountFactorMin, DedicatedWorkerSettings.WorkTypeCountFactorMax,
-                        0.05f, null, out dedicatedWorkersRect);
+                        DedicatedWorkerSettings.WorkTypeCountFactorMin,
+                        DedicatedWorkerSettings.WorkTypeCountFactorMax, 0.05f, null,
+                        out dedicatedWorkersRect);
                     break;
                 case DedicatedWorkerMode.CapablePawnRatio:
-                    dedicatedWorkersContentHeight += Fields.DoLabeledFloatSlider(dedicatedWorkersRect, 1, null,
-                        Strings.CapablePawnRatioFactorLabel, Strings.CapablePawnRatioFactorTooltip,
+                    dedicatedWorkersContentHeight += Fields.DoLabeledFloatSlider(
+                        dedicatedWorkersRect, 1, null, Strings.CapablePawnRatioFactorLabel,
+                        Strings.CapablePawnRatioFactorTooltip,
                         ref rule.DedicatedWorkerSettings.CapablePawnRatioFactor,
                         DedicatedWorkerSettings.CapablePawnRatioFactorMin,
-                        DedicatedWorkerSettings.CapablePawnRatioFactorMax, 0.1f, null, out dedicatedWorkersRect);
+                        DedicatedWorkerSettings.CapablePawnRatioFactorMax, 0.1f, null,
+                        out dedicatedWorkersRect);
                     break;
                 case DedicatedWorkerMode.PawnCount:
-                    dedicatedWorkersContentHeight += Fields.DoLabeledFloatSlider(dedicatedWorkersRect, 1, null,
-                        Strings.PawnCountFactorLabel, Strings.PawnCountFactorTooltip,
-                        ref rule.DedicatedWorkerSettings.PawnCountFactor, DedicatedWorkerSettings.PawnCountFactorMin,
-                        DedicatedWorkerSettings.PawnCountFactorMax, 0.1f, null, out dedicatedWorkersRect);
-                    dedicatedWorkersContentHeight += PawnFilterWidget.DoPawnFilter(dedicatedWorkersRect,
-                        rule.DedicatedWorkerSettings.PawnCountFilter!, PawnFilterSections.All,
+                    dedicatedWorkersContentHeight += Fields.DoLabeledFloatSlider(
+                        dedicatedWorkersRect, 1, null, Strings.PawnCountFactorLabel,
+                        Strings.PawnCountFactorTooltip,
+                        ref rule.DedicatedWorkerSettings.PawnCountFactor,
+                        DedicatedWorkerSettings.PawnCountFactorMin,
+                        DedicatedWorkerSettings.PawnCountFactorMax, 0.1f, null,
+                        out dedicatedWorkersRect);
+                    dedicatedWorkersContentHeight += PawnFilterWidget.DoPawnFilter(
+                        dedicatedWorkersRect, rule.DedicatedWorkerSettings.PawnCountFilter!,
+                        PawnFilterSections.All,
                         WorkManagerMod.GetModInputId(DedicatedWorkersPawnSkillInputLocalId),
                         WorkManagerMod.GetModInputId(DedicatedWorkersPawnStatInputLocalId),
-                        WorkManagerMod.GetModInputId(DedicatedWorkersPawnCapacityInputLocalId), null, out _);
+                        WorkManagerMod.GetModInputId(DedicatedWorkersPawnCapacityInputLocalId),
+                        null, out _);
                     break;
                 case null:
                     break;
@@ -388,9 +405,11 @@ public partial class Settings
     /// <param name="rect">The rectangle in which to draw the tab.</param>
     private void DoWorkTypesTab(Rect rect)
     {
-        var doBottomPart = SelectedWorkTypeRule != null && Find.CurrentMap != null && Find.Maps.Count > 0;
-        Tabs.DoTab(rect, _workTypesTopHeight, DoWorkTypesTabTopPart, _workTypesScrollableContentHeight,
-            ref _scrollPosition, DoWorkTypesTabScrollablePart, doBottomPart ? WorkTypesBottomHeight : 0f,
+        var doBottomPart = SelectedWorkTypeRule != null && Find.CurrentMap != null &&
+                           Find.Maps.Count > 0;
+        Tabs.DoTab(rect, _workTypesTopHeight, DoWorkTypesTabTopPart,
+            _workTypesScrollableContentHeight, ref _scrollPosition, DoWorkTypesTabScrollablePart,
+            doBottomPart ? WorkTypesBottomHeight : 0f,
             doBottomPart ? DoWorkTypesTabBottomPart : null);
     }
 
@@ -401,10 +420,13 @@ public partial class Settings
     private void DoWorkTypesTabBottomPart(Rect rect)
     {
         var headerRect = Sections.GetSectionHeaderRect(rect, out var remRect);
-        var buttonRect = Layout.GetRightColumnRect(headerRect, headerRect.width / 4f, out headerRect);
+        var buttonRect =
+            Layout.GetRightColumnRect(headerRect, headerRect.width / 4f, out headerRect);
         Layout.GetRightColumnRect(headerRect, Layout.ElementGap, out headerRect);
-        Sections.DoSectionHeaderLabel(headerRect, Strings.AvailablePawnsLabel, Strings.AvailablePawnsTooltip);
-        Buttons.DoActionButton(buttonRect, Common.Resources.Strings.Actions.Refresh, UpdateAllowedWorkers);
+        Sections.DoSectionHeaderLabel(headerRect, Strings.AvailablePawnsLabel,
+            Strings.AvailablePawnsTooltip);
+        Buttons.DoActionButton(buttonRect, Common.Resources.Strings.Actions.Refresh,
+            UpdateAllowedWorkers);
         Layout.DoVerticalGap(remRect, out remRect);
         PawnBox.DoPawnBox(remRect, ref _allowedWorkersScrollPosition, _allowedWorkers);
     }
@@ -435,7 +457,7 @@ public partial class Settings
     /// <param name="rect">The rectangular area within which the UI elements are rendered.</param>
     private void DoWorkTypesTabTopPart(Rect rect)
     {
-        var workTypeRules = _workTypeRules;
+        var workTypeRules = _workTypeRules!;
         var workTypeRulesCount = workTypeRules.Count;
         var allDefs = DefDatabase<WorkTypeDef>.AllDefsListForReading;
         List<WorkTypeDef> addableDefs;
@@ -487,14 +509,15 @@ public partial class Settings
             new ActionButton(Common.Resources.Strings.Actions.Select, () =>
             {
                 Find.WindowStack.Add(new FloatMenu([
-                    .. workTypeRules.Select(r => new FloatMenuOption(r.Label, () => { SelectedWorkTypeRule = r; }))
+                    .. workTypeRules.Select(r =>
+                        new FloatMenuOption(r.Label, () => { SelectedWorkTypeRule = r; }))
                 ]));
             }, Strings.SelectWorkTypeTooltip),
             new ActionButton(Common.Resources.Strings.Actions.Add, () =>
             {
                 Find.WindowStack.Add(new FloatMenu([
-                    .. addableDefs.OrderBy(def => def.labelShort).Select(def => new FloatMenuOption(def.GetLabel(),
-                        () =>
+                    .. addableDefs.OrderBy(def => def.labelShort).Select(def =>
+                        new FloatMenuOption(def.GetLabel(), () =>
                         {
                             var rule = WorkTypeAssignmentRule.CreateRule(def.defName);
                             workTypeRules.Add(rule);
@@ -512,7 +535,8 @@ public partial class Settings
                     }))
                 ]));
             }, Strings.DeleteWorkTypeTooltip, canDelete),
-            new ActionButton(Common.Resources.Strings.Actions.Reset, ResetWorkTypes, Strings.ResetWorkTypesTooltip)
+            new ActionButton(Common.Resources.Strings.Actions.Reset, ResetWorkTypes,
+                Strings.ResetWorkTypesTooltip)
         ], out _);
     }
 
@@ -534,7 +558,7 @@ public partial class Settings
     /// </remarks>
     private void ResetWorkTypes()
     {
-        _workTypeRules.Clear();
+        _workTypeRules!.Clear();
         _workTypeRules.AddRange(WorkTypeAssignmentRule.DefaultRules);
         SelectedWorkTypeRule = null;
     }

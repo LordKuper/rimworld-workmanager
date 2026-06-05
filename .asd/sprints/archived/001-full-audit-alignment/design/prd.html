@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<!--
+responsibility:
+  owns: product requirements (sprint draft full scope, or persistent per-subsystem feature set)
+  excludes: ui mockups, design decisions, code, ux flows
+  delegates_to: ux-spec.html (ui + flows), adr.html (decisions)
+provenance: original
+source: ""
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="generator" content="ASD workflow">
+  <meta name="doc-type" content="PRD">
+  <meta name="subsystem" content="sprint">
+  <meta name="sprint-id" content="001-full-audit-alignment">
+  <meta name="status" content="draft">
+  <meta name="updated" content="2026-06-04">
+  <meta name="responsibility" content="owns: product requirements (sprint draft full scope); excludes: ui mockups, design decisions, code, ux flows">
+  <meta name="provenance" content="original">
+  <meta name="source" content="">
+  <title>Work Manager — Sprint 001 PRD (Full Audit Alignment)</title>
+  <style>
+    :root {
+      --fg: #1a1c1e; --bg: #fff; --muted: #5b6770; --accent: #0066cc;
+      --code-bg: #f4f6f8; --border: #d0d7de; --max: 1040px;
+      --card-bg: #fafbfc;
+      --ok: #1f883d; --warn: #b35900; --danger: #cf222e; --info: #0969da; --neutral: #5b6770;
+      --chip-must-bg: #ffebe9; --chip-must-fg: #cf222e;
+      --chip-should-bg: #fff5e1; --chip-should-fg: #9a6700;
+      --chip-may-bg: #ddf4ff; --chip-may-fg: #0969da;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --fg: #e6e6e6; --bg: #0e1116; --muted: #9aa4ad; --code-bg: #161b22; --border: #30363d;
+        --card-bg: #161b22;
+        --chip-must-bg: #3b1416; --chip-must-fg: #ff7b72;
+        --chip-should-bg: #2d2410; --chip-should-fg: #e3b341;
+        --chip-may-bg: #0d2538; --chip-may-fg: #58a6ff;
+      }
+    }
+    html, body { margin: 0; padding: 0; }
+    * { box-sizing: border-box; }
+    body { font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--fg); background: var(--bg); }
+    .layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); min-height: 100vh; }
+    .content { min-width: 0; }
+    header, main, footer { max-width: var(--max); margin: 0 auto; padding: 16px 24px; }
+    header { border-bottom: 1px solid var(--border); }
+    header h1 { margin: 4px 0 8px; font-size: 1.9rem; }
+    .badges span { display: inline-block; padding: 2px 8px; margin-right: 6px; font-size: 0.75rem; border: 1px solid var(--border); border-radius: 4px; color: var(--muted); background: var(--bg); }
+    .badges .provenance-original { display: none; }
+    .badges .status-draft       { color: var(--neutral); border-color: var(--neutral); }
+    .badges .status-in-review   { color: var(--warn);    border-color: var(--warn); }
+    .badges .status-approved    { color: var(--ok);      border-color: var(--ok); }
+    .badges .status-locked      { color: var(--info);    border-color: var(--info); }
+    .stats { margin-top: 6px; font-size: 0.85rem; color: var(--muted); }
+    .stats .chip { display: inline-block; padding: 1px 8px; margin-right: 6px; border-radius: 10px; background: var(--code-bg); border: 1px solid var(--border); }
+    nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 18px 14px; border-right: 1px solid var(--border); background: var(--card-bg); font-size: 0.9rem; }
+    nav.toc .toc-title { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 8px; padding-left: 6px; }
+    nav.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: tocn; }
+    nav.toc li { margin: 2px 0; counter-increment: tocn; }
+    nav.toc a { display: block; padding: 4px 8px; border-radius: 4px; color: var(--fg); text-decoration: none; border-left: 2px solid transparent; }
+    nav.toc a:hover { background: var(--code-bg); color: var(--accent); }
+    nav.toc a.active { background: var(--code-bg); color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+    nav.toc a::before { content: counter(tocn) ". "; color: var(--muted); font-variant-numeric: tabular-nums; }
+    @media (max-width: 880px) {
+      .layout { grid-template-columns: 1fr; }
+      nav.toc { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--border); }
+    }
+    h2, h3, h4 { line-height: 1.25; margin-top: 1.6em; }
+    h2 { border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+    a { color: var(--accent); }
+    code, pre { font-family: ui-monospace, "Cascadia Code", Menlo, monospace; }
+    code { background: var(--code-bg); padding: 1px 5px; border-radius: 3px; font-size: 0.9em; }
+    pre { background: var(--code-bg); padding: 12px; border-radius: 6px; overflow-x: auto; }
+    pre code { background: none; padding: 0; }
+    table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+    th, td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; vertical-align: top; }
+    th { background: var(--code-bg); position: sticky; top: 0; z-index: 1; }
+    tbody tr:nth-child(even) td { background: var(--card-bg); }
+    blockquote { border-left: 3px solid var(--accent); margin: 0; padding: 4px 14px; color: var(--muted); }
+    footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 32px; }
+
+    .lede { font-size: 1.08rem; color: var(--fg); }
+    section.hero { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 18px; }
+    section.callout { border-left: 4px solid var(--border); padding: 8px 14px; background: var(--card-bg); border-radius: 4px; }
+    section.callout.warn { border-left-color: var(--warn); }
+    section.callout.warn h2::before { content: "⊘ "; color: var(--warn); }
+
+    ol.goal-grid { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; }
+    ol.goal-grid li { background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; display: flex; gap: 10px; }
+    ol.goal-grid .num { flex: 0 0 auto; font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; }
+    ol.goal-grid p { margin: 0; }
+
+    details.role-group { border: 1px solid var(--border); border-radius: 6px; margin: 8px 0; background: var(--card-bg); }
+    details.role-group > summary { cursor: pointer; padding: 8px 12px; font-weight: 600; }
+    details.role-group > summary .count { display: inline-block; margin-left: 6px; padding: 0 7px; border-radius: 10px; background: var(--code-bg); border: 1px solid var(--border); font-weight: 400; font-size: 0.8rem; color: var(--muted); }
+    details.role-group ul.stories { margin: 0; padding: 4px 16px 12px 28px; }
+    ul.stories li { margin: 4px 0; }
+    ul.stories b { color: var(--accent); font-weight: 600; }
+
+    table.ac-table td:first-child { white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 600; }
+    .chip { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 0.78rem; border: 1px solid var(--border); }
+    .chip.area { background: var(--code-bg); color: var(--muted); }
+    .chip.prio-must   { background: var(--chip-must-bg);   color: var(--chip-must-fg); border-color: var(--chip-must-fg); }
+    .chip.prio-should { background: var(--chip-should-bg); color: var(--chip-should-fg); border-color: var(--chip-should-fg); }
+    .chip.prio-may    { background: var(--chip-may-bg);    color: var(--chip-may-fg); border-color: var(--chip-may-fg); }
+    .chip.kind-func { background: rgba(31,136,61,0.10); color: var(--ok); border-color: var(--ok); }
+    .chip.kind-qual { background: var(--chip-may-bg); color: var(--info); border-color: var(--info); }
+
+    ul.non-goals { margin: 0; padding-left: 22px; }
+    ul.non-goals li::marker { content: "⊘  "; color: var(--warn); }
+
+    @media print {
+      nav.toc { background: none; border: 1px solid var(--border); }
+      a { color: inherit; text-decoration: none; }
+      footer { page-break-before: always; }
+      details.role-group[open] > summary { list-style: none; }
+      details.role-group { break-inside: avoid; }
+      tr, li { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <nav class="toc" aria-label="Table of contents">
+      <p class="toc-title">Contents</p>
+      <ol>
+        <li><a href="#problem">Problem</a></li>
+        <li><a href="#goals">Goals</a></li>
+        <li><a href="#user-stories">User stories</a></li>
+        <li><a href="#acceptance-criteria">Acceptance criteria</a></li>
+        <li><a href="#non-goals">Non-goals</a></li>
+      </ol>
+    </nav>
+    <div class="content">
+      <header>
+        <div class="badges">
+          <span>PRD</span>
+          <span>sprint</span>
+          <span class="status-draft">draft</span>
+          <span class="provenance-original">original</span>
+        </div>
+        <h1>Work Manager — Sprint 001 PRD (Full Audit Alignment)</h1>
+        <div class="stats">
+          <span class="chip">6 goals</span>
+          <span class="chip">7 stories</span>
+          <span class="chip">18 AC</span>
+          <span class="chip">6 non-goals</span>
+          <span class="chip">updated 2026-06-04</span>
+        </div>
+      </header>
+      <main>
+
+<section id="problem" class="hero">
+  <h2>Problem</h2>
+  <p class="lede">Work Manager is a mature, shipped RimWorld mod, but a full audit (<a href="../audit.md">audit.md</a>) found the codebase and its documentation drifting from the four reference standards the project commits to: the <code>.asd</code> rules, the documented technology stack, the <code>LordKuper.Common</code> upstream contract, and the code conventions. The complex assignment and schedule engines have no automated test net, two adopted technologies lack the mandatory tech-reference docs, two user-facing strings bypass localization, the singleton <code>WorkManagerGameComponent.Instance</code> is dereferenced inconsistently (risking a <code>NullReferenceException</code> on game-less UI screens), a stale vendored Harmony 2.3.6 package contradicts the pinned 2.4.2, and the README plus mod metadata under-describe the current product. This sprint closes those gaps so the project is verifiably aligned with its own standards — without changing what the mod does or how it looks.</p>
+</section>
+
+<section id="goals">
+  <h2>Goals</h2>
+  <ol class="goal-grid">
+    <li><span class="num">G1</span><p>Establish a real, standards-compliant unit-test foundation (FluentAssertions 7.x, static-state isolation, RimWorld <code>AssemblyResolve</code> registration) and cover the audit-named pure-logic units to the 80% floor.</p></li>
+    <li><span class="num">G2</span><p>Achieve complete tech-reference coverage: every adopted technology has an accurate <code>design/architecture/tech-reference/&lt;tech&gt;-&lt;version&gt;.md</code>.</p></li>
+    <li><span class="num">G3</span><p>Move the two hardcoded UI strings onto the keyed-localization surface across all shipped locales, with no change to the visible English text.</p></li>
+    <li><span class="num">G4</span><p>Apply one uniform null-handling contract for <code>WorkManagerGameComponent.Instance</code> across every call site so no NRE can occur on screens without an active game.</p></li>
+    <li><span class="num">G5</span><p>Remove dead/contradictory artifacts (the stale vendored Lib.Harmony 2.3.6 package tree) so the repository matches the pinned stack.</p></li>
+    <li><span class="num">G6</span><p>Bring the documentation set (README, concept, stack, tech-references, About.xml) back into alignment with the audited code and the four standards.</p></li>
+  </ol>
+</section>
+
+<section id="user-stories">
+  <h2>User stories</h2>
+
+  <details class="role-group" open>
+    <summary>Maintainer / Developer <span class="count">4</span></summary>
+    <ul class="stories">
+      <li id="US-1"><b>as</b> a maintainer, <b>I want</b> the pure-logic units (work-shift mapping, rule comparison/combination, dedicated-worker clamping, passion scoring, target-worker counting) covered by real unit tests with proper static-state isolation, <b>so that</b> I can refactor the assignment and schedule logic without silently breaking behavior. <em>(G1; AC-1…AC-6)</em></li>
+      <li id="US-2"><b>as</b> a maintainer, <b>I want</b> a single uniform contract for accessing <code>WorkManagerGameComponent.Instance</code> applied at every call site, <b>so that</b> the mod cannot throw a <code>NullReferenceException</code> from a UI patch or pawn column on screens where no game is active. <em>(G4; AC-11…AC-12)</em></li>
+      <li id="US-3"><b>as</b> a maintainer, <b>I want</b> the stale vendored Lib.Harmony 2.3.6 package tree removed, <b>so that</b> the repository contains no binaries that contradict the pinned Harmony 2.4.2 reference. <em>(G5; AC-13)</em></li>
+      <li id="US-4"><b>as</b> a maintainer, <b>I want</b> the production and test builds to compile clean (zero warnings, <code>TreatWarningsAsErrors</code> on) and the full test suite to pass green, <b>so that</b> every audit fix is verified by the build/quality gate before merge. <em>(quality gate; AC-17…AC-18)</em></li>
+    </ul>
+  </details>
+
+  <details class="role-group" open>
+    <summary>Architect / Standards owner <span class="count">1</span></summary>
+    <ul class="stories">
+      <li id="US-5"><b>as</b> the architecture owner, <b>I want</b> every adopted technology to have an accurate versioned tech-reference doc — including the currently missing RimWorld 1.6 game API and .NET Framework 4.7.2 references, <b>so that</b> the "no tech adopted without a reference" rule holds across the whole stack. <em>(G2; AC-7…AC-8)</em></li>
+    </ul>
+  </details>
+
+  <details class="role-group" open>
+    <summary>Mod player (end user) <span class="count">1</span></summary>
+    <ul class="stories">
+      <li id="US-6"><b>as</b> a non-English-speaking player, <b>I want</b> the work-shift labels in the schedule settings to come from the localization surface like every other label, <b>so that</b> they can be translated for my locale instead of always appearing in English. <em>(G3; AC-9…AC-10)</em></li>
+    </ul>
+  </details>
+
+  <details class="role-group" open>
+    <summary>Prospective user / Reader of docs <span class="count">1</span></summary>
+    <ul class="stories">
+      <li id="US-7"><b>as</b> a prospective user or contributor reading the project documentation, <b>I want</b> the README and mod metadata to accurately list the supported RimWorld versions, the scheduling capability, and the Harmony + LordKuper.Common dependencies, <b>so that</b> I understand what the mod does and what it needs before installing or contributing. <em>(G6; AC-14…AC-16)</em></li>
+    </ul>
+  </details>
+</section>
+
+<section id="acceptance-criteria">
+  <h2>Acceptance criteria</h2>
+  <p>Each criterion is one testable assertion, traceable to a user story. <span class="chip kind-func">functional</span> = observable behavior; <span class="chip kind-qual">quality</span> = non-functional / structural assertion verified by build, tests, or doc inspection.</p>
+  <table class="ac-table">
+    <thead>
+      <tr><th>ID</th><th>Criterion</th><th>Story</th><th>Area</th><th>Kind</th><th>Priority</th></tr>
+    </thead>
+    <tbody>
+      <tr id="AC-1">
+        <td><a href="#AC-1">AC-1</a></td>
+        <td>A test infrastructure exists: (a) a static-state isolation base class that snapshots relevant static state in <code>[SetUp]</code> and restores it in <code>[TearDown]</code>, and (b) a global <code>[SetUpFixture]</code> that registers the RimWorld <code>AssemblyResolve</code> handler before any RimWorld-typed test type loads. All new tests use FluentAssertions 7.x exclusively — no <code>Assert.*</code> calls remain in the test project (the <code>Assert.Pass()</code> placeholder is removed).</td>
+        <td><a href="#US-1">US-1</a></td>
+        <td><span class="chip area">tests</span></td>
+        <td><span class="chip kind-qual">quality</span></td>
+        <td><span class="chip prio-must">must</span></td>
+      </tr>
+      <tr id="AC-2">
+        <td><a href="#AC-2">AC-2</a></td>
+        <td><code>WorkShift</code> hour mapping and validation are unit-tested: tests assert the start/end hour-to-shift mapping and the validation/normalization of out-of-range or invalid hour values.</td>
+        <td><a href="#US-1">US-1</a></td>
+        <td><span class="chip area">tests</span></td>
+        <td><span class="chip kind-func">functional</span></td>
+        <td><span class="chip prio-must">must</span></td>
+      </tr>
+      <tr id="AC-3">
+        <td><a href="#AC-3">AC-3</a></td>
+        <td><code>WorkTypeAssignmentRuleComparer</code> ordering is unit-tested, and <code>WorkTypeAssignmentRule.Combine</code> is unit-tested for its merge result (including deterministic tie-breaks).</td>
+        <td><a href="#US-1">US-1</a></td>
+        <td><span class="chip area">tests</span></td>
+        <td><span class="chip kind-func">functional</span></td>
+        <td><span class="chip prio-must">must</span></td>
+      </tr>
+      <tr id="AC-4">
+        <td><a href="#AC-4">AC-4</a></td>
+        <td><code>DedicatedWorkerSettings.Combine</code> and <code>DedicatedWorkerSettings.Validate</code> are unit-tested, asserting the value-clamping behavior on out-of-range inputs.</td>
+        <td><a href="#US-1">US-1</a></td>
+        <td><span class="chip area">tests</span></td>
+        <td><span class="chip kind-func">functional</span></td>
+        <td><span class="chip prio-must">must</span></td>
+      </tr>
+      <tr id="AC-5">
+        <td><a href="#AC-5">AC-5</a></td>
+        <td><code>PassionHelper.GetPassionScore</code> normalization is unit-tested across the passion levels it handles, asserting the expected normalized score for each.</td>
+        <td><a href="#US-1">US-1</a></td>
+        <td><span class="chip area">tests</span></td>
+        <td><span class="chip kind-func">functional</span></td>
+        <td><span class="chip prio-must">must</span></td>
+      </tr>
+      <tr id="AC-6">
+        <td><a href="#AC-6">AC-6</a></td>
+        <td><code>GetTargetWorkersCount</code> is unit-tested for the non-<code>PawnCount</code> modes, asserting the computed target count per mode. Across AC-2…AC-6 the covered units meet the project's 80% line-coverage floor.</td>
+        <td><a href="#US-1">US-1</a></td>
+        <td><span class="chip area">tests</span></td>
+        <td><span class="chip kind-qual">quality</span></td>
+        <td><span class="chip prio-must">must</span></td>
+      </tr>
+      <tr id="AC-7">
+        <td><a href="#AC-7">AC-7</a></td>
+        <td>A tech-reference document <code>design/architecture/tech-reference/&lt;rimworld-1.6&gt;.md</code> exists for the RimWorld 1.6 game API and accurately describes the game-API surface the mod consumes (e.g. <code>MapComponent</code>, <code>GameComponent</code>, <code>Mod</code>, <code>Scribe_*</code>, <code>DefDatabase</code>, <code>Pawn</code>/<code>WorkTypeDef</code>/<code>TimeAssignmentDef</code>).</td>
+        <td><a href="#US-5">US-5</a></td>
+        <td><span class="chip area">docs</span></td>
+        <td><span class="chip kind-qual">quality</span></td>
+        <td><span class="chip prio-must">must</span></td>
+      </tr>
+      <tr id="AC-8">
+        <td><a href="#AC-8">AC-8</a></td>
+        <td>A tech-reference document for .NET Framework 4.7.2 exists and accurately describes the target framework. After this sprint, every technology listed in <code>stack.html</code> has a corresponding, version-accurate tech-reference doc and no reference points to a version the code no longer uses.</td>
+        <td><a href="#US-5">US-5</a></td>
+        <td><span class="chip area">docs</span></td>
+        <td><span class="chip kind-qual">quality</span></td>
+        <td><span class="chip prio-must">must</span></td>
+      </tr>
+      <tr id="AC-9">
+        <td><a href="#AC-9">AC-9</a></td>
+        <td>The two hardcoded <code>"Work shift #{i + 1}"</code> strings in <code>Settings_Schedules.cs</code> (lines 148 and 201) are replaced with lookups against the keyed-localization surface (<code>.Translate()</code>), and the rendered English text is byte-for-byte identical to the current output.</td>
+        <td><a href="#US-6">US-6</a></td>
+        <td><span class="chip area">i18n</span></td>
+        <td><span class="chip kind-func">functional</span></td>
+        <td><span class="chip prio-must">must</span></td>
+      </tr>
+      <tr id="AC-10">
+        <td><a href="#AC-10">AC-10</a></td>
+        <td>The corresponding keyed-text entries are added for all 1.6 shipped locales (English, Russian, ChineseSimplified) and for English in the legacy 1.1–1.5 language folders. No other visible text or layout changes.</td>
+        <td><a href="#US-6">US-6</a></td>
+        <td><span class="chip area">i18n</span></td>
+        <td><span class="chip kind-func">functional</span></td>
+        <td><span class="chip prio-must">must</span></td>
+      </tr>
+      <tr id="AC-11">
+        <td><a href="#AC-11">AC-11</a></td>
+        <td>A single, documented null-handling contract for <code>WorkManagerGameComponent.Instance</code> is defined and applied uniformly across all call sites: UI patches, pawn columns (<code>AutoWorkPriorities</code>/<code>AutoWorkSchedule</code>), <code>PawnCache</code>, and <code>WorkPriorityUpdater</code>. No call site dereferences <code>Instance</code> in a way that diverges from the contract.</td>
+        <td><a href="#US-2">US-2</a></td>
+        <td><span class="chip area">reliability</span></td>
+        <td><span class="chip kind-func">functional</span></td>
+        <td><span class="chip prio-must">must</span></td>
+      </tr>
+      <tr id="AC-12">
+        <td><a href="#AC-12">AC-12</a></td>
+        <td>Invoking the patched UI paths (work tab, work-priority column header, work boxes) and pawn columns on a screen with no active game produces no <code>NullReferenceException</code> from <code>Instance</code> access; behavior degrades gracefully per the contract.</td>
+        <td><a href="#US-2">US-2</a></td>
+        <td><span class="chip area">reliability</span></td>
+        <td><span class="chip kind-func">functional</span></td>
+        <td><span class="chip prio-must">must</span></td>
+      </tr>
+      <tr id="AC-13">
+        <td><a href="#AC-13">AC-13</a></td>
+        <td>The <code>Source/packages/Lib.Harmony.2.3.6/</code> directory tree (DLLs, nupkg, pdbs, README) is removed from the repository, and no project or build file references it. The only Harmony reference remaining is the <code>Lib.Harmony</code> 2.4.2 <code>PackageReference</code>.</td>
+        <td><a href="#US-3">US-3</a></td>
+        <td><span class="chip area">cleanup</span></td>
+        <td><span class="chip kind-qual">quality</span></td>
+        <td><span class="chip prio-must">must</span></td>
+      </tr>
+      <tr id="AC-14">
+        <td><a href="#AC-14">AC-14</a></td>
+        <td><code>README.md</code> version badges include RimWorld 1.6 (covering the full 1.1–1.6 support range), matching <code>About/About.xml</code> <code>supportedVersions</code>.</td>
+        <td><a href="#US-7">US-7</a></td>
+        <td><span class="chip area">docs</span></td>
+        <td><span class="chip kind-qual">quality</span></td>
+        <td><span class="chip prio-must">must</span></td>
+      </tr>
+      <tr id="AC-15">
+        <td><a href="#AC-15">AC-15</a></td>
+        <td><code>README.md</code> description is expanded to mention schedule management and the Harmony + LordKuper.Common dependencies, consistent with the <code>concept.html</code> value proposition (without duplicating the full feature list; link to the SSoT).</td>
+        <td><a href="#US-7">US-7</a></td>
+        <td><span class="chip area">docs</span></td>
+        <td><span class="chip kind-qual">quality</span></td>
+        <td><span class="chip prio-should">should</span></td>
+      </tr>
+      <tr id="AC-16">
+        <td><a href="#AC-16">AC-16</a></td>
+        <td>After all code changes land, <code>concept.html</code> and <code>stack.html</code> are re-verified against the current <code>Source/</code> + project files; either confirmed still accurate (no edit) or updated in lockstep with any change (with <code>updated</code> bumped). <code>About/About.xml</code> <code>&lt;description&gt;</code> is updated to mention scheduling only if other description text is touched (low priority).</td>
+        <td><a href="#US-7">US-7</a></td>
+        <td><span class="chip area">docs</span></td>
+        <td><span class="chip kind-qual">quality</span></td>
+        <td><span class="chip prio-should">should</span></td>
+      </tr>
+      <tr id="AC-17">
+        <td><a href="#AC-17">AC-17</a></td>
+        <td>The production build (<code>Source/WorkManager.slnx</code>) and the test build compile clean: zero errors and zero warnings, with <code>TreatWarningsAsErrors</code> remaining enabled in both Debug and Release.</td>
+        <td><a href="#US-4">US-4</a></td>
+        <td><span class="chip area">build</span></td>
+        <td><span class="chip kind-qual">quality</span></td>
+        <td><span class="chip prio-must">must</span></td>
+      </tr>
+      <tr id="AC-18">
+        <td><a href="#AC-18">AC-18</a></td>
+        <td>The full test suite (<code>Source/WorkManager.Tests</code>) builds and passes green, with no skipped or ignored tests masking missing coverage from AC-2…AC-6.</td>
+        <td><a href="#US-4">US-4</a></td>
+        <td><span class="chip area">build</span></td>
+        <td><span class="chip kind-qual">quality</span></td>
+        <td><span class="chip prio-must">must</span></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="non-goals" class="callout warn">
+  <h2>Non-goals</h2>
+  <ul class="non-goals">
+    <li>No UI/UX changes: this is an audit/refactor sprint. No UX-spec or design-system is produced or assumed; the work-shift localization (AC-9) preserves the exact visible English text.</li>
+    <li>No new mod features or behavior changes to the assignment or schedule engines beyond the uniform null contract (AC-11) — the refactor must be behavior-preserving.</li>
+    <li>No editing of the <code>LordKuper.Common</code> upstream library; it is consumed as an integration contract only.</li>
+    <li>No modification of ASD workflow infrastructure (<code>.asd/rules/</code>, <code>.asd/templates/</code>, <code>.claude/</code>, <code>CLAUDE.md</code>).</li>
+    <li>No full project requirements document (<code>design/product/requirements.html</code>): deferred to a future requirements sprint per the audit migration plan.</li>
+    <li>No tests for the live-game-dependent engine paths (multi-pass priority assignment, schedule scoring) in this sprint — only the audit-named pure-logic units are covered; broader engine coverage is out of scope here.</li>
+  </ul>
+</section>
+
+      </main>
+      <footer>by asd-ba | 2026-06-04 | sprint 001-full-audit-alignment</footer>
+    </div>
+  </div>
+</body>
+</html>

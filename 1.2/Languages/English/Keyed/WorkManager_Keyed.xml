@@ -58,4 +58,5 @@
   <WorkManager.WorkTypeNotLoadedTooltip>This work type is absent from current game setup. It will not affect work assignment until the game is restarted with corresponding work type loaded.</WorkManager.WorkTypeNotLoadedTooltip>
   <WorkManager.ManageWorkSchedule>Manage work schedule</WorkManager.ManageWorkSchedule>
   <WorkManager.ManageWorkScheduleTooltip>Automatic colonists' work shift management</WorkManager.ManageWorkScheduleTooltip>
+  <WorkManager.Settings_Schedule_WorkShiftLabel>Work shift #{0}</WorkManager.Settings_Schedule_WorkShiftLabel>
 </LanguageData>
