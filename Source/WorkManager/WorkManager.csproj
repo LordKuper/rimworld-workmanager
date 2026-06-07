@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <RootNamespace>LordKuper.WorkManager</RootNamespace>
-    <AssemblyName>WorkManager</AssemblyName>
+    <AssemblyName>LordKuper.WorkManager</AssemblyName>
     <LangVersion>latest</LangVersion>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
