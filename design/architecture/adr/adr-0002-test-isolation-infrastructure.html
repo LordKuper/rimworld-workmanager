@@ -16,7 +16,7 @@ source: ""
   <meta name="subsystem" content="N/A">
   <meta name="sprint-id" content="001-full-audit-alignment">
   <meta name="status" content="accepted">
-  <meta name="updated" content="2026-06-04">
+  <meta name="updated" content="2026-09-29">
   <meta name="responsibility" content="owns: test isolation infrastructure; excludes: requirements, ux, code">
   <meta name="provenance" content="original">
   <meta name="source" content="">
@@ -109,6 +109,7 @@ source: ""
         <li><a href="#decision">Decision</a></li>
         <li><a href="#consequences">Consequences</a></li>
         <li><a href="#alternatives">Alternatives considered</a></li>
+        <li><a href="#amendments">Amendments</a></li>
         <li><a href="#related">Related ADRs</a></li>
       </ol>
     </nav>
@@ -124,7 +125,7 @@ source: ""
         <div class="stats">
           <span class="chip">accepted</span>
           <span class="chip">subsystem N/A</span>
-          <span class="chip">updated 2026-06-04</span>
+          <span class="chip">updated 2026-09-29</span>
         </div>
       </header>
       <main>
@@ -151,7 +152,7 @@ source: ""
     <div class="pros">
       <h3>Positive</h3>
       <ul>
-        <li>RimWorld-typed tests load reliably without bundling <code>Assembly-CSharp</code> (resolver-based, per the established Common convention).</li>
+        <li>RimWorld-typed tests load reliably without committing or shipping <code>Assembly-CSharp</code>: the runtime resolver supplies RimWorld/Unity assemblies at execution time, and a build-time copy into the untracked test <code>bin/</code> covers NUnit discovery (see <a href="#amendment-2026-09-29">amendment 2026-09-29</a>). Both follow the established Common convention.</li>
         <li>Deterministic, order-independent tests via snapshot/restore — protects the untested assignment/schedule engines during the G4 refactor (risk mitigation from audit Risks).</li>
         <li>FluentAssertions-only keeps the assertion surface single and license-clean (AC-1).</li>
         <li>Minimal footprint: two well-known NUnit primitives (<code>[SetUpFixture]</code> + a base class), no new test dependency.</li>
@@ -169,10 +170,21 @@ source: ""
 
   <h2 id="alternatives">Alternatives considered</h2>
   <ul class="alt-list">
-    <li><strong>Copy <code>Assembly-CSharp</code> / Unity DLLs into the test project</strong> — rejected: redistributes game binaries (license-incompatible, large, version-fragile) and contradicts the stack's "compile against, never ship, the host" principle. The resolver approach is the project-standard already documented for Common.</li>
+    <li><strong>Copy <code>Assembly-CSharp</code> / Unity DLLs into the test project</strong> (committed to the repository or redistributed with the mod) — rejected. <em>Scope narrowed by the <a href="#amendment-2026-09-29">2026-09-29 amendment</a>: a build-time copy into the gitignored test <code>bin/</code> is not covered by this rejection.</em> Original rationale: redistributes game binaries (license-incompatible, large, version-fragile) and contradicts the stack's "compile against, never ship, the host" principle. The resolver approach is the project-standard already documented for Common.</li>
     <li><strong>No isolation base class; rely on test ordering / fresh process per test</strong> — rejected: order-dependent and slow; NUnit shares an AppDomain, so static bleed is real. Snapshot/restore is the cheapest deterministic fix.</li>
     <li><strong>Introduce a mocking framework (e.g. Moq/NSubstitute) to fake RimWorld types</strong> — rejected for this sprint: the AC-named units are pure (hour mapping, comparer ordering, clamping, score normalization, count modes) and testable with plain constructed inputs; a mocking dependency is unjustified surface (Simplicity Default) and would itself need a tech-reference. Reconsider only if a later sprint tests game-coupled paths.</li>
   </ul>
+
+  <h2 id="amendments">Amendments</h2>
+  <section id="amendment-2026-09-29">
+    <h3>2026-09-29 · sprint 002-work-type-needs-filters · build-time copy of <code>Assembly-CSharp</code> for NUnit discovery</h3>
+    <p><strong>Change.</strong> The test project's MSBuild target <code>CopyRimWorldTestDeps</code> (<code>AfterTargets="Build"</code>, in <code>Source/WorkManager.Tests/WorkManager.Tests.csproj</code>) copies <code>Assembly-CSharp.dll</code> from <code>$(RimWorldManagedDir)</code> into the test output directory. The <code>&lt;Reference&gt;</code> keeps <code>&lt;Private&gt;False&lt;/Private&gt;</code>, so the normal copy-local step is unchanged; the target is the only copy.</p>
+    <p><strong>Why.</strong> NUnit enumerates the test assembly's types (<code>Assembly.GetTypes()</code>) during discovery, before any <code>[OneTimeSetUp]</code> runs — so the resolver fixture from this ADR's Decision is not yet registered. A test type whose <em>signature</em> references a RimWorld type fails to load at that point, and the whole assembly fails discovery. Sprint 002 introduced such a type: the test-only <code>FakeDefProvider : IDefProvider</code>, whose generic constraints name <code>Verse.Def</code> (<code>where T : Def</code>; see <a href="adr-0006-needs-filter-model-and-evaluation.html">ADR-0006</a>). The resolver alone only covers types loaded while tests execute.</p>
+    <p><strong>Scope of the original rejection.</strong> The rejected alternative ("Copy <code>Assembly-CSharp</code> / Unity DLLs into the test project") is narrowed to committing game binaries to the repository or redistributing them. Its rationale (license, size, "compile against, never ship, the host") does not apply to this copy: the file lands only in the gitignored <code>Source/WorkManager.Tests/bin/</code> on the developer's machine, from that developer's own RimWorld install, and is never committed, packaged or shipped. Production output (<code>1.6/Assemblies/</code>) is unaffected.</p>
+    <p><strong>Resolver still required.</strong> The <code>[SetUpFixture]</code> <code>AssemblyResolve</code> handler stays: it supplies the Unity modules and any other RimWorld-dir assembly at execution time. Copy covers discovery; resolver covers execution.</p>
+    <p><strong>Precedent.</strong> <code>LordKuper.Common</code>'s test project uses the same approach (a <code>CopyRimWorldTestDeps</code> target, recorded in Common's ADR-0006 "RimWorld AssemblyResolve SetUpFixture"), there with a broader file set (Unity modules, <code>netstandard.dll</code>). WorkManager copies only <code>Assembly-CSharp.dll</code> because that is all its discovery-time signatures need; widen the set only if a discovery failure demonstrates the need.</p>
+    <p><strong>Additional negative consequence.</strong> The build of the test project now depends on <code>$(RimWorldManagedDir)\Assembly-CSharp.dll</code> existing (already true for compilation), and the copied DLL in <code>bin/</code> must not be force-added to git. The technical fact is recorded once in <a href="../tech-reference/NUnit-4.6.1.md#known-issues-and-workarounds">NUnit-4.6.1 tech-reference, Known issues</a>.</p>
+  </section>
 
   <h2 id="related">Related ADRs</h2>
   <ul>

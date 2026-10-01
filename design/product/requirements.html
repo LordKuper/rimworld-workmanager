@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<!--
+responsibility:
+  owns: product requirements (sprint draft full scope, or persistent per-subsystem feature set)
+  excludes: ui mockups, design decisions, code, ux flows
+  delegates_to: ux-spec.html (ui + flows), adr.html (decisions)
+provenance: original
+source: ""
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="generator" content="ASD workflow">
+  <meta name="doc-type" content="PRD">
+  <meta name="subsystem" content="project">
+  <meta name="sprint-id" content="002-work-type-needs-filters">
+  <meta name="status" content="approved">
+  <meta name="updated" content="2026-10-01">
+  <meta name="responsibility" content="product requirements (sprint draft full scope, or persistent per-subsystem feature set)">
+  <meta name="provenance" content="original">
+  <meta name="source" content="">
+  <title>Work Manager — Product Requirements</title>
+  <style>
+    :root {
+      --fg: #1a1c1e; --bg: #fff; --muted: #5b6770; --accent: #0066cc;
+      --code-bg: #f4f6f8; --border: #d0d7de; --max: 1040px;
+      --card-bg: #fafbfc;
+      --ok: #1f883d; --warn: #b35900; --danger: #cf222e; --info: #0969da; --neutral: #5b6770;
+      --chip-must-bg: #ffebe9; --chip-must-fg: #cf222e;
+      --chip-should-bg: #fff5e1; --chip-should-fg: #9a6700;
+      --chip-may-bg: #ddf4ff; --chip-may-fg: #0969da;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --fg: #e6e6e6; --bg: #0e1116; --muted: #9aa4ad; --code-bg: #161b22; --border: #30363d;
+        --card-bg: #161b22;
+        --chip-must-bg: #3b1416; --chip-must-fg: #ff7b72;
+        --chip-should-bg: #2d2410; --chip-should-fg: #e3b341;
+        --chip-may-bg: #0d2538; --chip-may-fg: #58a6ff;
+      }
+    }
+    html, body { margin: 0; padding: 0; }
+    * { box-sizing: border-box; }
+    body { font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--fg); background: var(--bg); }
+    .layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); min-height: 100vh; }
+    .content { min-width: 0; }
+    header, main, footer { max-width: var(--max); margin: 0 auto; padding: 16px 24px; }
+    header { border-bottom: 1px solid var(--border); }
+    header h1 { margin: 4px 0 8px; font-size: 1.9rem; }
+    .badges span { display: inline-block; padding: 2px 8px; margin-right: 6px; font-size: 0.75rem; border: 1px solid var(--border); border-radius: 4px; color: var(--muted); background: var(--bg); }
+    .badges .provenance-reverse-engineered, .badges .provenance-migrated { color: var(--warn); border-color: var(--warn); }
+    .badges .status-draft       { color: var(--neutral); border-color: var(--neutral); }
+    .badges .status-in-review   { color: var(--warn);    border-color: var(--warn); }
+    .badges .status-approved    { color: var(--ok);      border-color: var(--ok); }
+    .badges .status-locked      { color: var(--info);    border-color: var(--info); }
+    .stats { margin-top: 6px; font-size: 0.85rem; color: var(--muted); }
+    .stats .chip { display: inline-block; padding: 1px 8px; margin-right: 6px; border-radius: 10px; background: var(--code-bg); border: 1px solid var(--border); }
+    nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 18px 14px; border-right: 1px solid var(--border); background: var(--card-bg); font-size: 0.9rem; }
+    nav.toc .toc-title { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 8px; padding-left: 6px; }
+    nav.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: tocn; }
+    nav.toc li { margin: 2px 0; counter-increment: tocn; }
+    nav.toc a { display: block; padding: 4px 8px; border-radius: 4px; color: var(--fg); text-decoration: none; border-left: 2px solid transparent; }
+    nav.toc a:hover { background: var(--code-bg); color: var(--accent); }
+    nav.toc a.active { background: var(--code-bg); color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+    nav.toc a::before { content: counter(tocn) ". "; color: var(--muted); font-variant-numeric: tabular-nums; }
+    @media (max-width: 880px) {
+      .layout { grid-template-columns: 1fr; }
+      nav.toc { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--border); }
+    }
+    h2, h3, h4 { line-height: 1.25; margin-top: 1.6em; }
+    h2 { border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+    a { color: var(--accent); }
+    code, pre { font-family: ui-monospace, "Cascadia Code", Menlo, monospace; }
+    code { background: var(--code-bg); padding: 1px 5px; border-radius: 3px; font-size: 0.9em; }
+    pre { background: var(--code-bg); padding: 12px; border-radius: 6px; overflow-x: auto; }
+    pre code { background: none; padding: 0; }
+    table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+    th, td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; vertical-align: top; }
+    th { background: var(--code-bg); position: sticky; top: 0; z-index: 1; }
+    tbody tr:nth-child(even) td { background: var(--card-bg); }
+    blockquote { border-left: 3px solid var(--accent); margin: 0; padding: 4px 14px; color: var(--muted); }
+    .mermaid { background: var(--bg); text-align: center; margin: 16px 0; }
+    footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 32px; }
+
+    /* fragment-shared utilities */
+    .lede { font-size: 1.08rem; color: var(--fg); }
+    section.hero { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 18px; }
+    section.callout { border-left: 4px solid var(--border); padding: 8px 14px; background: var(--card-bg); border-radius: 4px; }
+    section.callout.warn { border-left-color: var(--warn); }
+    section.callout.warn h2::before { content: "⊘ "; color: var(--warn); }
+
+    ol.goal-grid { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; }
+    ol.goal-grid li { background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; display: flex; gap: 10px; }
+    ol.goal-grid .num { flex: 0 0 auto; font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; }
+    ol.goal-grid p { margin: 0; }
+
+    details.role-group { border: 1px solid var(--border); border-radius: 6px; margin: 8px 0; background: var(--card-bg); }
+    details.role-group > summary { cursor: pointer; padding: 8px 12px; font-weight: 600; }
+    details.role-group > summary .count { display: inline-block; margin-left: 6px; padding: 0 7px; border-radius: 10px; background: var(--code-bg); border: 1px solid var(--border); font-weight: 400; font-size: 0.8rem; color: var(--muted); }
+    details.role-group ul.stories { margin: 0; padding: 4px 16px 12px 28px; }
+    ul.stories li { margin: 4px 0; }
+    ul.stories b { color: var(--accent); font-weight: 600; }
+
+    table.ac-table td:first-child { white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 600; }
+    .chip { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 0.78rem; border: 1px solid var(--border); }
+    .chip.area { background: var(--code-bg); color: var(--muted); }
+    .chip.prio-must   { background: var(--chip-must-bg);   color: var(--chip-must-fg); border-color: var(--chip-must-fg); }
+    .chip.prio-should { background: var(--chip-should-bg); color: var(--chip-should-fg); border-color: var(--chip-should-fg); }
+    .chip.prio-may    { background: var(--chip-may-bg);    color: var(--chip-may-fg); border-color: var(--chip-may-fg); }
+
+    ul.non-goals { margin: 0; padding-left: 22px; }
+    ul.non-goals li::marker { content: "⊘  "; color: var(--warn); }
+
+    /* definition-list pattern: Purpose / Entry / Exit / Notes */
+    dl.def-list { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 8px 0; }
+    dl.def-list dt { font-weight: 600; color: var(--muted); }
+    dl.def-list dd { margin: 0; }
+
+    /* ADR */
+    .adr { border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; margin: 18px 0; background: var(--card-bg); }
+    .adr > .meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 6px; }
+    .adr h2 { margin-top: 1.1em; border-bottom: none; font-size: 1.15rem; }
+    .adr h3 { margin-top: 1em; font-size: 1rem; color: var(--muted); }
+    .status-chip { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.78rem; border: 1px solid var(--border); }
+    .status-proposed   { color: var(--warn);    border-color: var(--warn);    background: var(--chip-should-bg); }
+    .status-accepted   { color: var(--ok);      border-color: var(--ok);      background: rgba(31,136,61,0.10); }
+    .status-superseded { color: var(--muted);   border-color: var(--muted);   background: var(--code-bg); text-decoration: line-through; }
+    .status-deprecated { color: var(--danger);  border-color: var(--danger);  background: var(--chip-must-bg); }
+    .consequences { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .consequences .pros, .consequences .cons { padding: 10px 14px; border-radius: 6px; border: 1px solid var(--border); }
+    .consequences .pros { background: rgba(31,136,61,0.07); border-left: 3px solid var(--ok); }
+    .consequences .cons { background: rgba(207,34,46,0.06); border-left: 3px solid var(--danger); }
+    .consequences h3 { margin: 0 0 4px; }
+    .consequences ul { margin: 0; padding-left: 20px; }
+    @media (max-width: 720px) { .consequences { grid-template-columns: 1fr; } }
+    ul.alt-list li { margin: 4px 0; }
+    ul.alt-list li strong { color: var(--fg); }
+
+    /* UX-spec mockup */
+    article.mockup { border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; margin: 18px 0; background: var(--card-bg); }
+    article.mockup > h3 { margin-top: 0; }
+    .mockup-preview { background: var(--bg); border: 1px dashed var(--border); border-radius: 6px; padding: 16px; margin: 10px 0; min-height: 80px; }
+    .screen-meta { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 6px 0 10px; font-size: 0.92rem; }
+    .screen-meta b { color: var(--muted); font-weight: 600; }
+
+    /* Concept */
+    .pillar-grid { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+    .pillar-grid li { background: var(--card-bg); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; padding: 10px 12px; }
+    .pillar-grid li strong { display: block; margin-bottom: 4px; color: var(--accent); }
+    .anti-pillar-grid li { border-left-color: var(--danger); }
+    .anti-pillar-grid li strong { color: var(--danger); }
+    ul.user-segments { list-style: none; padding: 0; }
+    ul.user-segments li { padding: 8px 12px; margin: 6px 0; border-left: 3px solid var(--accent); background: var(--card-bg); border-radius: 4px; }
+    ul.user-segments li b { color: var(--accent); }
+    ul.metrics li { margin: 4px 0; }
+    ul.metrics li .target { float: right; color: var(--ok); font-variant-numeric: tabular-nums; }
+
+    /* Stack */
+    table.tech-table .ver { font-variant-numeric: tabular-nums; color: var(--muted); }
+    .principle-list { list-style: none; padding: 0; }
+    .principle-list li { background: var(--card-bg); border: 1px solid var(--border); border-left: 3px solid var(--info); border-radius: 6px; padding: 8px 12px; margin: 6px 0; }
+    .principle-list li strong { color: var(--info); }
+
+    /* Accessibility */
+    section.a11y-domain { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 18px; margin: 14px 0; }
+    section.a11y-domain h2 { border-bottom: 1px dashed var(--border); }
+    .a11y-domain .scope { font-size: 0.9rem; color: var(--muted); margin: 4px 0 8px; }
+    .limitation { background: var(--chip-should-bg); border-left: 3px solid var(--warn); padding: 8px 12px; margin: 6px 0; border-radius: 4px; }
+    .limitation b { color: var(--warn); }
+
+    /* API */
+    .http-method { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.78rem; font-weight: 700; font-family: ui-monospace, "Cascadia Code", Menlo, monospace; letter-spacing: 0.5px; border: 1px solid var(--border); }
+    .http-get    { color: var(--info);   background: var(--chip-may-bg);    border-color: var(--info); }
+    .http-post   { color: var(--ok);     background: rgba(31,136,61,0.10);  border-color: var(--ok); }
+    .http-put    { color: var(--warn);   background: var(--chip-should-bg); border-color: var(--warn); }
+    .http-patch  { color: var(--warn);   background: var(--chip-should-bg); border-color: var(--warn); }
+    .http-delete { color: var(--danger); background: var(--chip-must-bg);   border-color: var(--danger); }
+    article.endpoint { border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; margin: 14px 0; background: var(--card-bg); }
+    article.endpoint > h3 { margin-top: 0; font-family: ui-monospace, "Cascadia Code", Menlo, monospace; font-size: 1rem; }
+    article.endpoint h4 { margin: 12px 0 4px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
+
+    /* Design system */
+    .swatch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+    .swatch { background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px; }
+    .swatch .chip-color { height: 80px; border-radius: 4px; border: 1px solid var(--border); }
+    .swatch code { font-size: 0.78rem; }
+    .swatch small { color: var(--muted); }
+    .spacing-scale { display: flex; align-items: flex-end; gap: 8px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--card-bg); }
+    .spacing-scale > div { background: var(--accent); width: 24px; border-radius: 2px 2px 0 0; }
+    article.component-preview { border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; margin: 14px 0; background: var(--card-bg); }
+    .preview { padding: 16px; border: 1px dashed var(--border); border-radius: 6px; background: var(--bg); }
+
+    @media print {
+      nav.toc { background: none; border: 1px solid var(--border); }
+      a { color: inherit; text-decoration: none; }
+      footer { page-break-before: always; }
+      details.role-group[open] > summary { list-style: none; }
+      details.role-group { break-inside: avoid; }
+      tr, li { break-inside: avoid; }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>mermaid.initialize({ startOnLoad: true, theme: 'default' });</script>
+</head>
+<body>
+  <div class="layout">
+    <nav class="toc" aria-label="Table of contents">
+      <p class="toc-title">Contents</p>
+      <ol>
+        <li><a href="#problem">Problem</a></li>
+        <li><a href="#goals">Goals</a></li>
+        <li><a href="#user-stories">User stories</a></li>
+        <li><a href="#acceptance-criteria">Acceptance criteria</a></li>
+        <li><a href="#related">Related decisions</a></li>
+        <li><a href="#non-goals">Non-goals</a></li>
+      </ol>
+    </nav>
+    <div class="content">
+      <header>
+        <div class="badges">
+          <span>PRD</span>
+          <span>project</span>
+          <span class="status-approved">approved</span>
+          <!-- provenance badge omitted when provenance == original -->
+        </div>
+        <h1>Work Manager — Product Requirements</h1>
+        <div class="stats">
+          <span class="chip">5 goals</span>
+          <span class="chip">7 stories</span>
+          <span class="chip">45 AC</span>
+          <span class="chip">9 non-goals</span>
+          <span class="chip">updated 2026-10-01</span>
+        </div>
+      </header>
+      <main>
+
+<section id="problem" class="hero">
+  <h2>Problem</h2>
+  <p>This document holds the persistent product requirements of Work Manager, grouped by feature set. Each feature set keeps the requirement IDs of the sprint PRD it was promoted from, prefixed with a feature code. Project vision and target users are in <a href="concept.html">concept.html</a>.</p>
+  <h3>Feature set NF: Work-type needs filter</h3>
+  <p><em>Promoted from sprint 002-work-type-needs-filters (PRD approved 2026-09-29). IDs <code>NF-AC-n</code>, <code>NF-US-n</code> and <code>NF-Gn</code> correspond to sprint 002 AC-n, US-n and Gn.</em></p>
+  <p class="lede">Work Manager assigns work types by skill, passion, schedule and allowed-worker filters, but without the needs filter it ignores pawn needs. A pawn can stay on Mining under an overhead-mountain roof until its Outdoors need falls to "cabin fever" or "trapped / entombed underground", and until rough rock and rubble push its Beauty need down to "unsightly" / "ugly". Without this feature the player has no way to say "do not assign this work type to a pawn while need X is outside the range Y%". Setting priorities by hand does not help, because Work Manager overwrites them on its next update.</p>
+</section>
+
+<section id="goals">
+  <h2>Goals</h2>
+  <h3>NF: Work-type needs filter</h3>
+  <ol class="goal-grid">
+    <li><span class="num">NF-G1</span><p>Let the player block a work type for a pawn while any chosen need is outside a per-need range (0–100%, both bounds adjustable; amended 2026-10-01: threshold → two-sided range at user request). This works for any need and any work type. <em>(from sprint 002 G1)</em></p></li>
+    <li><span class="num">NF-G2</span><p>Make the needs block absolute. No assignment path assigns a need-blocked pawn, including EnsureWorkerAssigned / MinWorkerNumber and the dedicated-worker fail-safe. <em>(from sprint 002 G2)</em></p></li>
+    <li><span class="num">NF-G3</span><p>Fit the needs filter into the existing rule model. It inherits from the default rule, is saved and loaded with the other rule settings, is edited in the work-type rules UI and is shown in the rule summary. <em>(from sprint 002 G3)</em></p></li>
+    <li><span class="num">NF-G4</span><p>Change nothing for players who do not configure the filter. No needs rules ship by default, older settings load unchanged, and assignments are identical while the filter is off. <em>(from sprint 002 G4)</em></p></li>
+    <li><span class="num">NF-G5</span><p>Keep the feature robust for every player. Absent needs and needs from removed DLCs or mods never break evaluation, and all needs-filter UI text is localized in the three 1.6 locales. <em>(from sprint 002 G5, product part; the sprint-scoped test and research-documentation parts are not carried over)</em></p></li>
+  </ol>
+</section>
+
+<section id="user-stories">
+  <h2>User stories</h2>
+  <h3>NF: Work-type needs filter</h3>
+  <details class="role-group" open>
+    <summary>Mod player (colony manager) <span class="count">7</span></summary>
+    <ul class="stories">
+      <li id="NF-US-1"><b>as</b> a mod player, <b>I want</b> to add any need, each with its own range, to a work type's rule, <b>so that</b> pawns whose need is outside that range are not assigned that work type (e.g. Mining with Outdoors and Beauty). <em>(NF-G1; NF-AC-1, NF-AC-13…NF-AC-20, NF-AC-22, NF-AC-27, NF-AC-30…NF-AC-36)</em></li>
+      <li id="NF-US-2"><b>as</b> a mod player, <b>I want</b> to set needs limits once on the default rule and have work-type rules inherit or override them, <b>so that</b> I configure colony-wide limits in one place. <em>(NF-G3; NF-AC-1, NF-AC-4, NF-AC-5, NF-AC-7, NF-AC-8, NF-AC-28, NF-AC-29)</em></li>
+      <li id="NF-US-3"><b>as</b> a mod player, <b>I want</b> the needs block to take precedence over "ensure worker assigned" and "minimum workers", <b>so that</b> a need-blocked pawn is never forced onto the work type. <em>(NF-G2; NF-AC-24…NF-AC-26, NF-AC-41)</em></li>
+      <li id="NF-US-4"><b>as</b> a mod player, <b>I want</b> assignments to follow my pawns' current need levels automatically, <b>so that</b> a pawn goes back to the work type once its need recovers, without my intervention. <em>(NF-G1; NF-AC-21…NF-AC-23, NF-AC-38)</em></li>
+      <li id="NF-US-5"><b>as</b> a mod player, <b>I want</b> the rule summary and tooltips to describe the needs filter accurately, <b>so that</b> I understand why a pawn is or is not assigned. <em>(NF-G3; NF-AC-37, NF-AC-39…NF-AC-41)</em></li>
+      <li id="NF-US-6"><b>as</b> a mod player with existing settings or a changing mod list, <b>I want</b> my settings to keep working when I update Work Manager or remove a DLC or mod that added a need, <b>so that</b> I get no errors and lose no configuration. <em>(NF-G4, NF-G5; NF-AC-2, NF-AC-3, NF-AC-6, NF-AC-9…NF-AC-12, NF-AC-18, NF-AC-35)</em></li>
+      <li id="NF-US-7"><b>as</b> a Russian- or Chinese-speaking player, <b>I want</b> the needs filter UI in my language, never as raw keys, <b>so that</b> I can use it. <em>(NF-G5; NF-AC-42…NF-AC-44, NF-AC-49)</em></li>
+    </ul>
+  </details>
+  <p><em>Sprint 002 US-8 (maintainer: unit tests, warning-free build, documented needs research) is sprint-scoped and not carried over. Its outcomes live in the test suite and in <a href="../architecture/tech-reference/RimWorld-1.6.md">RimWorld-1.6.md</a>.</em></p>
+</section>
+
+<section id="acceptance-criteria">
+  <h2>Acceptance criteria</h2>
+  <h3>NF: Work-type needs filter</h3>
+  <p>Terms used below. <b>Needs state</b>: the tri-state of a rule's needs filter. <em>Inherit</em> uses the default rule's needs filter, <em>Off</em> means no needs filtering, and <em>On</em> filters by this rule's entries. <b>Entry</b>: one NeedDef plus an inclusive level range. <b>Need-blocked</b>: blocked by the needs filter as defined in NF-AC-13.</p>
+  <p>Each <code>NF-AC-n</code> is sprint 002 AC-n. Sprint 002 AC-45 (needs research documentation), AC-46 (warning-free Release build), AC-47 (full test suite passes) and AC-48 (unit-test coverage list) are sprint-scoped process criteria and are not carried over, so NF-AC-45…NF-AC-48 are intentionally unused.</p>
+  <table class="ac-table">
+    <thead>
+      <tr><th>ID</th><th>Criterion</th><th>Area</th><th>Priority</th></tr>
+    </thead>
+    <tbody>
+      <tr id="NF-AC-1"><td><a href="#NF-AC-1">NF-AC-1</a></td><td>Every <code>WorkTypeAssignmentRule</code>, including the default rule, has a needs filter. The filter consists of a needs state (Inherit / Off / On) and a list of entries, each a NeedDef plus a range [min, max] within 0–100%. <em>(from sprint 002 AC-1)</em></td><td><span class="chip area">rules</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-2"><td><a href="#NF-AC-2">NF-AC-2</a></td><td>On validation, entry range bounds outside 0–100% are clamped into 0–100%, a NaN bound is reset to its default, and min &gt; max is swapped. <em>(from sprint 002 AC-2)</em></td><td><span class="chip area">rules</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-3"><td><a href="#NF-AC-3">NF-AC-3</a></td><td>On validation, a rule's entry list keeps at most one entry per NeedDef defName; later duplicates are removed. <em>(from sprint 002 AC-3)</em></td><td><span class="chip area">rules</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-4"><td><a href="#NF-AC-4">NF-AC-4</a></td><td>The default rule's needs state is never Inherit. An Inherit or missing state on the default rule is normalised to Off. <em>(from sprint 002 AC-4)</em></td><td><span class="chip area">rules</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-5"><td><a href="#NF-AC-5">NF-AC-5</a></td><td>A newly created work-type rule starts with needs state Inherit and no entries. <em>(from sprint 002 AC-5)</em></td><td><span class="chip area">rules</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-6"><td><a href="#NF-AC-6">NF-AC-6</a></td><td>No shipped rule (the default rule or any entry in <code>DefaultRules</code>) contains needs entries or has needs state On. <em>(from sprint 002 AC-6)</em></td><td><span class="chip area">rules</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-7"><td><a href="#NF-AC-7">NF-AC-7</a></td><td>When a work-type rule's needs state is Inherit, its combined rule takes the default rule's needs state and a copy of the default rule's entries. <em>(from sprint 002 AC-7)</em></td><td><span class="chip area">rules</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-8"><td><a href="#NF-AC-8">NF-AC-8</a></td><td>When a work-type rule's needs state is On or Off, its combined rule takes that rule's own needs state and entries, independent of the default rule. <em>(from sprint 002 AC-8)</em></td><td><span class="chip area">rules</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-9"><td><a href="#NF-AC-9">NF-AC-9</a></td><td>Needs state, entry defNames and ranges survive a settings save → load round trip unchanged. <em>(from sprint 002 AC-9)</em></td><td><span class="chip area">persistence</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-10"><td><a href="#NF-AC-10">NF-AC-10</a></td><td>Settings saved by a Work Manager version without the needs filter load without errors. Work-type rules load with needs state Inherit, and the default rule loads with Off. <em>(from sprint 002 AC-10)</em></td><td><span class="chip area">persistence</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-11"><td><a href="#NF-AC-11">NF-AC-11</a></td><td>Settings load before defs. An entry loaded from settings resolves to its NeedDef once defs are loaded and is then evaluated normally. <em>(from sprint 002 AC-11)</em></td><td><span class="chip area">persistence</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-12"><td><a href="#NF-AC-12">NF-AC-12</a></td><td>An entry whose NeedDef cannot be resolved (DLC or mod removed) is kept, with its defName and range, through load and save. <em>(from sprint 002 AC-12)</em></td><td><span class="chip area">persistence</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-13"><td><a href="#NF-AC-13">NF-AC-13</a></td><td>With needs state On, a pawn is need-blocked for the work type when, for at least one resolved entry, the pawn has that need and its <code>CurLevelPercentage</code> is outside the entry range (below min or above max). <em>(from sprint 002 AC-13)</em></td><td><span class="chip area">evaluation</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-14"><td><a href="#NF-AC-14">NF-AC-14</a></td><td>A need level exactly equal to the range min or max does not block. <em>(from sprint 002 AC-14)</em></td><td><span class="chip area">evaluation</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-15"><td><a href="#NF-AC-15">NF-AC-15</a></td><td>An entry with the range 0%–100% never blocks. <em>(from sprint 002 AC-15)</em></td><td><span class="chip area">evaluation</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-16"><td><a href="#NF-AC-16">NF-AC-16</a></td><td>An entry for a need the pawn does not have passes. <em>(from sprint 002 AC-16)</em></td><td><span class="chip area">evaluation</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-17"><td><a href="#NF-AC-17">NF-AC-17</a></td><td>A pawn with no needs tracker (<code>pawn.needs == null</code>) passes all entries. <em>(from sprint 002 AC-17)</em></td><td><span class="chip area">evaluation</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-18"><td><a href="#NF-AC-18">NF-AC-18</a></td><td>An entry whose NeedDef is unresolved is skipped at evaluation (passes). <em>(from sprint 002 AC-18)</em></td><td><span class="chip area">evaluation</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-19"><td><a href="#NF-AC-19">NF-AC-19</a></td><td>With needs state Off, or On with no entries, the needs filter never blocks. <em>(from sprint 002 AC-19)</em></td><td><span class="chip area">evaluation</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-20"><td><a href="#NF-AC-20">NF-AC-20</a></td><td>A pawn is an allowed worker only if it satisfies both the allowed-workers filter and the needs filter. <em>(from sprint 002 AC-20)</em></td><td><span class="chip area">evaluation</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-21"><td><a href="#NF-AC-21">NF-AC-21</a></td><td>The verdict depends only on the current need levels and the combined rule. No state carries over between updates (no hysteresis). <em>(from sprint 002 AC-21)</em></td><td><span class="chip area">evaluation</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-22"><td><a href="#NF-AC-22">NF-AC-22</a></td><td>At the end of each Work Manager priority update, a managed pawn that is need-blocked for a managed work type has priority 0 (not assigned) for that work type. <em>(from sprint 002 AC-22)</em></td><td><span class="chip area">assignment</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-23"><td><a href="#NF-AC-23">NF-AC-23</a></td><td>A pawn that was need-blocked becomes eligible for the work type at the first update at which the levels of all its entries are inside their ranges. <em>(from sprint 002 AC-23)</em></td><td><span class="chip area">assignment</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-24"><td><a href="#NF-AC-24">NF-AC-24</a></td><td>EnsureWorkerAssigned never causes a need-blocked pawn to be assigned on any assignment path, including the dedicated-worker fail-safe in <code>AssignDedicatedWorkersForDay</code>. <em>(from sprint 002 AC-24)</em></td><td><span class="chip area">assignment</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-25"><td><a href="#NF-AC-25">NF-AC-25</a></td><td>MinWorkerNumber never causes a need-blocked pawn to be assigned. If fewer pawns are eligible than the minimum, fewer (possibly zero) are assigned. <em>(from sprint 002 AC-25)</em></td><td><span class="chip area">assignment</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-26"><td><a href="#NF-AC-26">NF-AC-26</a></td><td>When every combined rule has needs state Off (or On with no entries), the pawns selected by the dedicated-worker fail-safe and all resulting priorities are identical to Work Manager without the needs filter. This includes the fail-safe's existing handling of pawns that fail the allowed-workers filter. <em>(from sprint 002 AC-26)</em></td><td><span class="chip area">assignment</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-27"><td><a href="#NF-AC-27">NF-AC-27</a></td><td>The work-type rule editor shows a Needs section next to the Allowed workers section, for the default rule and for every work-type rule. <em>(from sprint 002 AC-27)</em></td><td><span class="chip area">settings-ui</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-28"><td><a href="#NF-AC-28">NF-AC-28</a></td><td>The Needs section has a state control that offers Inherit / Off / On on work-type rules and Off / On on the default rule. <em>(from sprint 002 AC-28)</em></td><td><span class="chip area">settings-ui</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-29"><td><a href="#NF-AC-29">NF-AC-29</a></td><td>The tooltip of the Inherit option uses the existing undefined-setting wording ("The setting's value from the default rule will be used."). <em>(from sprint 002 AC-29)</em></td><td><span class="chip area">settings-ui</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-30"><td><a href="#NF-AC-30">NF-AC-30</a></td><td>With needs state On, an Add button, labelled with <code>LordKuper.Common</code>'s shared "Add" string (no Work Manager key of its own), opens a menu of NeedDefs sorted by <code>listPriority</code> (highest first), then by label. The menu lists all NeedDefs except those with <code>playerMechsOnly</code>, the <code>Authority</code> need and needs already in the list. Needs with <code>showOnNeedList = false</code> (e.g. Mood, RoomSize) are included. <em>(from sprint 002 AC-30)</em></td><td><span class="chip area">settings-ui</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-31"><td><a href="#NF-AC-31">NF-AC-31</a></td><td>Each Add need menu option shows the need's label, and its tooltip shows the need's description. <em>(from sprint 002 AC-31)</em></td><td><span class="chip area">settings-ui</span></td><td><span class="chip prio-should">should</span></td></tr>
+      <tr id="NF-AC-32"><td><a href="#NF-AC-32">NF-AC-32</a></td><td>Adding a need creates an entry with the range 50%–100%. <em>(from sprint 002 AC-32)</em></td><td><span class="chip area">settings-ui</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-33"><td><a href="#NF-AC-33">NF-AC-33</a></td><td>Each entry row shows the need's label and a two-sided percent range slider (0–100%, 1% step) that sets the entry range. <em>(from sprint 002 AC-33)</em></td><td><span class="chip area">settings-ui</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-34"><td><a href="#NF-AC-34">NF-AC-34</a></td><td>Each entry row has a remove button that deletes the entry. <em>(from sprint 002 AC-34)</em></td><td><span class="chip area">settings-ui</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-35"><td><a href="#NF-AC-35">NF-AC-35</a></td><td>An entry with an unresolved NeedDef is shown as a row with its defName and an "unavailable" marker, and it can be removed. <em>(from sprint 002 AC-35)</em></td><td><span class="chip area">settings-ui</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-36"><td><a href="#NF-AC-36">NF-AC-36</a></td><td>With needs state On and no entries, the section shows an empty-state text. <em>(from sprint 002 AC-36)</em></td><td><span class="chip area">settings-ui</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-37"><td><a href="#NF-AC-37">NF-AC-37</a></td><td>The Needs section tooltip states four things. The work type is disabled for a pawn while any listed need is outside its allowed range. This overrides "ensure worker assigned" and "minimum workers". Pawns that do not have a listed need are unaffected. Fast-changing needs (e.g. Beauty, Comfort, Food, Rest, Mood) may switch the work type on and off between updates. <em>(from sprint 002 AC-37)</em></td><td><span class="chip area">settings-ui</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-38"><td><a href="#NF-AC-38">NF-AC-38</a></td><td>Changes made in the Needs section take effect from the next Work Manager priority update, without restarting the game. <em>(from sprint 002 AC-38)</em></td><td><span class="chip area">settings-ui</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-39"><td><a href="#NF-AC-39">NF-AC-39</a></td><td>The rule summary tooltip (<code>Description</code>) contains a Needs part. Inherit shows the undefined-section text. Off shows the disabled text. On shows one line per entry, "&lt;need label&gt; [&lt;min&gt;%..&lt;max&gt;%]", using the defName for unresolved entries. On with no entries shows the empty-state text. <em>(from sprint 002 AC-39)</em></td><td><span class="chip area">settings-ui</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-40"><td><a href="#NF-AC-40">NF-AC-40</a></td><td>The Available pawns preview lists the pawns that satisfy the allowed-workers filter and are not currently blocked by the rule's effective needs filter (its own, or the default rule's when inheriting). It refreshes when the Needs section changes, and its tooltip says so. <em>(from sprint 002 AC-40; amended 2026-09-30 after in-game testing)</em></td><td><span class="chip area">settings-ui</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-41"><td><a href="#NF-AC-41">NF-AC-41</a></td><td>The EnsureWorkerAssigned (on) and MinWorkerNumber tooltips state that pawns blocked by the needs filter are never assigned, in all three 1.6 locales. <em>(from sprint 002 AC-41)</em></td><td><span class="chip area">settings-ui</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-42"><td><a href="#NF-AC-42">NF-AC-42</a></td><td>Every needs-filter user-facing string is a <code>Resources.Strings.Settings.WorkTypes</code> member keyed <code>LordKuper.WorkManager.Settings.WorkTypes.&lt;Name&gt;</code>. <em>(from sprint 002 AC-42)</em></td><td><span class="chip area">i18n</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-43"><td><a href="#NF-AC-43">NF-AC-43</a></td><td>Every needs-filter key exists in the 1.6 English, Russian and ChineseSimplified <code>WorkManager_Keyed.xml</code>, and the <code>Settings.WorkTypes.*</code> key sets of the three locales are identical. <em>(from sprint 002 AC-43)</em></td><td><span class="chip area">i18n</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-44"><td><a href="#NF-AC-44">NF-AC-44</a></td><td>No needs-filter keys are added to the 1.1–1.5 language folders. <em>(from sprint 002 AC-44)</em></td><td><span class="chip area">i18n</span></td><td><span class="chip prio-must">must</span></td></tr>
+      <tr id="NF-AC-49"><td><a href="#NF-AC-49">NF-AC-49</a></td><td>The Russian and ChineseSimplified values of every needs-filter key, and of the reworded EnsureWorkerAssigned / MinWorkerNumber tooltips, are translations into that language, not English placeholder text. <em>(from sprint 002 AC-49)</em></td><td><span class="chip area">i18n</span></td><td><span class="chip prio-must">must</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="related">
+  <h2>Related decisions</h2>
+  <h3>NF: Work-type needs filter</h3>
+  <p>The design decisions behind these requirements are recorded in the ADRs below; this document does not restate them.</p>
+  <ul>
+    <li><a href="../architecture/adr/adr-0006-needs-filter-model-and-evaluation.html">ADR-0006</a>: Work Manager-local needs filter on <code>WorkTypeAssignmentRule</code> (model, inheritance, evaluation, persistence).</li>
+    <li><a href="../architecture/adr/adr-0007-needs-block-absolute-in-failsafe.html">ADR-0007</a>: the needs block is absolute in the day-level dedicated-worker fail-safe.</li>
+    <li><a href="../architecture/adr/adr-0008-needs-ui-summary-and-strings.html">ADR-0008</a>: needs UI, rule summary and localized strings.</li>
+  </ul>
+  <p>RimWorld needs mechanics (Need / NeedDef API, level semantics, Outdoors and Beauty thought stages) are background in <a href="../architecture/tech-reference/RimWorld-1.6.md">RimWorld-1.6.md</a>.</p>
+</section>
+
+<section id="non-goals" class="callout warn">
+  <h2>Non-goals</h2>
+  <h3>NF: Work-type needs filter</h3>
+  <ul class="non-goals">
+    <li>Changing <code>LordKuper.Common</code>, including adding a needs dimension to <code>PawnFilter</code>.</li>
+    <li>Shipping needs rules for Mining or any other work type.</li>
+    <li>Lowering priority, instead of disabling the work type, for need-blocked pawns.</li>
+    <li>Hysteresis or latching (enter-low / exit-high) of the needs block.</li>
+    <li>Actively restoring needs (sending pawns outside, scheduling recreation). The filter only withholds work.</li>
+    <li>Per-need threshold hints or thought-stage markers on the slider.</li>
+    <li>Restricting the dedicated-worker fail-safe to allowed workers, and correcting the existing EnsureWorkerAssigned tooltip inaccuracy about the allowed-workers filter. Both are open follow-ups.</li>
+    <li>Legacy 1.1–1.5 builds and locales.</li>
+    <li>Per-pawn exemption from the needs filter.</li>
+  </ul>
+</section>
+
+      </main>
+      <footer>by ASD workflow | 2026-09-29 | sprint 002-work-type-needs-filters</footer>
+    </div>
+  </div>
+  <script>
+    // Scrollspy: highlight current section in TOC
+    (function () {
+      const links = Array.from(document.querySelectorAll('nav.toc a[href^="#"]'));
+      if (!links.length) return;
+      const map = new Map();
+      links.forEach(a => { const el = document.getElementById(a.getAttribute('href').slice(1)); if (el) map.set(el, a); });
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(a => a.classList.remove('active'));
+            const a = map.get(e.target);
+            if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '-30% 0px -65% 0px', threshold: 0 });
+      map.forEach((_a, el) => io.observe(el));
+    })();
+  </script>
+</body>
+</html>

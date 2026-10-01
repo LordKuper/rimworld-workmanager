@@ -1,0 +1,100 @@
+{
+  "sprint_id": "002-work-type-needs-filters",
+  "branch": "sprint/002-work-type-needs-filters",
+  "phase": "done",
+  "reviews": {
+    "design": {
+      "iteration": 2,
+      "verdicts": {
+        "iter-01": {
+          "documentation": "FAIL",
+          "simplification": "CONCERNS",
+          "external": "APPROVE",
+          "ui": "N/A"
+        },
+        "iter-02": {
+          "documentation": "APPROVE",
+          "simplification": "APPROVE",
+          "external": "APPROVE",
+          "ui": "N/A"
+        }
+      }
+    },
+    "impl": {
+      "iteration": 4,
+      "verdicts": {
+        "iter-01": {
+          "quality": "CONCERNS",
+          "implementation": "APPROVE",
+          "testing": "APPROVE",
+          "ui": "APPROVE",
+          "simplification": "CONCERNS",
+          "documentation": "FAIL",
+          "performance": "CONCERNS",
+          "external": "APPROVE"
+        },
+        "iter-02": {
+          "quality": "APPROVE",
+          "implementation": "APPROVE",
+          "testing": "APPROVE",
+          "ui": "CONCERNS",
+          "simplification": "APPROVE",
+          "documentation": "CONCERNS",
+          "performance": "APPROVE",
+          "external": "APPROVE"
+        },
+        "iter-03": {
+          "quality": "APPROVE",
+          "implementation": "APPROVE",
+          "testing": "APPROVE",
+          "ui": "APPROVE",
+          "simplification": "CONCERNS",
+          "documentation": "APPROVE",
+          "performance": "APPROVE",
+          "external": "APPROVE"
+        },
+        "iter-04": {
+          "quality": "APPROVE",
+          "implementation": "APPROVE",
+          "testing": "APPROVE",
+          "ui": "APPROVE (below-floor finding dropped)",
+          "simplification": "APPROVE",
+          "documentation": "APPROVE",
+          "performance": "APPROVE",
+          "external": "APPROVE"
+        }
+      }
+    }
+  },
+  "created_at": "2026-09-29T00:00:00Z",
+  "updated_at": "2026-09-30T00:31:54Z",
+  "review_fixes_pending": null,
+  "subsystems_touched": [],
+  "new_subsystems": [],
+  "escalations": [
+    {
+      "type": "manual-steps",
+      "phase": "impl",
+      "date": "2026-09-29",
+      "items": [
+        "MS-1",
+        "MS-2",
+        "MS-3",
+        "MS-4",
+        "MS-5"
+      ],
+      "status": "resolved",
+      "note": "impl tasks 1-8 done; verification gate build 0/0, tests 119/119, format clean, jb skipped (unavailable), assembly commit 09c4209. In-game checks need a running RimWorld with UI; dev build installed at C:\\Program Files (x86)\\Steam\\steamapps\\common\\RimWorld\\Mods\\WorkManager-dev, settings file Mod_WorkManager-dev_WorkManagerMod.xml. Resume on user's continue command.",
+      "resolved": "2026-09-29",
+      "resolution": "User ran MS-1..MS-5 in RimWorld 1.6: all passed (\"Everything passed as expected.\"). Impl assessment approved; advanced to impl-review."
+    }
+  ],
+  "archived_at": "2026-09-30T00:31:54Z",
+  "pr": {
+    "target": "upstream",
+    "repo": "LordKuper/rimworld-workmanager",
+    "base": "master",
+    "head": "RobertCoop:sprint/002-work-type-needs-filters",
+    "url": "https://github.com/LordKuper/rimworld-workmanager/pull/22"
+  }
+}

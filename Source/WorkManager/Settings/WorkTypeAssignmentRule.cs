@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using LordKuper.Common.Cache;
 using LordKuper.Common.Filters;
 using LordKuper.Common.Helpers;
+using RimWorld;
 using UnityEngine;
 using Verse;
 using PawnHealthState = LordKuper.Common.Filters.PawnHealthState;
@@ -79,6 +80,18 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
     public int MinWorkerNumber;
 
     /// <summary>
+    ///     Indicates whether the needs filter is applied: <c>null</c> inherits from the default rule, <c>false</c> is off,
+    ///     <c>true</c> is on.
+    /// </summary>
+    public bool? FilterNeeds;
+
+    /// <summary>
+    ///     The need thresholds. While the filter is on, a pawn below any threshold is not assigned this work type.
+    ///     Nullable because <see cref="Verse.Scribe_Collections" /> sets this to null when loading older settings.
+    /// </summary>
+    public List<NeedLimit>? NeedLimits = [];
+
+    /// <summary>
     ///     Initializes a new instance of the <see cref="WorkTypeAssignmentRule" /> class.
     /// </summary>
     [UsedImplicitly]
@@ -121,6 +134,7 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
                 CapablePawnRatioFactor = 1f
             },
             AssignEveryone = null,
+            FilterNeeds = false,
             AssignEveryonePriority = 1,
             EnsureWorkerAssigned = true,
             MinWorkerNumber = 1
@@ -382,6 +396,29 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
                 $"{Strings.AllowedWorkersLabel}".Colorize(ColoredText.ColonistCountColor), 1);
             if (AllowedWorkers != null)
                 stringBuilder.AppendLine(AllowedWorkers.GetSummary(2));
+            stringBuilder.AppendLineIndented(
+                $"{Strings.NeedsLabel}".Colorize(ColoredText.ColonistCountColor), 1);
+            if (!FilterNeeds.HasValue)
+            {
+                stringBuilder.AppendLineIndented(Strings.WorkTypeRuleUndefinedSectionTooltip, 2);
+            }
+            else if (!FilterNeeds.Value)
+            {
+                stringBuilder.AppendLineIndented(Strings.WorkTypeRuleDisabledSettingTooltip, 2);
+            }
+            else if (NeedLimits == null || NeedLimits.Count == 0)
+            {
+                stringBuilder.AppendLineIndented(Strings.NeedsEmptyLabel, 2);
+            }
+            else
+            {
+                foreach (var limit in NeedLimits)
+                {
+                    stringBuilder.AppendLineIndented(
+                        $"{limit.Label} [{limit.Limit.min.ToStringPercent()}..{limit.Limit.max.ToStringPercent()}]",
+                        2);
+                }
+            }
             return stringBuilder.ToString();
         }
     }
@@ -405,6 +442,9 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
         Scribe_Values.Look(ref EnsureWorkerAssigned, nameof(EnsureWorkerAssigned));
         Scribe_Values.Look(ref MinWorkerNumber, nameof(MinWorkerNumber));
         Scribe_Deep.Look(ref DedicatedWorkerSettings, nameof(DedicatedWorkerSettings));
+        Scribe_Values.Look(ref FilterNeeds, nameof(FilterNeeds));
+        Scribe_Collections.Look(ref NeedLimits, nameof(NeedLimits), LookMode.Deep);
+        if (Scribe.mode == LoadSaveMode.LoadingVars) ValidateNeedsFilter();
     }
 
     /// <summary>
@@ -431,8 +471,11 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
     {
         if (main == null) throw new ArgumentNullException(nameof(main));
         if (fallback == null) throw new ArgumentNullException(nameof(fallback));
+        var needsSource = main.FilterNeeds.HasValue ? main : fallback;
         return new WorkTypeAssignmentRule(main.DefName)
         {
+            FilterNeeds = needsSource.FilterNeeds,
+            NeedLimits = [.. needsSource.NeedLimits ?? []],
             EnsureWorkerAssigned = main.EnsureWorkerAssigned ?? fallback.EnsureWorkerAssigned,
             MinWorkerNumber = main.EnsureWorkerAssigned.HasValue
                 ? main.MinWorkerNumber
@@ -465,7 +508,9 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
             DedicatedWorkerSettings = new DedicatedWorkerSettings
             {
                 TriStateMode = workTypeDefName != null
-            }
+            },
+            FilterNeeds = workTypeDefName == null ? false : null,
+            NeedLimits = []
         };
     }
 
@@ -551,7 +596,63 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
     public bool IsAllowedWorker(Pawn pawn)
     {
         if (pawn == null) throw new ArgumentNullException(nameof(pawn));
-        return AllowedWorkers!.SatisfiesFilter(pawn, Def);
+        return AllowedWorkers!.SatisfiesFilter(pawn, Def) && !IsNeedBlocked(pawn);
+    }
+
+    /// <summary>
+    ///     Determines whether the needs filter blocks this work type for the specified pawn.
+    /// </summary>
+    /// <param name="pawn">The pawn to evaluate.</param>
+    /// <returns>
+    ///     <see langword="true" /> if the filter is on and the pawn's level for any listed need is outside its range.
+    /// </returns>
+    internal bool IsNeedBlocked(Pawn pawn)
+    {
+        return IsNeedBlocked(FilterNeeds, NeedLimits,
+            def => pawn.needs?.TryGetNeed(def)?.CurLevelPercentage);
+    }
+
+    /// <summary>
+    ///     Determines whether any need in <paramref name="limits" /> is outside its inclusive range. Entries whose def is
+    ///     unresolved and needs the pawn does not have are ignored.
+    /// </summary>
+    /// <param name="filterNeeds">The filter state; only <c>true</c> can block.</param>
+    /// <param name="limits">The need ranges.</param>
+    /// <param name="getLevelPercentage">
+    ///     Returns the pawn's level for a need as a fraction of its maximum, or <c>null</c> when the pawn lacks the need.
+    /// </param>
+    /// <returns><see langword="true" /> if the work type is blocked.</returns>
+    internal static bool IsNeedBlocked(bool? filterNeeds, IReadOnlyList<NeedLimit>? limits,
+        Func<NeedDef, float?> getLevelPercentage)
+    {
+        if (filterNeeds != true || limits == null || limits.Count == 0) return false;
+        foreach (var limit in limits)
+        {
+            var def = limit.Def;
+            if (def == null) continue;
+            var level = getLevelPercentage(def);
+            if (level.HasValue && (level.Value < limit.Limit.min || level.Value > limit.Limit.max)) return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    ///     Normalizes the needs filter: creates the list, drops empty and duplicate entries, normalizes ranges (NaN reset, clamp, swap) and sets the
+    ///     default rule's state. Reads only def names and ranges, so it is safe before defs are loaded.
+    /// </summary>
+    internal void ValidateNeedsFilter()
+    {
+        NeedLimits ??= [];
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        NeedLimits.RemoveAll(limit =>
+            limit == null || string.IsNullOrEmpty(limit.DefName) || !seen.Add(limit.DefName!));
+        foreach (var limit in NeedLimits)
+        {
+            var min = float.IsNaN(limit.Limit.min) ? NeedLimit.DefaultMin : Mathf.Clamp01(limit.Limit.min);
+            var max = float.IsNaN(limit.Limit.max) ? NeedLimit.DefaultMax : Mathf.Clamp01(limit.Limit.max);
+            limit.Limit = min <= max ? new FloatRange(min, max) : new FloatRange(max, min);
+        }
+        if (DefName == null) FilterNeeds ??= false;
     }
 
     /// <summary>
@@ -561,6 +662,7 @@ internal class WorkTypeAssignmentRule : DefCache<WorkTypeDef>, IExposable
     {
         var defaultRule = GetDefaultRule(DefName);
         DedicatedWorkerSettings ??= new DedicatedWorkerSettings();
+        ValidateNeedsFilter();
         AllowedWorkers ??= new PawnFilter();
         AllowedWorkers.Validate();
         AllowedWorkers.ForbiddenPawnTypes = [.. AllowedWorkersForbiddenPawnTypes];

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using LordKuper.WorkManager.Helpers;
 
 namespace LordKuper.WorkManager.Tests;
@@ -255,4 +256,5 @@ public class WorkTypeAssignmentRuleComparerTests
         var result = comparer.Compare(rule, rule);
         result.Should().Be(0);
     }
+
 }

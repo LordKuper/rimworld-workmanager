@@ -71,10 +71,10 @@
 	<LordKuper.WorkManager.Settings.WorkTypes.AssignEveryonePriorityLabel>Assign everyone priority</LordKuper.WorkManager.Settings.WorkTypes.AssignEveryonePriorityLabel>
 	<LordKuper.WorkManager.Settings.WorkTypes.AssignEveryonePriorityTooltip>The priority value with which work will be assigned to all eligible workers.</LordKuper.WorkManager.Settings.WorkTypes.AssignEveryonePriorityTooltip>
 	<LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedLabel>Ensure workers assigned</LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedLabel>
-	<LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedOnTooltip>At least one worker will be assigned even if no pawn satisfies the allowed workers filter.</LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedOnTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedOnTooltip>At least one worker will be assigned even if no pawn satisfies the allowed workers filter. Pawns blocked by the needs filter are never assigned.</LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedOnTooltip>
 	<LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedOffTooltip>A worker will only be assigned if there is a pawn that satisfies the allowed workers filter.</LordKuper.WorkManager.Settings.WorkTypes.EnsureWorkerAssignedOffTooltip>
 	<LordKuper.WorkManager.Settings.WorkTypes.MinWorkerNumberLabel>Minimum number of workers</LordKuper.WorkManager.Settings.WorkTypes.MinWorkerNumberLabel>
-	<LordKuper.WorkManager.Settings.WorkTypes.MinWorkerNumberTooltip>At least the specified number of workers will be assigned.</LordKuper.WorkManager.Settings.WorkTypes.MinWorkerNumberTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.MinWorkerNumberTooltip>At least the specified number of workers will be assigned. Pawns blocked by the needs filter are never assigned.</LordKuper.WorkManager.Settings.WorkTypes.MinWorkerNumberTooltip>
 	<LordKuper.WorkManager.Settings.WorkTypes.DedicatedWorkerSettingsLabel>Dedicated workers settings</LordKuper.WorkManager.Settings.WorkTypes.DedicatedWorkerSettingsLabel>
 	<LordKuper.WorkManager.Settings.WorkTypes.DedicatedWorkerSettingsTooltip>Settings that determine the criteria for assigning dedicated workers.</LordKuper.WorkManager.Settings.WorkTypes.DedicatedWorkerSettingsTooltip>
 	<LordKuper.WorkManager.Settings.WorkTypes.AllowDedicatedWorkerLabel>Allow dedicated workers</LordKuper.WorkManager.Settings.WorkTypes.AllowDedicatedWorkerLabel>
@@ -91,7 +91,15 @@
 	<LordKuper.WorkManager.Settings.WorkTypes.PawnCountFactorLabel>Pawn number factor</LordKuper.WorkManager.Settings.WorkTypes.PawnCountFactorLabel>
 	<LordKuper.WorkManager.Settings.WorkTypes.PawnCountFactorTooltip>The target number of dedicated workers will be calculated by multiplying the number of pawns that meet the criteria below by this number and rounding to the nearest integer number.</LordKuper.WorkManager.Settings.WorkTypes.PawnCountFactorTooltip>
 	<LordKuper.WorkManager.Settings.WorkTypes.AvailablePawnsLabel>Available pawns</LordKuper.WorkManager.Settings.WorkTypes.AvailablePawnsLabel>
-	<LordKuper.WorkManager.Settings.WorkTypes.AvailablePawnsTooltip>List of pawns that satisfy the allowed workers filter.</LordKuper.WorkManager.Settings.WorkTypes.AvailablePawnsTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.AvailablePawnsTooltip>List of pawns that satisfy the allowed workers filter and are not currently blocked by the needs filter. Need levels change over time; press Refresh to update.</LordKuper.WorkManager.Settings.WorkTypes.AvailablePawnsTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.NeedsLabel>Needs</LordKuper.WorkManager.Settings.WorkTypes.NeedsLabel>
+	<LordKuper.WorkManager.Settings.WorkTypes.NeedsTooltip>The work type is disabled for a pawn while any need listed here is outside its allowed range (inclusive). This overrides "ensure worker assigned" and "minimum workers". Pawns that do not have a listed need are not affected. Fast-changing needs (Beauty, Comfort, Food, Rest, Mood) may switch the work type on and off between updates.</LordKuper.WorkManager.Settings.WorkTypes.NeedsTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.FilterNeedsLabel>Filter by needs</LordKuper.WorkManager.Settings.WorkTypes.FilterNeedsLabel>
+	<LordKuper.WorkManager.Settings.WorkTypes.FilterNeedsOnTooltip>Pawns with a listed need outside its allowed range are not assigned to the work type.</LordKuper.WorkManager.Settings.WorkTypes.FilterNeedsOnTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.FilterNeedsOffTooltip>Needs are ignored when assigning the work type.</LordKuper.WorkManager.Settings.WorkTypes.FilterNeedsOffTooltip>
+	<LordKuper.WorkManager.Settings.WorkTypes.NeedsEmptyLabel>No needs added. Nothing is filtered.</LordKuper.WorkManager.Settings.WorkTypes.NeedsEmptyLabel>
+	<LordKuper.WorkManager.Settings.WorkTypes.NeedUnavailableLabel>{0} (unavailable)</LordKuper.WorkManager.Settings.WorkTypes.NeedUnavailableLabel>
+	<LordKuper.WorkManager.Settings.WorkTypes.NeedUnavailableTooltip>This need is not available in the current game (its mod may be missing). The limit is kept but ignored. You can remove it.</LordKuper.WorkManager.Settings.WorkTypes.NeedUnavailableTooltip>
 	<LordKuper.WorkManager.DedicatedWorkerMode.Constant.Label>Constant number</LordKuper.WorkManager.DedicatedWorkerMode.Constant.Label>
 	<LordKuper.WorkManager.DedicatedWorkerMode.Constant.Tooltip>A fixed number of dedicated workers will be assigned to a type of work.</LordKuper.WorkManager.DedicatedWorkerMode.Constant.Tooltip>
 	<LordKuper.WorkManager.DedicatedWorkerMode.WorkTypeCount.Label>Work types count</LordKuper.WorkManager.DedicatedWorkerMode.WorkTypeCount.Label>

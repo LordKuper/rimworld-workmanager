@@ -10,7 +10,7 @@ responsibility:
 ## Canonical source
 - Official docs: https://docs.nunit.org/
 - NuGet: https://www.nuget.org/packages/NUnit/4.6.1
-- Last verified: 2026-06-04
+- Last verified: 2026-09-29 (Known issues: discovery-time type loading). Earlier sections: 2026-06-04.
 
 ## Package wiring
 - Added to `Source/WorkManager.Tests/WorkManager.Tests.csproj` as `<PackageReference Include="NUnit" Version="4.6.1" />`.
@@ -40,10 +40,14 @@ NUnit is the **test framework only** (attributes + lifecycle). Assertions are NO
 - Use a global `<Using Include="NUnit.Framework" />` in the test csproj instead of per-file `using NUnit.Framework;`.
 - **Static-state isolation**: tests mutating global/cached/static state save/restore via per-test `[SetUp]` (snapshot) / `[TearDown]` (restore) on a shared base class. Use per-test `[SetUp]`/`[TearDown]`, NOT per-class `[OneTimeSetUp]`, so each test gets true isolation.
 - NUnit runs non-parallel by default; mark static-touching classes `[NonParallelizable]` and never add `[assembly: Parallelizable]`.
-- If RimWorld-typed test types are introduced, register the RimWorld `AppDomain.AssemblyResolve` handler in a namespace-less (global) `[SetUpFixture]` with `[OneTimeSetUp]` before any such type loads.
+- If RimWorld-typed test types are introduced, register the RimWorld `AppDomain.AssemblyResolve` handler in a namespace-less (global) `[SetUpFixture]` with `[OneTimeSetUp]`. That covers execution only; discovery-time loading needs `Assembly-CSharp.dll` in the test output (see Known issues below).
 - Do not depend on test execution order.
 - The placeholder `Assert.Pass` is legacy-only; first real test must add the FluentAssertions 7.x package and use `.Should()`.
 
 ## Known issues and workarounds
-- Tests that load RimWorld types fail at type-load without the global AssemblyResolve setup fixture — register it first.
+- **RimWorld types in tests: discovery vs execution (single home for this fact).** NUnit enumerates every type in the test assembly (`Assembly.GetTypes()`, attribute reads) during *discovery*, before any `[OneTimeSetUp]` runs, so the global `[SetUpFixture]` `AssemblyResolve` handler is not yet registered. Therefore:
+  - A test-assembly type whose **signature** references a RimWorld type (base type, field/method signature, generic constraint — e.g. the test-only `FakeDefProvider : IDefProvider` with `where T : Def`) fails to load at discovery unless `Assembly-CSharp.dll` sits next to the test assembly; the whole assembly is then not runnable (zero tests discovered or mass failure).
+  - Workaround in use: the test csproj's `CopyRimWorldTestDeps` target (`AfterTargets="Build"`) copies `$(RimWorldManagedDir)\Assembly-CSharp.dll` into the test output (`<Reference>` stays `Private=False`). The output `bin/` is gitignored; the DLL is never committed or shipped. Decision and scope: ADR-0002 amendment 2026-09-29 (`design/architecture/adr/adr-0002-test-isolation-infrastructure.html#amendment-2026-09-29`). LordKuper.Common's test project uses the same target (Common ADR-0006), with a wider file set.
+  - The `AssemblyResolve` handler is still required: it supplies the Unity modules and other RimWorld-dir assemblies while tests *execute* (types referenced only inside method bodies load lazily and hit the resolver).
+  - If a future discovery failure names another RimWorld-dir assembly (Unity module, `netstandard` 2.1), add it to `CopyRimWorldTestDeps` rather than restructuring tests.
 - Parallelism + static state is a correctness hazard; the `[NonParallelizable]` + per-test SetUp/TearDown convention is the mitigation.

@@ -466,6 +466,46 @@ internal static class Resources
                     $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(MinWorkerNumberTooltip)}"
                         .Translate();
 
+                /// <summary>Label of the needs filter section.</summary>
+                internal static readonly string NeedsLabel =
+                    $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(NeedsLabel)}"
+                        .Translate();
+
+                /// <summary>Tooltip of the needs filter section.</summary>
+                internal static readonly string NeedsTooltip =
+                    $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(NeedsTooltip)}"
+                        .Translate();
+
+                /// <summary>Label of the needs filter state checkbox.</summary>
+                internal static readonly string FilterNeedsLabel =
+                    $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(FilterNeedsLabel)}"
+                        .Translate();
+
+                /// <summary>Tooltip of the enabled needs filter state.</summary>
+                internal static readonly string FilterNeedsOnTooltip =
+                    $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(FilterNeedsOnTooltip)}"
+                        .Translate();
+
+                /// <summary>Tooltip of the disabled needs filter state.</summary>
+                internal static readonly string FilterNeedsOffTooltip =
+                    $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(FilterNeedsOffTooltip)}"
+                        .Translate();
+
+                /// <summary>Text shown when the needs filter is enabled but has no entries.</summary>
+                internal static readonly string NeedsEmptyLabel =
+                    $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(NeedsEmptyLabel)}"
+                        .Translate();
+
+                /// <summary>Format of the label of a need that cannot be resolved; <c>{0}</c> is the def name.</summary>
+                internal static readonly string NeedUnavailableLabel =
+                    $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(NeedUnavailableLabel)}"
+                        .Translate();
+
+                /// <summary>Tooltip of a need that cannot be resolved.</summary>
+                internal static readonly string NeedUnavailableTooltip =
+                    $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(NeedUnavailableTooltip)}"
+                        .Translate();
+
                 internal static readonly string NoRuleSelected =
                     $"{WorkManagerMod.ModId}.{nameof(Settings)}.{nameof(WorkTypes)}.{nameof(NoRuleSelected)}"
                         .Translate();
@@ -540,6 +580,8 @@ internal static class Resources
                 private static string? _assignEveryoneTriStateTooltip;
                 private static string? _ensureWorkerAssignedTooltip;
                 private static string? _ensureWorkerAssignedTriStateTooltip;
+                private static string? _filterNeedsTooltip;
+                private static string? _filterNeedsTriStateTooltip;
 
                 private static string AppendUndefinedSettingTooltip(string tooltip)
                 {
@@ -573,6 +615,21 @@ internal static class Resources
                     var baseTooltip = GetAssignEveryoneTooltip(false);
                     _assignEveryoneTriStateTooltip = AppendUndefinedSettingTooltip(baseTooltip);
                     return _assignEveryoneTriStateTooltip;
+                }
+
+                /// <summary>Gets the tooltip of the needs filter state checkbox.</summary>
+                /// <param name="triState">Whether the checkbox has the additional undefined state.</param>
+                /// <returns>The tooltip text.</returns>
+                public static string GetFilterNeedsTooltip(bool triState)
+                {
+                    if (!triState)
+                        return _filterNeedsTooltip ??= string.Concat(MultiCheckboxStates.On, ": ",
+                            FilterNeedsOnTooltip, Environment.NewLine, MultiCheckboxStates.Off, ": ",
+                            FilterNeedsOffTooltip);
+                    if (_filterNeedsTriStateTooltip != null) return _filterNeedsTriStateTooltip;
+                    var baseTooltip = GetFilterNeedsTooltip(false);
+                    _filterNeedsTriStateTooltip = AppendUndefinedSettingTooltip(baseTooltip);
+                    return _filterNeedsTriStateTooltip;
                 }
 
                 public static string GetEnsureWorkerAssignedTooltip(bool triState)

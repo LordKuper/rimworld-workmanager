@@ -42,4 +42,15 @@
     </Reference>
   </ItemGroup>
 
+  <!-- NUnit loads every test type during discovery, before any [OneTimeSetUp] can register the RimWorld
+       AssemblyResolve handler. A test type whose signature references a RimWorld type (such as FakeDefProvider,
+       whose generic constraints name Verse.Def) makes the whole assembly fail to load unless Assembly-CSharp sits
+       next to it. Private=False above keeps it out of the normal copy step, so copy it explicitly; the runtime
+       handler still supplies the Unity modules at execution time. -->
+  <Target Name="CopyRimWorldTestDeps" AfterTargets="Build">
+    <Copy SourceFiles="$(RimWorldManagedDir)\Assembly-CSharp.dll"
+          DestinationFolder="$(OutputPath)"
+          SkipUnchangedFiles="true" />
+  </Target>
+
 </Project>

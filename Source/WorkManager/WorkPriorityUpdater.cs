@@ -281,7 +281,10 @@ public class WorkPriorityUpdater(Map map) : MapComponent(map)
             var availableWorkers = new List<PawnCache>(_capablePawns.Count);
             foreach (var pc in _capablePawns)
             {
-                if (!goodWorkers.Contains(pc)) availableWorkers.Add(pc);
+                // The fallback pool deliberately skips the allowed-workers filter; it only
+                // excludes pawns blocked by the needs filter, which is never overridden.
+                if (!goodWorkers.Contains(pc) && !rule.IsNeedBlocked(pc.Pawn))
+                    availableWorkers.Add(pc);
             }
             pawnScores = GetDedicatedWorkersScores(availableWorkers, def, relevantRules);
             AssignBestDedicatedWorkers(pawnScores, rule, workerCount, targetWorkersCount);

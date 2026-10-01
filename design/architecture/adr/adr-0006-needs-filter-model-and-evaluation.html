@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<!--
+responsibility:
+  owns: single architecture decision — needs filter data model, persistence and evaluation on WorkTypeAssignmentRule
+  excludes: requirements, ux, code
+  delegates_to: prd (requirements), code (implementation)
+provenance: original
+source: ""
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="generator" content="ASD workflow">
+  <meta name="doc-type" content="ADR">
+  <meta name="subsystem" content="N/A">
+  <meta name="sprint-id" content="002-work-type-needs-filters">
+  <meta name="status" content="accepted">
+  <meta name="updated" content="2026-10-01">
+  <meta name="responsibility" content="owns: needs filter data model, persistence and evaluation on WorkTypeAssignmentRule; excludes: requirements, ux, code">
+  <meta name="provenance" content="original">
+  <meta name="source" content="">
+  <title>ADR-0006 · WorkManager-local needs filter on WorkTypeAssignmentRule</title>
+  <style>
+    :root {
+      --fg: #1a1c1e; --bg: #fff; --muted: #5b6770; --accent: #0066cc;
+      --code-bg: #f4f6f8; --border: #d0d7de; --max: 1040px;
+      --card-bg: #fafbfc;
+      --ok: #1f883d; --warn: #b35900; --danger: #cf222e; --info: #0969da; --neutral: #5b6770;
+      --chip-must-bg: #ffebe9; --chip-must-fg: #cf222e;
+      --chip-should-bg: #fff5e1; --chip-should-fg: #9a6700;
+      --chip-may-bg: #ddf4ff; --chip-may-fg: #0969da;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --fg: #e6e6e6; --bg: #0e1116; --muted: #9aa4ad; --code-bg: #161b22; --border: #30363d;
+        --card-bg: #161b22;
+        --chip-must-bg: #3b1416; --chip-must-fg: #ff7b72;
+        --chip-should-bg: #2d2410; --chip-should-fg: #e3b341;
+        --chip-may-bg: #0d2538; --chip-may-fg: #58a6ff;
+      }
+    }
+    html, body { margin: 0; padding: 0; }
+    * { box-sizing: border-box; }
+    body { font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--fg); background: var(--bg); }
+    .layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); min-height: 100vh; }
+    .content { min-width: 0; }
+    header, main, footer { max-width: var(--max); margin: 0 auto; padding: 16px 24px; }
+    header { border-bottom: 1px solid var(--border); }
+    header h1 { margin: 4px 0 8px; font-size: 1.9rem; }
+    .badges span { display: inline-block; padding: 2px 8px; margin-right: 6px; font-size: 0.75rem; border: 1px solid var(--border); border-radius: 4px; color: var(--muted); background: var(--bg); }
+    .badges .provenance-original { display: none; }
+    .badges .status-proposed { color: var(--warn); border-color: var(--warn); }
+    .badges .status-accepted { color: var(--ok); border-color: var(--ok); }
+    .stats { margin-top: 6px; font-size: 0.85rem; color: var(--muted); }
+    .stats .chip { display: inline-block; padding: 1px 8px; margin-right: 6px; border-radius: 10px; background: var(--code-bg); border: 1px solid var(--border); }
+    nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 18px 14px; border-right: 1px solid var(--border); background: var(--card-bg); font-size: 0.9rem; }
+    nav.toc .toc-title { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 8px; padding-left: 6px; }
+    nav.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: tocn; }
+    nav.toc li { margin: 2px 0; counter-increment: tocn; }
+    nav.toc a { display: block; padding: 4px 8px; border-radius: 4px; color: var(--fg); text-decoration: none; border-left: 2px solid transparent; }
+    nav.toc a:hover { background: var(--code-bg); color: var(--accent); }
+    nav.toc a.active { background: var(--code-bg); color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+    nav.toc a::before { content: counter(tocn) ". "; color: var(--muted); font-variant-numeric: tabular-nums; }
+    @media (max-width: 880px) {
+      .layout { grid-template-columns: 1fr; }
+      nav.toc { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--border); }
+    }
+    h2, h3, h4 { line-height: 1.25; margin-top: 1.6em; }
+    h2 { border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+    a { color: var(--accent); }
+    code, pre { font-family: ui-monospace, "Cascadia Code", Menlo, monospace; }
+    code { background: var(--code-bg); padding: 1px 5px; border-radius: 3px; font-size: 0.9em; }
+    pre { background: var(--code-bg); padding: 12px; border-radius: 6px; overflow-x: auto; }
+    pre code { background: none; padding: 0; }
+    .chip { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 0.78rem; border: 1px solid var(--border); }
+    .chip.area { background: var(--code-bg); color: var(--muted); }
+    footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 32px; }
+    .lede { font-size: 1.08rem; color: var(--fg); }
+
+    .adr { border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; margin: 18px 0; background: var(--card-bg); }
+    .adr > .meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 6px; }
+    .adr h2 { margin-top: 1.1em; border-bottom: none; font-size: 1.15rem; }
+    .adr h3 { margin-top: 1em; font-size: 1rem; color: var(--muted); }
+    .status-chip { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.78rem; border: 1px solid var(--border); }
+    .status-proposed   { color: var(--warn);    border-color: var(--warn);    background: var(--chip-should-bg); }
+    .status-accepted   { color: var(--ok);      border-color: var(--ok);      background: rgba(31,136,61,0.10); }
+    .status-superseded { color: var(--muted);   border-color: var(--muted);   background: var(--code-bg); text-decoration: line-through; }
+    .status-deprecated { color: var(--danger);  border-color: var(--danger);  background: var(--chip-must-bg); }
+    .consequences { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .consequences .pros, .consequences .cons { padding: 10px 14px; border-radius: 6px; border: 1px solid var(--border); }
+    .consequences .pros { background: rgba(31,136,61,0.07); border-left: 3px solid var(--ok); }
+    .consequences .cons { background: rgba(207,34,46,0.06); border-left: 3px solid var(--danger); }
+    .consequences h3 { margin: 0 0 4px; }
+    .consequences ul { margin: 0; padding-left: 20px; }
+    @media (max-width: 720px) { .consequences { grid-template-columns: 1fr; } }
+    ul.alt-list li { margin: 4px 0; }
+    ul.alt-list li strong { color: var(--fg); }
+    table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+    th, td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; vertical-align: top; }
+    th { background: var(--code-bg); }
+    .traces { font-size: 0.85rem; color: var(--muted); margin-top: 6px; }
+    .traces .chip { background: var(--chip-may-bg); color: var(--chip-may-fg); border-color: var(--chip-may-fg); }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <nav class="toc" aria-label="Table of contents">
+      <p class="toc-title">Contents</p>
+      <ol>
+        <li><a href="#context">Context</a></li>
+        <li><a href="#decision">Decision</a></li>
+        <li><a href="#consequences">Consequences</a></li>
+        <li><a href="#alternatives">Alternatives considered</a></li>
+        <li><a href="#complication-approval">Complication Approval</a></li>
+        <li><a href="#related">Related ADRs</a></li>
+      </ol>
+    </nav>
+    <div class="content">
+      <header>
+        <div class="badges">
+          <span>ADR</span>
+          <span>N/A</span>
+          <span class="status-accepted">accepted</span>
+          <span class="provenance-original">original</span>
+        </div>
+        <h1>ADR-0006 · WorkManager-local needs filter on WorkTypeAssignmentRule</h1>
+        <div class="stats">
+          <span class="chip">accepted</span>
+          <span class="chip">subsystem N/A</span>
+          <span class="chip">updated 2026-10-01</span>
+        </div>
+      </header>
+      <main>
+
+<article class="adr" id="adr-0006">
+  <div class="meta">
+    <span class="status-chip status-accepted">accepted</span>
+    <span class="chip area">subsystem: N/A</span>
+    <span class="chip">ADR-0006</span>
+  </div>
+
+  <h2 id="context">Context</h2>
+  <ul>
+    <li><strong>Amended 2026-10-01: threshold → two-sided range at user request.</strong> The single lower threshold became an inclusive range <code>[min, max]</code> (<code>FloatRange Limit</code>, default 50%–100%, equivalent to the old 50% threshold), so the player can block a pawn whose need is too low or too high. The model, evaluation, validation and legacy migration below describe the amended behavior; the earlier "strictly below a threshold" wording is superseded.</li>
+    <li>Scope decisions (decisions-log 2026-09-29): a per-work-type needs filter that is WorkManager-local, because LordKuper.Common is an upstream contract and cannot be edited from this repo. It blocks a need level outside a per-need range, supports any need, ships no defaults, and the block is absolute. There is no hysteresis: the check is stateless and runs on every update.</li>
+    <li>The existing rule model is <code>WorkTypeAssignmentRule : DefCache&lt;WorkTypeDef&gt;, IExposable</code>. Nullable fields mean "undefined, inherit from the default rule". <code>Combine(main, fallback)</code> takes the value from <code>main</code> when it has one. <code>Validate()</code> runs only when saving. Settings load in the <code>WorkManagerMod</code> constructor, before defs are loaded.</li>
+    <li>Common precedent: <code>PawnCapacityLimit : DefCache&lt;PawnCapacityDef&gt;, IExposable</code> together with <code>PawnFilter.FilterPawnCapacities</code> (<code>bool?</code>) and <code>PawnCapacityLimits</code> (list). <code>CombinePawnCapacities</code> takes the source whose flag has a value and makes a shallow copy of its list. <code>SatisfiesFilter</code> skips entries whose def is unresolved and keeps no state.</li>
+    <li><code>DefCache&lt;T&gt;</code> resolves lazily through <code>DefProvider.Current.GetNamedSilentFail&lt;T&gt;</code>. It latches on the first <code>.Def</code> / <code>.Label</code> read, so reading either before defs load caches <code>null</code> until restart.</li>
+    <li><code>Scribe_Collections.Look(..., LookMode.Deep)</code> sets the list to <code>null</code> when the node is missing, which is the case for settings saved by older versions.</li>
+    <li>Convention conflict D-3: <code>LordKuper.Common-1.6.md</code> states "Pawn eligibility is expressed through <code>PawnFilter</code> … not ad-hoc predicates".</li>
+    <li>Evaluation choke point: <code>PawnCache.IsAllowedWorker(WorkTypeDef)</code> calls <code>CombinedRulesDict[wt].IsAllowedWorker(pawn)</code>. The result is memoised per update and cleared on every refresh.</li>
+    <li>Tests target net472 with NUnit 4.6.1 and FluentAssertions 7.2.2. No existing test constructs a <code>Pawn</code>. Common exposes <code>DefProvider.Current</code> (a public, settable <code>IDefProvider</code>) as the def-lookup seam. Common's own tests construct defs with object initialisers.</li>
+  </ul>
+
+  <h2 id="decision">Decision</h2>
+  <p class="lede">Add a <code>NeedLimit</code> entry type and a tri-state needs filter to <code>WorkTypeAssignmentRule</code>, following the shape of Common's capacity limits. Evaluate it inside <code>IsAllowedWorker</code> through a pure static seam.</p>
+  <ol>
+    <li><strong>Entry type.</strong> New <code>internal sealed class NeedLimit : DefCache&lt;NeedDef&gt;, IExposable</code> in <code>Source/WorkManager/Settings/NeedLimit.cs</code>.
+      <ul>
+        <li>Field: <code>public FloatRange Limit = new(DefaultMin, DefaultMax);</code> with <code>internal const float DefaultMin = 0.5f</code> and <code>DefaultMax = 1f</code> (AC-32). It is stored as fractions in [0, 1], the same scale as <code>Need.CurLevelPercentage</code>, and shown as 0–100%. The range is inclusive at both ends.</li>
+        <li>Constructors: <code>NeedLimit()</code> for Scribe, <code>NeedLimit(string defName)</code> and <code>NeedLimit(NeedDef def)</code>.</li>
+        <li><code>public new void ExposeData()</code> calls <code>base.ExposeData()</code> and persists <code>Limit</code> with <code>Scribe_Values.Look</code> (NaN sentinel default). <em>Legacy migration:</em> settings saved by the earlier build have a <code>Threshold</code> float and no <code>Limit</code> node; when loading reads no <code>Limit</code> but a <code>Threshold</code>, <code>Limit</code> becomes <code>[threshold, 1]</code>, which preserves the old behavior. The load path touches only values, never <code>.Def</code>. Only the defName and range are persisted, never <code>Scribe_Defs</code> / <code>LookMode.Def</code> (AC-11). Unresolved defNames survive load and save (AC-12).</li>
+      </ul></li>
+    <li><strong>Rule fields</strong> (after <code>AllowedWorkers</code>): <code>public bool? FilterNeeds;</code> (<code>null</code> = Inherit, <code>false</code> = Off, <code>true</code> = On) and <code>public List&lt;NeedLimit&gt;? NeedLimits = [];</code>. The list is nullable because Scribe can set it to <code>null</code> on load (AC-1).</li>
+    <li><strong>Persistence.</strong> <code>ExposeData</code> adds <code>Scribe_Values.Look(ref FilterNeeds, …)</code> and <code>Scribe_Collections.Look(ref NeedLimits, …, LookMode.Deep)</code>, followed by <code>if (Scribe.mode == LoadSaveMode.LoadingVars) ValidateNeedsFilter();</code>. <code>ValidateNeedsFilter</code> reads only <code>DefName</code> and <code>Limit</code> (and, before the range exists, the legacy <code>Threshold</code>), so it is safe before defs load (AC-10, AC-11). <code>Settings_Version</code> is not bumped: the nodes are additive and optional.</li>
+    <li><strong><code>internal void ValidateNeedsFilter()</code></strong>, also called from <code>Validate()</code> on every save:
+      <ul>
+        <li>Sets <code>NeedLimits ??= []</code> and drops null entries and entries with an empty <code>DefName</code>.</li>
+        <li>Removes duplicate <code>DefName</code>s (OrdinalIgnoreCase) and keeps the first (AC-3).</li>
+        <li>Resets a NaN min or max to <code>NeedLimit.DefaultMin</code> (0.5) or <code>DefaultMax</code> (1), clamps both with <code>Mathf.Clamp01</code>, and swaps them when min &gt; max (AC-2).</li>
+        <li>On the default rule (<code>DefName == null</code>), sets <code>FilterNeeds ??= false</code> (AC-4).</li>
+      </ul>
+      The method is <code>internal</code> because <code>Validate()</code> reads <code>WorkManagerMod.Settings</code>, which is not available in unit tests.</li>
+    <li><strong>Construction.</strong> <code>CreateRule(defName)</code> sets <code>FilterNeeds = defName == null ? false : null</code> and <code>NeedLimits = []</code> (AC-4, AC-5). In <code>DefaultRules</code>, the default rule sets <code>FilterNeeds = false</code> explicitly. No shipped rule has entries or <code>FilterNeeds == true</code> (AC-6).</li>
+    <li><strong>Combine.</strong> <code>var source = main.FilterNeeds.HasValue ? main : fallback;</code> then <code>FilterNeeds = source.FilterNeeds; NeedLimits = [.. source.NeedLimits ?? []];</code>. This is a shallow copy, the same as <code>PawnFilter.CombinePawnCapacities</code> (AC-7, AC-8).</li>
+    <li><strong>Evaluation.</strong>
+      <ul>
+        <li><code>IsAllowedWorker(pawn)</code> becomes <code>AllowedWorkers!.SatisfiesFilter(pawn, Def) &amp;&amp; !IsNeedBlocked(pawn)</code> (AC-20).</li>
+        <li><code>internal bool IsNeedBlocked(Pawn pawn) =&gt; IsNeedBlocked(FilterNeeds, NeedLimits, def =&gt; pawn.needs?.TryGetNeed(def)?.CurLevelPercentage);</code> is a one-line call into the static seam, which is the only place that checks the state.</li>
+        <li>Pure test seam: <code>internal static bool IsNeedBlocked(bool? filterNeeds, IReadOnlyList&lt;NeedLimit&gt;? limits, Func&lt;NeedDef, float?&gt; getLevelPercentage)</code>.
+          <ul>
+            <li>Returns <code>false</code> when the state is not On or the list is empty (AC-19).</li>
+            <li>Skips entries whose <code>Def == null</code> (AC-18).</li>
+            <li>Skips a <code>null</code> level: the pawn lacks the need (AC-16) or <code>pawn.needs == null</code> (AC-17).</li>
+            <li>Blocks when <code>level &lt; Limit.min || level &gt; Limit.max</code> for any entry. The range is inclusive: a level equal to either bound passes (AC-14), and a [0%, 100%] range never blocks (AC-15, AC-13).</li>
+            <li>Keeps no state between updates (AC-21).</li>
+          </ul></li>
+        <li><code>CurLevelPercentage</code> is used rather than <code>CurLevel</code> because Food and MechEnergy have <code>MaxLevel != 1</code> (<a href="../../../.asd/sprints/archived/002-work-type-needs-filters/audit.md">audit</a> R-1).</li>
+        <li><code>PawnCache</code> is unchanged. It memoises the verdict per update and recomputes it on every update (AC-22, AC-23). Priority 0 is already the default outcome of <code>UpdateCache</code>, so no new write path is needed.</li>
+      </ul></li>
+    <li><strong>Scoped exception to the eligibility convention (D-3).</strong> Pawn eligibility stays expressed through <code>PawnFilter</code>, except for this per-work-type needs filter on <code>WorkTypeAssignmentRule</code>. At design-promote, the convention line in <code>LordKuper.Common-1.6.md</code> is amended to cite ADR-0006. If Common later adds a needs dimension to <code>PawnFilter</code>, a new ADR supersedes this one and migrates the settings.</li>
+    <li><strong>Test approach</strong> (net472, no <code>Pawn</code> construction).
+      <ul>
+        <li>A new test-only <code>FakeDefProvider : IDefProvider</code> in WorkManager.Tests (dictionary-backed). It is installed into <code>DefProvider.Current</code> in SetUp and restored in TearDown. Fixtures that touch default-rule caches derive from <code>StateIsolationTestBase</code>. Because its generic constraints name <code>Verse.Def</code>, the type must load at NUnit discovery; how the test build makes <code>Assembly-CSharp</code> available for that is recorded in the <a href="adr-0002-test-isolation-infrastructure.html#amendment-2026-09-29">ADR-0002 amendment (2026-09-29)</a>.</li>
+        <li>NeedDefs are built with <code>new NeedDef { defName = …, label = …, listPriority = … }</code>. If that needs the game runtime, the fallback is <code>FormatterServices.GetUninitializedObject</code> plus field assignment (the <code>IsInitializedTests</code> precedent).</li>
+        <li>The need-level check is tested through the static <code>IsNeedBlocked</code> with a dictionary-backed <code>getLevelPercentage</code>. A missing key means the pawn lacks the need; all-null values mean <code>pawn.needs == null</code>. This covers AC-13…AC-19.</li>
+        <li><code>ValidateNeedsFilter</code> tests cover AC-2, AC-3, AC-4 and AC-10 (older settings simulated by setting the fields to <code>null</code>). <code>DefaultRules</code> tests cover AC-6, and <code>Combine</code> tests cover AC-7 and AC-8.</li>
+        <li>The real Scribe round trip (AC-9, AC-11, AC-12) and the one-line <code>pawn.needs?</code> adapter (AC-17) are manual in-game checks, following the sprint 001 MS precedent.</li>
+      </ul></li>
+  </ol>
+
+  <h2 id="consequences">Consequences</h2>
+  <div class="consequences">
+    <div class="pros">
+      <h3>Positive</h3>
+      <ul>
+        <li>Same shape as the existing tri-state rule fields and Common's capacity limits, so the code is familiar to reviewers.</li>
+        <li>Safe with older settings (the list is null-coalesced on load) and with removed DLCs or mods (entries are kept and skipped).</li>
+        <li>One evaluation point covers every gated assignment pass. The result is memoised per update, and the cost is negligible: a few linear <code>TryGetNeed</code> scans, made only while the state is On. The level-lookup delegate is allocated on every call (memoised per update), which is negligible.</li>
+        <li>The pure static seam makes AC-13…AC-19 unit-testable without building <code>Pawn</code> object graphs.</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h3>Negative</h3>
+      <ul>
+        <li>There are now two eligibility mechanisms, which is a documented exception to a project convention. <code>DedicatedWorkerMode.PawnCount</code> target counting does not see the needs filter. (The "Available pawns" preview does since 2026-09-30; see ADR-0008.)</li>
+        <li>Combined rules share <code>NeedLimit</code> instances with the source rule (shallow copy, as in Common). Edits in the settings window reach the combined rule before <code>WriteSettings</code> rebuilds it.</li>
+        <li>Unresolved entries are silently inert during evaluation. The only signal is the marker in the UI (ADR-0008).</li>
+        <li>The <code>pawn.needs?.TryGetNeed</code> adapter line and the Scribe round trip are not unit-tested; they are covered by manual checks.</li>
+        <li>Fast-changing needs (Beauty, Comfort, Food, Rest, Mood) can switch a work type on and off between updates. This is accepted by user decision (no hysteresis); the tooltip gives guidance.</li>
+        <li>Any future code that reads <code>.Def</code> / <code>.Label</code> of a <code>NeedLimit</code> on the load path would silently break def resolution until restart.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2 id="alternatives">Alternatives considered</h2>
+  <ul class="alt-list">
+    <li><strong>Persisted <code>NeedDef → float</code> dictionary</strong>, rejected because it needs <code>LookMode.Def</code> or manual key lists, breaks loading before defs, and diverges from Common's limit pattern.</li>
+    <li><strong><code>FloatRange</code> per need (like <code>PawnCapacityLimit</code>)</strong>, rejected at the time because the scope was a lower threshold only. Adopted on 2026-10-01 at user request (see the amendment note above).</li>
+    <li><strong>A separate <code>NeedsFilter</code> sub-object</strong>, rejected because it adds a layer for two fields when the rule already hosts sibling tri-state fields.</li>
+    <li><strong>A needs dimension in Common's <code>PawnFilter</code></strong>, rejected because Common is not editable from this repo (non-goal).</li>
+    <li><strong>A per-entry predicate <code>(float? level, FloatRange limit)</code> as the only seam</strong>, rejected because it leaves the aggregation loop untested: the any-entry rule, the unresolved skip and the state gating.</li>
+    <li><strong>Real <code>Pawn</code> / <code>Pawn_NeedsTracker</code> objects built through <code>GetUninitializedObject</code> and reflection</strong>, rejected as brittle against game internals (audit G-7).</li>
+  </ul>
+
+  <h2 id="complication-approval">Complication Approval</h2>
+  <p>Status: <strong>approved</strong> by the user on 2026-09-29 through AskUserQuestion ("Approve all (Recommended)"). No new package dependency, no new config flag and no change to Common. CA-4's <code>GetAddableNeeds</code> is consumed by <a href="adr-0008-needs-ui-summary-and-strings.html">ADR-0008</a>.</p>
+  <table>
+    <thead><tr><th>#</th><th>What</th><th>Why</th><th>Justification</th><th>Alternatives</th></tr></thead>
+    <tbody>
+      <tr><td>CA-1</td><td>New class <code>NeedLimit : DefCache&lt;NeedDef&gt;, IExposable</code></td><td>Persist one need and its range by name</td><td>Per-need ranges are in scope, and they must persist by defName before defs load. The class mirrors Common's <code>PawnCapacityLimit</code>.</td><td>A dictionary (breaks loading before defs); reusing <code>PawnCapacityLimit</code> (wrong def type)</td></tr>
+      <tr><td>CA-2</td><td>New rule fields <code>bool? FilterNeeds</code> and <code>List&lt;NeedLimit&gt;? NeedLimits</code> (new settings surface)</td><td>Tri-state inheritance plus the entries</td><td>Approved scope and PRD D3; the same shape as the sibling fields</td><td>A separate <code>NeedsFilter</code> class (an extra layer)</td></tr>
+      <tr><td>CA-3</td><td><code>internal static IsNeedBlocked(bool?, IReadOnlyList&lt;NeedLimit&gt;?, Func&lt;NeedDef, float?&gt;)</code> and <code>internal bool IsNeedBlocked(Pawn)</code></td><td>A unit-test seam, also reused by the ADR-0007 fail-safe</td><td>A <code>Pawn</code> cannot be built in net472 tests, and the aggregation logic must be tested</td><td>A per-entry predicate only (leaves the loop untested)</td></tr>
+      <tr><td>CA-4</td><td><code>internal void ValidateNeedsFilter()</code> and <code>internal static GetAddableNeeds(...)</code> / <code>HasAddableNeeds(...)</code></td><td>Make the validation and add-menu logic testable</td><td><code>Validate()</code> depends on <code>WorkManagerMod.Settings</code>, and a UI lambda cannot be tested</td><td>Private methods called through reflection (existing precedent, but noisier)</td></tr>
+      <tr><td>CA-5</td><td>Test-only <code>FakeDefProvider : IDefProvider</code> in WorkManager.Tests</td><td>Resolve NeedDefs in tests (discovery-time load cost: see <a href="adr-0002-test-isolation-infrastructure.html#amendment-2026-09-29">ADR-0002 amendment 2026-09-29</a>)</td><td>Common's fake lives in Common.Tests and is not shipped</td><td><code>GetUninitializedObject</code> on <code>DefDatabase</code> (brittle)</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="related">Related ADRs</h2>
+  <ul>
+    <li><a href="adr-0007-needs-block-absolute-in-failsafe.html">ADR-0007</a>: reuses <code>IsNeedBlocked(Pawn)</code> in the dedicated-worker fail-safe.</li>
+    <li><a href="adr-0008-needs-ui-summary-and-strings.html">ADR-0008</a>: the UI, summary and strings for these fields.</li>
+    <li><a href="adr-0002-test-isolation-infrastructure.html">ADR-0002</a>: the test isolation base (<code>StateIsolationTestBase</code>) that the new fixtures extend.</li>
+  </ul>
+  <p class="traces"><span class="chip">satisfies</span> <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#AC-1">AC-1</a>, <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#AC-2">AC-2</a>, <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#AC-3">AC-3</a>, <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#AC-4">AC-4</a>, <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#AC-5">AC-5</a>, <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#AC-6">AC-6</a>, <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#AC-7">AC-7</a>, <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#AC-8">AC-8</a>, <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#AC-9">AC-9</a>, <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#AC-10">AC-10</a>, <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#AC-11">AC-11</a>, <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#AC-12">AC-12</a>, <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#AC-13">AC-13</a>, <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#AC-14">AC-14</a>, <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#AC-15">AC-15</a>, <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#AC-16">AC-16</a>, <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#AC-17">AC-17</a>, <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#AC-18">AC-18</a>, <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#AC-19">AC-19</a>, <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#AC-20">AC-20</a>, <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#AC-21">AC-21</a>, <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#AC-22">AC-22</a>, <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#AC-23">AC-23</a> · <span class="chip">story</span> <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#US-1">US-1</a>, <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#US-2">US-2</a>, <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/design/prd.html#US-4">US-4</a> · <span class="chip">audit</span> <a href="../../../.asd/sprints/archived/002-work-type-needs-filters/audit.md">G-1, G-2, G-7, D-3</a> · <span class="chip">tech-ref</span> <a href="../tech-reference/RimWorld-1.6.md">RimWorld-1.6</a>, <a href="../tech-reference/LordKuper.Common-1.6.md">LordKuper.Common-1.6</a></p>
+</article>
+
+      </main>
+      <footer>by asd-architect | 2026-09-29 | sprint 002-work-type-needs-filters</footer>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const links = Array.from(document.querySelectorAll('nav.toc a[href^="#"]'));
+      if (!links.length) return;
+      const map = new Map();
+      links.forEach(a => { const el = document.getElementById(a.getAttribute('href').slice(1)); if (el) map.set(el, a); });
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(a => a.classList.remove('active'));
+            const a = map.get(e.target);
+            if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '-30% 0px -65% 0px', threshold: 0 });
+      map.forEach((_a, el) => io.observe(el));
+    })();
+  </script>
+</body>
+</html>

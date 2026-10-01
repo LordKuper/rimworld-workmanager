@@ -800,6 +800,35 @@
             <param name="mode">The dedicated worker mode for which to retrieve the tooltip.</param>
             <returns>A string containing the tooltip text for the specified mode.</returns>
         </member>
+        <member name="F:LordKuper.WorkManager.Resources.Strings.Settings.WorkTypes.NeedsLabel">
+            <summary>Label of the needs filter section.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Resources.Strings.Settings.WorkTypes.NeedsTooltip">
+            <summary>Tooltip of the needs filter section.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Resources.Strings.Settings.WorkTypes.FilterNeedsLabel">
+            <summary>Label of the needs filter state checkbox.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Resources.Strings.Settings.WorkTypes.FilterNeedsOnTooltip">
+            <summary>Tooltip of the enabled needs filter state.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Resources.Strings.Settings.WorkTypes.FilterNeedsOffTooltip">
+            <summary>Tooltip of the disabled needs filter state.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Resources.Strings.Settings.WorkTypes.NeedsEmptyLabel">
+            <summary>Text shown when the needs filter is enabled but has no entries.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Resources.Strings.Settings.WorkTypes.NeedUnavailableLabel">
+            <summary>Format of the label of a need that cannot be resolved; <c>{0}</c> is the def name.</summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Resources.Strings.Settings.WorkTypes.NeedUnavailableTooltip">
+            <summary>Tooltip of a need that cannot be resolved.</summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.Resources.Strings.Settings.WorkTypes.GetFilterNeedsTooltip(System.Boolean)">
+            <summary>Gets the tooltip of the needs filter state checkbox.</summary>
+            <param name="triState">Whether the checkbox has the additional undefined state.</param>
+            <returns>The tooltip text.</returns>
+        </member>
         <member name="T:LordKuper.WorkManager.ScheduleUpdater">
             <summary>
                 Map component that assigns pawn work schedules based on configured work shifts.
@@ -1038,6 +1067,56 @@
         <member name="M:LordKuper.WorkManager.DedicatedWorkerSettings.Validate">
             <summary>
                 Validates and clamps all configurable values to their allowed ranges.
+            </summary>
+        </member>
+        <member name="T:LordKuper.WorkManager.NeedLimit">
+            <summary>
+                A level range for a single <see cref="T:RimWorld.NeedDef" />: a pawn is allowed the work type only while its level for the
+                need (<c>CurLevelPercentage</c>, 0..1) is inside the inclusive range <see cref="F:LordKuper.WorkManager.NeedLimit.Limit" />; outside it the work
+                type is blocked. Only the def name and the range are persisted.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.NeedLimit.DefaultMin">
+            <summary>
+                The lower bound given to a newly added need limit (50%).
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.NeedLimit.DefaultMax">
+            <summary>
+                The upper bound given to a newly added need limit (100%).
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.NeedLimit.LegacyThresholdNodeName">
+            <summary>
+                The settings node name used by earlier builds for the single threshold.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.NeedLimit.Limit">
+            <summary>
+                The allowed need level range, as fractions in [0, 1] of the need's maximum, inclusive at both ends.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.NeedLimit.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:LordKuper.WorkManager.NeedLimit" /> class for deserialization.
+            </summary>
+        </member>
+        <member name="M:LordKuper.WorkManager.NeedLimit.#ctor(System.String)">
+            <summary>
+                Initializes a new instance of the <see cref="T:LordKuper.WorkManager.NeedLimit" /> class for the need with the specified def name.
+            </summary>
+            <param name="defName">The def name of the need.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.NeedLimit.#ctor(RimWorld.NeedDef)">
+            <summary>
+                Initializes a new instance of the <see cref="T:LordKuper.WorkManager.NeedLimit" /> class for the specified need.
+            </summary>
+            <param name="def">The need definition.</param>
+        </member>
+        <member name="M:LordKuper.WorkManager.NeedLimit.ExposeData">
+            <summary>
+                Serializes the def name and the range. Settings saved before the range existed hold a single legacy
+                <c>Threshold</c>; it is migrated to the range [threshold, 1]. Touches only values, never <c>Def</c>.
             </summary>
         </member>
         <member name="T:LordKuper.WorkManager.Settings">
@@ -1348,6 +1427,11 @@
                 Local input ID for allowed workers pawn stat.
             </summary>
         </member>
+        <member name="F:LordKuper.WorkManager.Settings.NeedLimitsInputLocalId">
+            <summary>
+                Local input ID for the need limit range sliders; clear of the worker filter ranges above.
+            </summary>
+        </member>
         <member name="F:LordKuper.WorkManager.Settings.DedicatedWorkersPawnCapacityInputLocalId">
             <summary>
                 Local input ID for dedicated workers pawn capacity.
@@ -1411,6 +1495,11 @@
         <member name="F:LordKuper.WorkManager.Settings._assignmentSectionContentHeight">
             <summary>
                 Cached height of the assignment section content.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.Settings._needsSectionContentHeight">
+            <summary>
+                Cached height of the needs section content.
             </summary>
         </member>
         <member name="F:LordKuper.WorkManager.Settings._dedicatedWorkersSectionContentHeight">
@@ -1483,6 +1572,35 @@
             </param>
             <param name="remRect">When this method returns, contains the remaining rectangle after rendering the section.</param>
             <returns>The vertical offset after rendering the section, which can be used to position subsequent UI elements.</returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.GetAddableNeeds(System.Collections.Generic.IEnumerable{RimWorld.NeedDef},System.Collections.Generic.IReadOnlyList{LordKuper.WorkManager.NeedLimit})">
+            <summary>
+                Gets the needs that can still be added to a needs filter, in menu order.
+            </summary>
+            <param name="all">All known need definitions.</param>
+            <param name="existing">The need limits already present; their def names are excluded.</param>
+            <returns>
+                The addable needs, excluding mechanoid-only needs, the Authority need and already listed needs, sorted by
+                list priority (descending) and then by label.
+            </returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.HasAddableNeeds(System.Collections.Generic.IReadOnlyList{RimWorld.NeedDef},System.Collections.Generic.IReadOnlyList{LordKuper.WorkManager.NeedLimit})">
+            <summary>
+                Determines whether at least one need can still be added to a needs filter. Allocation-free, safe to call
+                every frame.
+            </summary>
+            <param name="all">All known need definitions.</param>
+            <param name="existing">The need limits already present; their def names are excluded.</param>
+            <returns><see langword="true" /> if <see cref="M:LordKuper.WorkManager.Settings.GetAddableNeeds(System.Collections.Generic.IEnumerable{RimWorld.NeedDef},System.Collections.Generic.IReadOnlyList{LordKuper.WorkManager.NeedLimit})" /> would return a non-empty list.</returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.Settings.DoRuleNeeds(UnityEngine.Rect,System.Boolean,UnityEngine.Rect@)">
+            <summary>
+                Renders the needs filter section of the selected work type rule.
+            </summary>
+            <param name="rect">The rectangle within which the section is rendered.</param>
+            <param name="defaultRule">Whether the selected rule is the default rule (two-state) or a work type rule.</param>
+            <param name="remRect">When this method returns, contains the remaining rectangle after the section.</param>
+            <returns>The vertical offset after rendering the section.</returns>
         </member>
         <member name="M:LordKuper.WorkManager.Settings.DoRuleDedicatedWorkerSettings(UnityEngine.Rect,System.Boolean,UnityEngine.Rect@)">
             <summary>
@@ -1557,8 +1675,9 @@
             </summary>
             <remarks>
                 This method clears the existing list of allowed workers and repopulates it by applying  the
-                filtering logic defined in the selected work type rule. If no rule is selected or  the rule does not specify
-                allowed workers, the list remains empty.
+                filtering logic defined in the selected work type rule, then removes pawns that the rule's effective needs
+                filter currently blocks. If no rule is selected or  the rule does not specify allowed workers, the list
+                remains empty.
             </remarks>
         </member>
         <member name="M:LordKuper.WorkManager.Settings.ValidateWorkTypes">
@@ -1647,6 +1766,18 @@
         <member name="F:LordKuper.WorkManager.WorkTypeAssignmentRule.MinWorkerNumber">
             <summary>
                 Gets or sets the minimum number of workers to be assigned.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkTypeAssignmentRule.FilterNeeds">
+            <summary>
+                Indicates whether the needs filter is applied: <c>null</c> inherits from the default rule, <c>false</c> is off,
+                <c>true</c> is on.
+            </summary>
+        </member>
+        <member name="F:LordKuper.WorkManager.WorkTypeAssignmentRule.NeedLimits">
+            <summary>
+                The need thresholds. While the filter is on, a pawn below any threshold is not assigned this work type.
+                Nullable because <see cref="T:Verse.Scribe_Collections" /> sets this to null when loading older settings.
             </summary>
         </member>
         <member name="M:LordKuper.WorkManager.WorkTypeAssignmentRule.#ctor">
@@ -1741,6 +1872,33 @@
                 .
             </returns>
             <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="pawn" /> is <see langword="null" />.</exception>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkTypeAssignmentRule.IsNeedBlocked(Verse.Pawn)">
+            <summary>
+                Determines whether the needs filter blocks this work type for the specified pawn.
+            </summary>
+            <param name="pawn">The pawn to evaluate.</param>
+            <returns>
+                <see langword="true" /> if the filter is on and the pawn's level for any listed need is outside its range.
+            </returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkTypeAssignmentRule.IsNeedBlocked(System.Nullable{System.Boolean},System.Collections.Generic.IReadOnlyList{LordKuper.WorkManager.NeedLimit},System.Func{RimWorld.NeedDef,System.Nullable{System.Single}})">
+            <summary>
+                Determines whether any need in <paramref name="limits" /> is outside its inclusive range. Entries whose def is
+                unresolved and needs the pawn does not have are ignored.
+            </summary>
+            <param name="filterNeeds">The filter state; only <c>true</c> can block.</param>
+            <param name="limits">The need ranges.</param>
+            <param name="getLevelPercentage">
+                Returns the pawn's level for a need as a fraction of its maximum, or <c>null</c> when the pawn lacks the need.
+            </param>
+            <returns><see langword="true" /> if the work type is blocked.</returns>
+        </member>
+        <member name="M:LordKuper.WorkManager.WorkTypeAssignmentRule.ValidateNeedsFilter">
+            <summary>
+                Normalizes the needs filter: creates the list, drops empty and duplicate entries, normalizes ranges (NaN reset, clamp, swap) and sets the
+                default rule's state. Reads only def names and ranges, so it is safe before defs are loaded.
+            </summary>
         </member>
         <member name="M:LordKuper.WorkManager.WorkTypeAssignmentRule.Validate">
             <summary>
